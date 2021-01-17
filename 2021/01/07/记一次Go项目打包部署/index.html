@@ -1,0 +1,264 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>记一次Go项目打包部署 | hadoo个人博客</title><meta name="keywords" content="记录学习、生活和有趣的事"><meta name="author" content="hadoo"><meta name="copyright" content="hadoo"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="description" content="快一个月没有更新博客了，可以看到之前的主要博客内容都是一些偏向于面试的内容，因为实习期间也没那么多给我自由学习的时间，所以更新的频率也就低了，另外一点也是自己基于博客内容的考虑吧，不想把博客和学习笔记混为一谈，写一些专题的总结，或者是遇到的问题以及解决方法，这是我对今后博客内容的期待，而不是将一些学习笔记铺天盖地的放上来，这里不是走量的，不多说了， 进入今天要写的整体吧。 最近完成了一个管理端的操">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次Go项目打包部署">
+<meta property="og:url" content="https://blog.hadoo.life/2021/01/07/%E8%AE%B0%E4%B8%80%E6%AC%A1Go%E9%A1%B9%E7%9B%AE%E6%89%93%E5%8C%85%E9%83%A8%E7%BD%B2/index.html">
+<meta property="og:site_name" content="hadoo个人博客">
+<meta property="og:description" content="快一个月没有更新博客了，可以看到之前的主要博客内容都是一些偏向于面试的内容，因为实习期间也没那么多给我自由学习的时间，所以更新的频率也就低了，另外一点也是自己基于博客内容的考虑吧，不想把博客和学习笔记混为一谈，写一些专题的总结，或者是遇到的问题以及解决方法，这是我对今后博客内容的期待，而不是将一些学习笔记铺天盖地的放上来，这里不是走量的，不多说了， 进入今天要写的整体吧。 最近完成了一个管理端的操">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg">
+<meta property="article:published_time" content="2021-01-07T03:35:16.000Z">
+<meta property="article:modified_time" content="2021-01-07T03:36:06.614Z">
+<meta property="article:author" content="hadoo">
+<meta property="article:tag" content="记录学习、生活和有趣的事">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://blog.hadoo.life/2021/01/07/%E8%AE%B0%E4%B8%80%E6%AC%A1Go%E9%A1%B9%E7%9B%AE%E6%89%93%E5%8C%85%E9%83%A8%E7%BD%B2/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="yandex-verification" content="{&quot;theme_color&quot;:{&quot;enable&quot;:true,&quot;main&quot;:&quot;#49B1F5&quot;,&quot;paginator&quot;:&quot;#00c4b6&quot;,&quot;button_hover&quot;:&quot;#FF7242&quot;,&quot;text_selection&quot;:&quot;#00c4b6&quot;,&quot;link_color&quot;:&quot;#99a9bf&quot;,&quot;meta_color&quot;:&quot;#858585&quot;,&quot;hr_color&quot;:&quot;#A4D8FA&quot;,&quot;code_foreground&quot;:&quot;#F47466&quot;,&quot;code_background&quot;:&quot;rgba(27, 31, 35, .05)&quot;,&quot;toc_color&quot;:&quot;#00c4b6&quot;,&quot;blockquote_padding_color&quot;:&quot;#49b1f5&quot;,&quot;blockquote_background_color&quot;:&quot;#49b1f5&quot;}}"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: hadoo","link":"链接: ","source":"来源: hadoo个人博客","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+  },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}
+
+// https://stackoverflow.com/questions/16839698/jquery-getscript-alternative-in-native-javascript
+const getScript = url => new Promise((resolve, reject) => {
+  const script = document.createElement('script')
+  script.src = url
+  script.async = true
+  script.onerror = reject
+  script.onload = script.onreadystatechange = function() {
+    const loadState = this.readyState
+    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+    script.onload = script.onreadystatechange = null
+    resolve()
+  }
+  document.head.appendChild(script)
+})</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2021-01-07 11:36:06'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(function () {  window.activateDarkMode = function () {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+    }
+  }
+  window.activateLightMode = function () {
+    document.documentElement.setAttribute('data-theme', 'light')
+   if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+    }
+  }
+  const autoChangeMode = 'false'
+  const t = saveToLocal.get('theme')
+  if (autoChangeMode === '1') {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+    const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+    const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+    if (t === undefined) {
+      if (isLightMode) activateLightMode()
+      else if (isDarkMode) activateDarkMode()
+      else if (isNotSpecified || hasNoSupport) {
+        const now = new Date()
+        const hour = now.getHours()
+        const isNight = hour <= 6 || hour >= 18
+        isNight ? activateDarkMode() : activateLightMode()
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+        if (saveToLocal.get('theme') === undefined) {
+          e.matches ? activateDarkMode() : activateLightMode()
+        }
+      })
+    } else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else if (autoChangeMode === '2') {
+    const now = new Date()
+    const hour = now.getHours()
+    const isNight = hour <= 6 || hour >= 18
+    if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+    else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else {
+    if (t === 'dark') activateDarkMode()
+    else if (t === 'light') activateLightMode()
+  }const asideStatus = saveToLocal.get('aside-status')
+if (asideStatus !== undefined) {
+   if (asideStatus === 'hide') {
+     document.documentElement.classList.add('hide-aside')
+   } else {
+     document.documentElement.classList.remove('hide-aside')
+   }
+}const fontSizeVal = saveToLocal.get('global-font-size')
+if (fontSizeVal !== undefined) {
+  document.documentElement.style.setProperty('--global-font-size', fontSizeVal + 'px')
+}})()</script><meta name="generator" content="Hexo 5.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down expand hide"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg)"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">hadoo个人博客</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down expand hide"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">记一次Go项目打包部署</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-01-07T03:35:16.000Z" title="发表于 2021-01-07 11:35:16">2021-01-07</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-01-07T03:36:06.614Z" title="更新于 2021-01-07 11:36:06">2021-01-07</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Go/">Go</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>快一个月没有更新博客了，可以看到之前的主要博客内容都是一些偏向于面试的内容，因为实习期间也没那么多给我自由学习的时间，所以更新的频率也就低了，另外一点也是自己基于博客内容的考虑吧，不想把博客和学习笔记混为一谈，写一些专题的总结，或者是遇到的问题以及解决方法，这是我对今后博客内容的期待，而不是将一些学习笔记铺天盖地的放上来，这里不是走量的，不多说了， 进入今天要写的整体吧。</p>
+<p>最近完成了一个管理端的操作历史模块的功能需求，在本地完成编码测试之后，需要上到测试环境一下，目的就是不是我一个人进行测试，其他人在本地hosts文件中配置域名之后，也可以进行访问，因为是第一次搞Go的部署，自然也是是踩了一些坑，做个记录。</p>
+<hr>
+<p>想要在服务器上部署项目，那么第一件事情自然就是找到服务器，企业级服务器和个人的不一样，这也是我今天遇到的第一个问题，就是<strong>堡垒机</strong>，这个概念之前没怎么接触过，具体太深入的咱也不用知道太多，这是功能的介绍：</p>
+<p><img src="https://i.loli.net/2020/08/06/Dy5CgVHu3mU6FQP.png" alt="image-20200805191742868"></p>
+<p>我理解的是他的作用和名字很像，他就是企业里面服务器的一个堡垒、城墙，如果想要访问服务器，那么就需要先过这一关，主要还是方便了运维吧，可以看到上面的功能确实强大，实现了一种权限验证分发的功能。今天使用客户端ssh的方式疯狂怼后面的容器ip，我也是太楞了，好在后面出坑了。</p>
+<p>另外一点就是两个主机直接文件的传输问题，也让我第一次在生产环境上亲身体会到了，开发为什么一定要用苹果，正常的通用上传命令是：<strong>rz</strong>，应该是这个命令的问题，这是具体的传输情况：</p>
+<p><img src="https://i.loli.net/2020/08/06/ln5mkgFTLMUC1Wz.png" alt="image-20200805192233864"></p>
+<p>这倒怪不得人家widows，能够想到的就是使用其他的传输命令替换这个rz，没错，就是scp</p>
+<p>不过scp的命令是这样用的：</p>
+<p><img src="https://i.loli.net/2020/08/06/GBEezSDKfwU4RTk.png"></p>
+<p>看到了吧，源文件路径得是这样婶的，而我们的windows文件路径那种反斜杠形式的，放进去直接报错，这确实没办法，只能使用rz等待了。</p>
+<hr>
+<p>另外一个遇到的问题就是Go项目的打包问题。</p>
+<p>看了网上的教程，我直接就使用go build main.go进行打包，然后中间还使用rz上传了两次，花费很长时间，上传成功执行后发现了一个问题：首先，运行日志中缺少配置信息，我手动的将配置信息导入之后，访问出现了这个情况：</p>
+<p><img src="https://i.loli.net/2020/08/06/uad6rA7YolTgJyH.png" alt="image-20200805192832467"></p>
+<p>我的第一感觉就是缺少静态文件，原来，使用build这种方式打包，只是将可执行文件的linux形式发过去了， 这个可执行文件的一些上下文依赖，例如配置信息、静态文件，全部没有带过去，正确的做法是使用beego框架的bee命令来做</p>
+<p><code>bee pack -be GOOS=linux -f=zip</code></p>
+<p>我老老实实的在项目路径下执行：</p>
+<p><img src="https://i.loli.net/2020/08/06/ZCShF8j3qg7UM5D.png" alt="image-20200805193145158"></p>
+<p>也就是没有bee这个可执行文件的意思呗，去安装</p>
+<p>找到了bee.go这个文件，我们来手动编译一下，估计编译完就可以出来可执行文件<strong>bee.exe</strong>：</p>
+<p><img src="https://i.loli.net/2020/08/06/ua6U7xszWc51ZXA.png" alt="image-20200805193743147"></p>
+<p>额，失败，继续递归找下去，环境问题往往是最恶心人的，而且带有劝退性质，刚下去就好了</p>
+<p>是代理出现问题了，在系统环境变量中配置了代理变量，然后就可以进行正常的编译了：</p>
+<p><img src="https://i.loli.net/2020/08/06/kwsZMm3SDqNVRYv.png" alt="image-20200806105212622"></p>
+<p>将GOPATH/bin放到环境变量中的path下面，然后：</p>
+<p><img src="https://i.loli.net/2020/08/06/i2ZfQs5aFH1dY6g.png" alt="image-20200806105709891"></p>
+<p>可以了！！！</p>
+<p>然后，执行我们正确的打包命令：</p>
+<p>bee pack -be GOOS=linux -f=zip</p>
+<p><img src="https://i.loli.net/2020/08/06/ELN4BzPju2GYHZs.png" alt="image-20200806105835944"></p>
+<p>接下来就是使用rz进行龟速上传环节：</p>
+<p><img src="https://i.loli.net/2020/08/06/QOJZpqnd926WaUh.png" alt="image-20200806110201437"></p>
+<p>估计怎么也得两个小时吧，该干嘛干嘛去吧，散了吧</p>
+<hr>
+<p>上传完成，在测试环境服务器进行解压，然后使用启动脚本进行启动</p>
+<p>在本地配置好域名映射之后，就可以进行访问了！</p>
+<p><img src="https://i.loli.net/2020/08/06/GnMvJXd32VPTSmW.png" alt="image-20200806224608333"></p>
+<p>明天进行测试<del>希望不要回炉</del>上传一次耗时太大了~</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">hadoo</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://blog.hadoo.life/2021/01/07/%E8%AE%B0%E4%B8%80%E6%AC%A1Go%E9%A1%B9%E7%9B%AE%E6%89%93%E5%8C%85%E9%83%A8%E7%BD%B2/">https://blog.hadoo.life/2021/01/07/记一次Go项目打包部署/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://blog.hadoo.life" target="_blank">hadoo个人博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/01/07/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F%E7%9A%84%E4%BA%94%E7%A7%8D%E5%AE%9E%E7%8E%B0/"><img class="prev-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">单例模式的五种实现</div></div></a></div><div class="next-post pull-right"><a href="/2021/01/07/ArrayList%E4%B8%BA%E4%BB%80%E4%B9%88%E7%BA%BF%E7%A8%8B%E4%B8%8D%E5%AE%89%E5%85%A8/"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">ArrayList为什么线程不安全</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">hadoo</div><div class="author-info__description">记录学习、生活和有趣的事</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/yeshadoo" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:hc15024839064@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/01/16/hello-world/" title="Hello World"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2021/01/16/hello-world/" title="Hello World">Hello World</a><time datetime="2021-01-16T09:24:47.701Z" title="发表于 2021-01-16 17:24:47">2021-01-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/01/07/SPI%E6%9C%BA%E5%88%B6%E5%9C%A8%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/" title="dubbo SPI机制在项目中的应用"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="dubbo SPI机制在项目中的应用"/></a><div class="content"><a class="title" href="/2021/01/07/SPI%E6%9C%BA%E5%88%B6%E5%9C%A8%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/" title="dubbo SPI机制在项目中的应用">dubbo SPI机制在项目中的应用</a><time datetime="2021-01-07T04:12:59.000Z" title="发表于 2021-01-07 12:12:59">2021-01-07</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/01/07/%E7%9F%A5%E5%85%B6%E6%89%80%E4%BB%A5%E7%84%B6%E4%B9%8BGit/" title="知其所以然之Git"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="知其所以然之Git"/></a><div class="content"><a class="title" href="/2021/01/07/%E7%9F%A5%E5%85%B6%E6%89%80%E4%BB%A5%E7%84%B6%E4%B9%8BGit/" title="知其所以然之Git">知其所以然之Git</a><time datetime="2021-01-07T04:11:51.000Z" title="发表于 2021-01-07 12:11:51">2021-01-07</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/01/07/Scanner%E5%A4%84%E7%90%86%E8%BE%93%E5%85%A5%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E9%97%AE%E9%A2%98/" title="Scanner处理输入遇到的一个问题"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Scanner处理输入遇到的一个问题"/></a><div class="content"><a class="title" href="/2021/01/07/Scanner%E5%A4%84%E7%90%86%E8%BE%93%E5%85%A5%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E9%97%AE%E9%A2%98/" title="Scanner处理输入遇到的一个问题">Scanner处理输入遇到的一个问题</a><time datetime="2021-01-07T04:09:53.000Z" title="发表于 2021-01-07 12:09:53">2021-01-07</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/01/07/%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%9A%84%E9%80%89%E5%9E%8B/" title="如何进行消息队列的选型"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="如何进行消息队列的选型"/></a><div class="content"><a class="title" href="/2021/01/07/%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%9A%84%E9%80%89%E5%9E%8B/" title="如何进行消息队列的选型">如何进行消息队列的选型</a><time datetime="2021-01-07T04:07:51.000Z" title="发表于 2021-01-07 12:07:51">2021-01-07</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By hadoo</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="font-plus" type="button" title="放大字体"><i class="fas fa-plus"></i></button><button id="font-minus" type="button" title="缩小字体"><i class="fas fa-minus"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',()=> {preloader.endLoading()})</script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    let initData = {
+      el: '#vcomment',
+      appId: 'fpA9vd7rAiQQHQtdwGjRr1jG-gzGzoHsz',
+      appKey: 'so8lgUvDE16hbbKPq7GeRMmO',
+      placeholder: 'Please leave your footprints',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'zh-CN',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+    }
+
+    if (true) { 
+      initData.requiredFields= ('nick,mail'.split(','))
+    }
+    
+    if (false) {
+      const otherData = false
+      initData = Object.assign(initData, otherData)
+    }
+    
+    const valine = new Valine(initData)
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></div></body></html>
