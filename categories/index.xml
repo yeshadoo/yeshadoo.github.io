@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Categories on My New Hugo Site</title>
-    <link>https://example.org/categories/</link>
-    <description>Recent content in Categories on My New Hugo Site</description>
+    <title>Categories on Hadoo&#39;s Blog</title>
+    <link>https://hanchao666.top/categories/</link>
+    <description>Recent content in Categories on Hadoo&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 08 Sep 2023 10:52:26 +0800</lastBuildDate><atom:link href="https://example.org/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 08 Sep 2023 10:52:26 +0800</lastBuildDate><atom:link href="https://hanchao666.top/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Thought</title>
-      <link>https://example.org/categories/thought/</link>
+      <link>https://hanchao666.top/categories/thought/</link>
       <pubDate>Fri, 08 Sep 2023 10:52:26 +0800</pubDate>
       
-      <guid>https://example.org/categories/thought/</guid>
+      <guid>https://hanchao666.top/categories/thought/</guid>
       <description></description>
     </item>
     

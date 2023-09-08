@@ -2,40 +2,40 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://example.org/cn/categories/</loc>
+    <loc>https://hanchao666.top/cn/categories/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="en-us"
-                href="https://example.org/categories/"
+                href="https://hanchao666.top/categories/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="cn"
-                href="https://example.org/cn/categories/"
+                href="https://hanchao666.top/cn/categories/"
                 />
   </url><url>
-    <loc>https://example.org/cn/</loc>
+    <loc>https://hanchao666.top/cn/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="en-us"
-                href="https://example.org/"
+                href="https://hanchao666.top/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="cn"
-                href="https://example.org/cn/"
+                href="https://hanchao666.top/cn/"
                 />
   </url><url>
-    <loc>https://example.org/cn/tags/</loc>
+    <loc>https://hanchao666.top/cn/tags/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="en-us"
-                href="https://example.org/tags/"
+                href="https://hanchao666.top/tags/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="cn"
-                href="https://example.org/cn/tags/"
+                href="https://hanchao666.top/cn/tags/"
                 />
   </url>
 </urlset>

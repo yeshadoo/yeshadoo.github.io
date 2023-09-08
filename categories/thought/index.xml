@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Thought on My New Hugo Site</title>
-    <link>https://example.org/categories/thought/</link>
-    <description>Recent content in Thought on My New Hugo Site</description>
+    <title>Thought on Hadoo&#39;s Blog</title>
+    <link>https://hanchao666.top/categories/thought/</link>
+    <description>Recent content in Thought on Hadoo&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 08 Sep 2023 10:52:26 +0800</lastBuildDate><atom:link href="https://example.org/categories/thought/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 08 Sep 2023 10:52:26 +0800</lastBuildDate><atom:link href="https://hanchao666.top/categories/thought/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>聊聊博客</title>
-      <link>https://example.org/posts/about-blog/</link>
+      <link>https://hanchao666.top/posts/about-blog/</link>
       <pubDate>Fri, 08 Sep 2023 10:52:26 +0800</pubDate>
       
-      <guid>https://example.org/posts/about-blog/</guid>
+      <guid>https://hanchao666.top/posts/about-blog/</guid>
       <description>正值博客迁移，随便写写。
 我与博客 初识
 大学期间就开始接触博客了，平时学习也有记录笔记的习惯，发布的第一篇博客是在大二暑假，当时闲着没事在家刷题，那时主要的搜索手段还是CSDN，于是心血来潮的就把当时的解题思路发布出去了，具体时间是2019.8.12，

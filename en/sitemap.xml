@@ -2,56 +2,56 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://example.org/categories/</loc>
+    <loc>https://hanchao666.top/categories/</loc>
     <lastmod>2023-09-08T10:52:26+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="cn"
-                href="https://example.org/cn/categories/"
+                href="https://hanchao666.top/cn/categories/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en-us"
-                href="https://example.org/categories/"
+                href="https://hanchao666.top/categories/"
                 />
   </url><url>
-    <loc>https://example.org/categories/</loc>
+    <loc>https://hanchao666.top/categories/</loc>
     <lastmod>2023-09-08T10:52:26+08:00</lastmod>
   </url><url>
-    <loc>https://example.org/</loc>
+    <loc>https://hanchao666.top/</loc>
     <lastmod>2023-09-08T10:52:26+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="cn"
-                href="https://example.org/cn/"
+                href="https://hanchao666.top/cn/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en-us"
-                href="https://example.org/"
+                href="https://hanchao666.top/"
                 />
   </url><url>
-    <loc>https://example.org/posts/</loc>
+    <loc>https://hanchao666.top/posts/</loc>
     <lastmod>2023-09-08T10:52:26+08:00</lastmod>
   </url><url>
-    <loc>https://example.org/categories/thought/</loc>
+    <loc>https://hanchao666.top/categories/thought/</loc>
     <lastmod>2023-09-08T10:52:26+08:00</lastmod>
   </url><url>
-    <loc>https://example.org/posts/about-blog/</loc>
+    <loc>https://hanchao666.top/posts/about-blog/</loc>
     <lastmod>2023-09-08T10:52:26+08:00</lastmod>
   </url><url>
-    <loc>https://example.org/categories/thought/</loc>
+    <loc>https://hanchao666.top/categories/thought/</loc>
   </url><url>
-    <loc>https://example.org/tags/</loc>
+    <loc>https://hanchao666.top/tags/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="cn"
-                href="https://example.org/cn/tags/"
+                href="https://hanchao666.top/cn/tags/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en-us"
-                href="https://example.org/tags/"
+                href="https://hanchao666.top/tags/"
                 />
   </url>
 </urlset>
