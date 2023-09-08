@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.118.2">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="" />
+  <meta property="og:url" content="https://example.org/posts/about-blog/" />
+  <link rel="canonical" href="https://example.org/posts/about-blog/" /><link rel="alternate" type="application/atom+xml" href="https://example.org/index.xml" title="My New Hugo Site">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/example.org\/"
+      },
+      "articleSection" : "posts",
+      "name" : "聊聊博客",
+      "headline" : "聊聊博客",
+      "description" : "正值博客迁移，随便写写。\n我与博客 初识\n大学期间就开始接触博客了，平时学习也有记录笔记的习惯，发布的第一篇博客是在大二暑假，当时闲着没事在家刷题，那时主要的搜索手段还是CSDN，于是心血来潮的就把当时的解题思路发布出去了，具体时间是2019.8.12，\nCSDN不愧是国内开发者解决问题的聚集之地(可能StackOverFlow访问不到)，后来又陆续发布了几篇，收获到了不错的曝光度，当时每天看着浏览量和站内月排名逐渐上升，还是挺有成就感的，最高的一篇浏览量动态规划解决最长公共子序列(Java实现)目前已经到了2W\u002b，由此可见，培养一个习惯还是要有一定激励机制的。\n开始折腾\n大二结束，大三就开始准备秋招了，这时认识了一个B站 up主：CodeSheep。这个老羊头当时还没现在这么鸽，更新的还是比较频繁的，他当时推出了一系列的博客相关视频，包括写博客的好处、如何搭建等，于是爱折腾、还想装个B的我开始了博客自建之路。\n接触Halo\n当时搭建博客除了想提升一下逼格之外，还有一个刚需，找实习简历上缺项目！在学校做的辣鸡HR管理系统、图书管理系统，我自己都觉得拿不出手，所以，我就去找了一下基于Java生态的博客，Halo进入了我的视线。\n于是乎开始了第一次动态博客的建站，使用腾讯云学生套餐买服务器，应用部署，主题调参，域名注册\u0026hellip;\u0026hellip;\n搭建成功开门大吉，当时在博客上面陆续更新了很多文章，主要内容都是面试相关的哈哈哈，还是挺有成就感的。\n不过随着后面的折腾，已经很久没用halo了，刚才又看了一眼Halo现状，好家伙，士别三日当刮目相待了呀。\n被Handsome主题勾引到了Typecho\n这是第二次搭建动态博客，不得不说一下Handsome主题，这是主题作者的网站。\n这是一款付费主题，印象中是80\u002b。它有自己的管理后台，可以进行多维度调参，当时看到这个主题之后，就立刻心动了。所以男人真的靠不住，喜新厌旧呸呸呸。当时完全是瞎折腾，折腾的很累很费时，但是在部署成功，将主题的参数布局调换成自己满意的状态之后，真的是乐在其中，有点理解为什么小时候妹妹那么喜欢娃娃换装游戏了。。当然，这也是我这次迁移之前的博客，目前是这个样子的：\n还是挺好看的吧，嘿嘿。\n回归本源\n直到遇见平凡，才是唯一的答案。\n这也是为什么我要进行这次的博客迁移。\nto be honest，其实最直接的原因，是腾讯云的服务器又要到期了，但是续费的价钱已经没有新人首单优惠了，，\n一年这个价钱，啥条件啊，我的钱还得攒着娶媳妇呢。。\n所以所以，我对写博客这件事进行了一次思考，思考的集中点主要在于，动态博客和静态博客的选择。\n二者具体的优劣势这里不再做赘述，可以参考上述超链接。\n没有最好的，只有最适合自己的。\n我需要的博客的到底是什么样子的？\n一个内容展示平台，分享观点，记录思考。 好的书写体验，类比RPC，写博客的书写体验以及发布流程，就像在本地书写一样。 低成本，包括部署运维成本，发布构建成本。 其他没了。 我觉的不管怎么选择，**博客的唯一核心竞争力，是内容，而不是展现形式。**所以可以发现，很多技术大牛的博客，主题都很Simple、Stupid，但是不影响人家发布影响行业的技术观点。看Martin Fowler的主页，连个分类、TOC、归档都没有，但人家福勒爷就是在这上面发布的重构。。\n所以我的最终方案是：Hugo \u002b Github Pages。\n为什么写博客 根据我个人的理解，瞎说说。\n一言以蔽之，主动学习。\n在一开始觉得写博客是一件浪费时间的事情，学完就记在脑子里呀，正经人谁写这玩意啊，赶紧再学其他的，他不香吗？\n我的思想转变，是受两件事情的影响，其实都是一个道理。\n主动学习理论。 主动学习是一个方法论，区别于被动学习。之前看过一个理论，对于信息或者知识的接收，在不同环节是逐渐衰减的(信噪比)，例如，\n你听到的 \u0026gt; 能听的进去的 \u0026gt; 能理解的 \u0026gt; 能记住的 \u0026gt; 能说出来的 \u0026gt; 能教会别人的。\n所以在很多情况下，你以为已经掌握的一个理论，让你说出来的话，就会吞吞吐吐的，根本原因就是思路还不清晰，缺少细节，而细节才见功夫。所以很多人在交代任务时，除了高情商的说一句“不知道我说清楚了吗”，还会再来一句，“你重复一遍呗”，就是这个道理。\n主动学习，就是一种深度学习，是理论和实践两条腿走路的学习。\n职场导师 进入职场之后，进行过若干次专题技术分享，即针对自己遇到的问题，分析出难点，评估水平方案，给出最佳实践，最后举一反三提炼方法论，这个过程是导师教给我的，有一句话印象很深，“所谓的技术分享，其实最大的收获者是你自己”。确实是这么一回事儿。真正的高手，能用通俗易懂的语言把问题描述清楚并教会给别人，如果你能把别人也教会，说明就是真的掌握了，写博客，就是一场知识的传播教学。\n再多说点，关于体系化思考。\n从高中开始，老师就一直强调知识要进行体系化，为什么要体系化？\n我们平时接触到的知识，大多都是信息孤岛，只有整合孤岛，才有可能触类旁通。以目前的市面数据库产品为例，虽然每年都会涌现出新的技术产品，但是万变不离其宗的是底层数据结构，如果你知道它的底层数据结构，就立马能知道这个产品是什么尿性。例如，以B\u002b树作为存储结构，那么他就是对查询更友好，因为写入可能会涉及到页的分裂；如果以日志作为存储结构，那么顺序追加的方式会对写入更加友好。\n三维世界的道理，万变不离其宗，物理规律逃不出声光热力电，世间道理相通，计算机科学也是如此。体系化的知识体系，可以视作一颗树形结构，最终的道理就是Root节点，由Root节点开始，道生一，一生二\u0026hellip;\u0026hellip;\n扯远了。。。\n写什么 根据黄金圈法则，上面已经介绍了关于博客的How和Why，下面来聊一聊What。\n我给自己博客定义的Slogan是：记录思考，见证成长。只要是对成长有帮助的，只要是经过自己思考的，都可以，内容题材不限，也不会强行限制在技术博客，正如上述所说，道理都是相同的。\n具体内容上，我不会写一些入门性的文章，例如软件的安装、API的调用等，RTFM！，我主要会进行专题形式的记录，以某一问题为契机，以解决实际问题为目的，问题驱动式学习，不会空谈技术说教，因为技术如果一旦脱离了应用场景，一文不值。\n同时呢，生活不是只有技术，我也会不定期的来一些和我兴趣爱好密切相关的话题，例如跑步、摄影==。",
+      "inLanguage" : "en-US",
+      "author" : "",
+      "creator" : "",
+      "publisher": "",
+      "accountablePerson" : "",
+      "copyrightHolder" : "",
+      "copyrightYear" : "2023",
+      "datePublished": "2023-09-08 10:52:26 \u002b0800 CST",
+      "dateModified" : "2023-09-08 10:52:26 \u002b0800 CST",
+      "url" : "https:\/\/example.org\/posts\/about-blog\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>聊聊博客</title>
+  <meta property="og:title" content="聊聊博客" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="正值博客迁移，随便写写。
+我与博客 初识
+大学期间就开始接触博客了，平时学习也有记录笔记的习惯，发布的第一篇博客是在大二暑假，当时闲着没事在家刷题，那时主要的搜索手段还是CSDN，于是心血来潮的就把当时的解题思路发布出去了，具体时间是2019.8.12，
+CSDN不愧是国内开发者解决问题的聚集之地(可能StackOverFlow访问不到)，后来又陆续发布了几篇，收获到了不错的曝光度，当时每天看着浏览量和站内月排名逐渐上升，还是挺有成就感的，最高的一篇浏览量动态规划解决最长公共子序列(Java实现)目前已经到了2W&#43;，由此可见，培养一个习惯还是要有一定激励机制的。
+开始折腾
+大二结束，大三就开始准备秋招了，这时认识了一个B站 up主：CodeSheep。这个老羊头当时还没现在这么鸽，更新的还是比较频繁的，他当时推出了一系列的博客相关视频，包括写博客的好处、如何搭建等，于是爱折腾、还想装个B的我开始了博客自建之路。
+接触Halo
+当时搭建博客除了想提升一下逼格之外，还有一个刚需，找实习简历上缺项目！在学校做的辣鸡HR管理系统、图书管理系统，我自己都觉得拿不出手，所以，我就去找了一下基于Java生态的博客，Halo进入了我的视线。
+于是乎开始了第一次动态博客的建站，使用腾讯云学生套餐买服务器，应用部署，主题调参，域名注册&amp;hellip;&amp;hellip;
+搭建成功开门大吉，当时在博客上面陆续更新了很多文章，主要内容都是面试相关的哈哈哈，还是挺有成就感的。
+不过随着后面的折腾，已经很久没用halo了，刚才又看了一眼Halo现状，好家伙，士别三日当刮目相待了呀。
+被Handsome主题勾引到了Typecho
+这是第二次搭建动态博客，不得不说一下Handsome主题，这是主题作者的网站。
+这是一款付费主题，印象中是80&#43;。它有自己的管理后台，可以进行多维度调参，当时看到这个主题之后，就立刻心动了。所以男人真的靠不住，喜新厌旧呸呸呸。当时完全是瞎折腾，折腾的很累很费时，但是在部署成功，将主题的参数布局调换成自己满意的状态之后，真的是乐在其中，有点理解为什么小时候妹妹那么喜欢娃娃换装游戏了。。当然，这也是我这次迁移之前的博客，目前是这个样子的：
+还是挺好看的吧，嘿嘿。
+回归本源
+直到遇见平凡，才是唯一的答案。
+这也是为什么我要进行这次的博客迁移。
+to be honest，其实最直接的原因，是腾讯云的服务器又要到期了，但是续费的价钱已经没有新人首单优惠了，，
+一年这个价钱，啥条件啊，我的钱还得攒着娶媳妇呢。。
+所以所以，我对写博客这件事进行了一次思考，思考的集中点主要在于，动态博客和静态博客的选择。
+二者具体的优劣势这里不再做赘述，可以参考上述超链接。
+没有最好的，只有最适合自己的。
+我需要的博客的到底是什么样子的？
+一个内容展示平台，分享观点，记录思考。 好的书写体验，类比RPC，写博客的书写体验以及发布流程，就像在本地书写一样。 低成本，包括部署运维成本，发布构建成本。 其他没了。 我觉的不管怎么选择，**博客的唯一核心竞争力，是内容，而不是展现形式。**所以可以发现，很多技术大牛的博客，主题都很Simple、Stupid，但是不影响人家发布影响行业的技术观点。看Martin Fowler的主页，连个分类、TOC、归档都没有，但人家福勒爷就是在这上面发布的重构。。
+所以我的最终方案是：Hugo &#43; Github Pages。
+为什么写博客 根据我个人的理解，瞎说说。
+一言以蔽之，主动学习。
+在一开始觉得写博客是一件浪费时间的事情，学完就记在脑子里呀，正经人谁写这玩意啊，赶紧再学其他的，他不香吗？
+我的思想转变，是受两件事情的影响，其实都是一个道理。
+主动学习理论。 主动学习是一个方法论，区别于被动学习。之前看过一个理论，对于信息或者知识的接收，在不同环节是逐渐衰减的(信噪比)，例如，
+你听到的 &amp;gt; 能听的进去的 &amp;gt; 能理解的 &amp;gt; 能记住的 &amp;gt; 能说出来的 &amp;gt; 能教会别人的。
+所以在很多情况下，你以为已经掌握的一个理论，让你说出来的话，就会吞吞吐吐的，根本原因就是思路还不清晰，缺少细节，而细节才见功夫。所以很多人在交代任务时，除了高情商的说一句“不知道我说清楚了吗”，还会再来一句，“你重复一遍呗”，就是这个道理。
+主动学习，就是一种深度学习，是理论和实践两条腿走路的学习。
+职场导师 进入职场之后，进行过若干次专题技术分享，即针对自己遇到的问题，分析出难点，评估水平方案，给出最佳实践，最后举一反三提炼方法论，这个过程是导师教给我的，有一句话印象很深，“所谓的技术分享，其实最大的收获者是你自己”。确实是这么一回事儿。真正的高手，能用通俗易懂的语言把问题描述清楚并教会给别人，如果你能把别人也教会，说明就是真的掌握了，写博客，就是一场知识的传播教学。
+再多说点，关于体系化思考。
+从高中开始，老师就一直强调知识要进行体系化，为什么要体系化？
+我们平时接触到的知识，大多都是信息孤岛，只有整合孤岛，才有可能触类旁通。以目前的市面数据库产品为例，虽然每年都会涌现出新的技术产品，但是万变不离其宗的是底层数据结构，如果你知道它的底层数据结构，就立马能知道这个产品是什么尿性。例如，以B&#43;树作为存储结构，那么他就是对查询更友好，因为写入可能会涉及到页的分裂；如果以日志作为存储结构，那么顺序追加的方式会对写入更加友好。
+三维世界的道理，万变不离其宗，物理规律逃不出声光热力电，世间道理相通，计算机科学也是如此。体系化的知识体系，可以视作一颗树形结构，最终的道理就是Root节点，由Root节点开始，道生一，一生二&amp;hellip;&amp;hellip;
+扯远了。。。
+写什么 根据黄金圈法则，上面已经介绍了关于博客的How和Why，下面来聊一聊What。
+我给自己博客定义的Slogan是：记录思考，见证成长。只要是对成长有帮助的，只要是经过自己思考的，都可以，内容题材不限，也不会强行限制在技术博客，正如上述所说，道理都是相同的。
+具体内容上，我不会写一些入门性的文章，例如软件的安装、API的调用等，RTFM！，我主要会进行专题形式的记录，以某一问题为契机，以解决实际问题为目的，问题驱动式学习，不会空谈技术说教，因为技术如果一旦脱离了应用场景，一文不值。
+同时呢，生活不是只有技术，我也会不定期的来一些和我兴趣爱好密切相关的话题，例如跑步、摄影==。" />
+  <meta name="description" content="正值博客迁移，随便写写。
+我与博客 初识
+大学期间就开始接触博客了，平时学习也有记录笔记的习惯，发布的第一篇博客是在大二暑假，当时闲着没事在家刷题，那时主要的搜索手段还是CSDN，于是心血来潮的就把当时的解题思路发布出去了，具体时间是2019.8.12，
+CSDN不愧是国内开发者解决问题的聚集之地(可能StackOverFlow访问不到)，后来又陆续发布了几篇，收获到了不错的曝光度，当时每天看着浏览量和站内月排名逐渐上升，还是挺有成就感的，最高的一篇浏览量动态规划解决最长公共子序列(Java实现)目前已经到了2W&#43;，由此可见，培养一个习惯还是要有一定激励机制的。
+开始折腾
+大二结束，大三就开始准备秋招了，这时认识了一个B站 up主：CodeSheep。这个老羊头当时还没现在这么鸽，更新的还是比较频繁的，他当时推出了一系列的博客相关视频，包括写博客的好处、如何搭建等，于是爱折腾、还想装个B的我开始了博客自建之路。
+接触Halo
+当时搭建博客除了想提升一下逼格之外，还有一个刚需，找实习简历上缺项目！在学校做的辣鸡HR管理系统、图书管理系统，我自己都觉得拿不出手，所以，我就去找了一下基于Java生态的博客，Halo进入了我的视线。
+于是乎开始了第一次动态博客的建站，使用腾讯云学生套餐买服务器，应用部署，主题调参，域名注册&amp;hellip;&amp;hellip;
+搭建成功开门大吉，当时在博客上面陆续更新了很多文章，主要内容都是面试相关的哈哈哈，还是挺有成就感的。
+不过随着后面的折腾，已经很久没用halo了，刚才又看了一眼Halo现状，好家伙，士别三日当刮目相待了呀。
+被Handsome主题勾引到了Typecho
+这是第二次搭建动态博客，不得不说一下Handsome主题，这是主题作者的网站。
+这是一款付费主题，印象中是80&#43;。它有自己的管理后台，可以进行多维度调参，当时看到这个主题之后，就立刻心动了。所以男人真的靠不住，喜新厌旧呸呸呸。当时完全是瞎折腾，折腾的很累很费时，但是在部署成功，将主题的参数布局调换成自己满意的状态之后，真的是乐在其中，有点理解为什么小时候妹妹那么喜欢娃娃换装游戏了。。当然，这也是我这次迁移之前的博客，目前是这个样子的：
+还是挺好看的吧，嘿嘿。
+回归本源
+直到遇见平凡，才是唯一的答案。
+这也是为什么我要进行这次的博客迁移。
+to be honest，其实最直接的原因，是腾讯云的服务器又要到期了，但是续费的价钱已经没有新人首单优惠了，，
+一年这个价钱，啥条件啊，我的钱还得攒着娶媳妇呢。。
+所以所以，我对写博客这件事进行了一次思考，思考的集中点主要在于，动态博客和静态博客的选择。
+二者具体的优劣势这里不再做赘述，可以参考上述超链接。
+没有最好的，只有最适合自己的。
+我需要的博客的到底是什么样子的？
+一个内容展示平台，分享观点，记录思考。 好的书写体验，类比RPC，写博客的书写体验以及发布流程，就像在本地书写一样。 低成本，包括部署运维成本，发布构建成本。 其他没了。 我觉的不管怎么选择，**博客的唯一核心竞争力，是内容，而不是展现形式。**所以可以发现，很多技术大牛的博客，主题都很Simple、Stupid，但是不影响人家发布影响行业的技术观点。看Martin Fowler的主页，连个分类、TOC、归档都没有，但人家福勒爷就是在这上面发布的重构。。
+所以我的最终方案是：Hugo &#43; Github Pages。
+为什么写博客 根据我个人的理解，瞎说说。
+一言以蔽之，主动学习。
+在一开始觉得写博客是一件浪费时间的事情，学完就记在脑子里呀，正经人谁写这玩意啊，赶紧再学其他的，他不香吗？
+我的思想转变，是受两件事情的影响，其实都是一个道理。
+主动学习理论。 主动学习是一个方法论，区别于被动学习。之前看过一个理论，对于信息或者知识的接收，在不同环节是逐渐衰减的(信噪比)，例如，
+你听到的 &amp;gt; 能听的进去的 &amp;gt; 能理解的 &amp;gt; 能记住的 &amp;gt; 能说出来的 &amp;gt; 能教会别人的。
+所以在很多情况下，你以为已经掌握的一个理论，让你说出来的话，就会吞吞吐吐的，根本原因就是思路还不清晰，缺少细节，而细节才见功夫。所以很多人在交代任务时，除了高情商的说一句“不知道我说清楚了吗”，还会再来一句，“你重复一遍呗”，就是这个道理。
+主动学习，就是一种深度学习，是理论和实践两条腿走路的学习。
+职场导师 进入职场之后，进行过若干次专题技术分享，即针对自己遇到的问题，分析出难点，评估水平方案，给出最佳实践，最后举一反三提炼方法论，这个过程是导师教给我的，有一句话印象很深，“所谓的技术分享，其实最大的收获者是你自己”。确实是这么一回事儿。真正的高手，能用通俗易懂的语言把问题描述清楚并教会给别人，如果你能把别人也教会，说明就是真的掌握了，写博客，就是一场知识的传播教学。
+再多说点，关于体系化思考。
+从高中开始，老师就一直强调知识要进行体系化，为什么要体系化？
+我们平时接触到的知识，大多都是信息孤岛，只有整合孤岛，才有可能触类旁通。以目前的市面数据库产品为例，虽然每年都会涌现出新的技术产品，但是万变不离其宗的是底层数据结构，如果你知道它的底层数据结构，就立马能知道这个产品是什么尿性。例如，以B&#43;树作为存储结构，那么他就是对查询更友好，因为写入可能会涉及到页的分裂；如果以日志作为存储结构，那么顺序追加的方式会对写入更加友好。
+三维世界的道理，万变不离其宗，物理规律逃不出声光热力电，世间道理相通，计算机科学也是如此。体系化的知识体系，可以视作一颗树形结构，最终的道理就是Root节点，由Root节点开始，道生一，一生二&amp;hellip;&amp;hellip;
+扯远了。。。
+写什么 根据黄金圈法则，上面已经介绍了关于博客的How和Why，下面来聊一聊What。
+我给自己博客定义的Slogan是：记录思考，见证成长。只要是对成长有帮助的，只要是经过自己思考的，都可以，内容题材不限，也不会强行限制在技术博客，正如上述所说，道理都是相同的。
+具体内容上，我不会写一些入门性的文章，例如软件的安装、API的调用等，RTFM！，我主要会进行专题形式的记录，以某一问题为契机，以解决实际问题为目的，问题驱动式学习，不会空谈技术说教，因为技术如果一旦脱离了应用场景，一文不值。
+同时呢，生活不是只有技术，我也会不定期的来一些和我兴趣爱好密切相关的话题，例如跑步、摄影==。" />
+  <meta property="og:locale" content="en-us" /><meta property="og:image" content="" />
+  
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="My New Hugo Site">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-xxx"></script>
+</head>
+
+
+<body>
+  <article class="post " id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Hadoo&#39;s Blog</a
+    >
+  </div>
+  <div class="header-subtitle">大道至简，知行合一</div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://joway.io" target="_blank">About Me</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/joway" target="_blank">Github</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+   
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/cn/">Chinese</a>
+  </div>
+   
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">聊聊博客</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2023-09-08 10:52:26 CST">
+                08 Sep 2023
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>正值博客迁移，随便写写。</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230907103431427.png" alt=""></p>
+<h3 id="我与博客">我与博客</h3>
+<p><strong>初识</strong></p>
+<p>大学期间就开始接触博客了，平时学习也有记录笔记的习惯，发布的第一篇博客是在大二暑假，当时闲着没事在家刷题，那时主要的搜索手段还是CSDN，于是心血来潮的就把当时的解题思路发布出去了，具体时间是2019.8.12，</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230907100549964.png" alt=""></p>
+<p>CSDN不愧是国内开发者解决问题的聚集之地(可能StackOverFlow访问不到)，后来又陆续发布了几篇，收获到了不错的曝光度，当时每天看着浏览量和站内月排名逐渐上升，还是挺有成就感的，最高的一篇浏览量<a href="https://blog.csdn.net/weixin_43238030/article/details/100044092?spm=1001.2014.3001.5501">动态规划解决最长公共子序列(Java实现)</a>目前已经到了2W+，由此可见，培养一个习惯还是要有一定激励机制的。</p>
+<p><strong>开始折腾</strong></p>
+<p>大二结束，大三就开始准备秋招了，这时认识了一个B站 up主：CodeSheep。这个老羊头当时还没现在这么鸽，更新的还是比较频繁的，他当时推出了一系列的博客相关视频，包括写博客的好处、如何搭建等，于是爱折腾、还想装个B的我开始了博客自建之路。</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230907101339274.png" alt=""></p>
+<p><strong>接触Halo</strong></p>
+<p>当时搭建博客除了想提升一下逼格之外，还有一个刚需，找实习简历上缺项目！在学校做的辣鸡HR管理系统、图书管理系统，我自己都觉得拿不出手，所以，我就去找了一下基于Java生态的博客，<a href="https://halo.run/">Halo</a>进入了我的视线。</p>
+<p>于是乎开始了第一次动态博客的建站，使用腾讯云学生套餐买服务器，应用部署，主题调参，域名注册&hellip;&hellip;</p>
+<p>搭建成功开门大吉，当时在博客上面陆续更新了很多文章，主要内容都是面试相关的哈哈哈，还是挺有成就感的。</p>
+<p>不过随着后面的折腾，已经很久没用halo了，刚才又看了一眼Halo现状，好家伙，士别三日当刮目相待了呀。</p>
+<p><strong>被Handsome主题勾引到了Typecho</strong></p>
+<p>这是第二次搭建动态博客，不得不说一下Handsome主题，这是主题作者的<a href="https://www.ihewro.com/">网站</a>。</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230907102318011.png" alt=""></p>
+<p>这是一款付费主题，印象中是80+。它有自己的管理后台，可以进行多维度调参，当时看到这个主题之后，就立刻心动了。所以男人真的靠不住，喜新厌旧呸呸呸。当时完全是瞎折腾，折腾的很累很费时，但是在部署成功，将主题的参数布局调换成自己满意的状态之后，真的是乐在其中，有点理解为什么小时候妹妹那么喜欢娃娃换装游戏了。。当然，这也是我这次迁移之前的博客，目前是这个样子的：</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230907102715498.png" alt="image-20230907102715498"></p>
+<p>还是挺好看的吧，嘿嘿。</p>
+<p><strong>回归本源</strong></p>
+<p>直到遇见平凡，才是唯一的答案。</p>
+<p>这也是为什么我要进行这次的博客迁移。</p>
+<p>to be honest，其实最直接的原因，是腾讯云的服务器又要到期了，但是续费的价钱已经没有新人首单优惠了，，</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230907103040647.png" alt="image-20230907103040647"></p>
+<p>一年这个价钱，啥条件啊，我的钱还得攒着娶媳妇呢。。</p>
+<p>所以所以，我对写博客这件事进行了一次思考，思考的集中点主要在于，<a href="https://sitedominion.medium.com/static-vs-dynamic-blogs-which-is-right-for-you-a4b3c2e6c493">动态博客和静态博客的选择</a>。</p>
+<p>二者具体的优劣势这里不再做赘述，可以参考上述超链接。</p>
+<p>没有最好的，只有最适合自己的。</p>
+<p>我需要的博客的到底是什么样子的？</p>
+<ul>
+<li>一个内容展示平台，分享观点，记录思考。</li>
+<li>好的书写体验，类比RPC，写博客的书写体验以及发布流程，就像在本地书写一样。</li>
+<li>低成本，包括部署运维成本，发布构建成本。</li>
+<li>其他没了。</li>
+</ul>
+<p>我觉的不管怎么选择，**博客的唯一核心竞争力，是内容，而不是展现形式。**所以可以发现，很多技术大牛的博客，主题都很Simple、Stupid，但是不影响人家发布影响行业的技术观点。看Martin Fowler的主页，连个分类、TOC、归档都没有，但人家福勒爷就是在这上面发布的重构。。</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230907104354596.png" alt="image-20230907104354596"></p>
+<p>所以我的最终方案是：Hugo + Github Pages。</p>
+<h3 id="为什么写博客">为什么写博客</h3>
+<p>根据我个人的理解，瞎说说。</p>
+<p>一言以蔽之，<strong>主动学习。</strong></p>
+<p>在一开始觉得写博客是一件浪费时间的事情，学完就记在脑子里呀，正经人谁写这玩意啊，赶紧再学其他的，他不香吗？</p>
+<p>我的思想转变，是受两件事情的影响，其实都是一个道理。</p>
+<ul>
+<li>主动学习理论。</li>
+</ul>
+<p>主动学习是一个方法论，区别于被动学习。之前看过一个理论，对于信息或者知识的接收，在不同环节是逐渐衰减的(信噪比)，例如，</p>
+<p>你听到的 &gt; 能听的进去的 &gt; 能理解的 &gt; 能记住的 &gt; 能说出来的 &gt; 能教会别人的。</p>
+<p>所以在很多情况下，你以为已经掌握的一个理论，让你说出来的话，就会吞吞吐吐的，根本原因就是思路还不清晰，缺少细节，而细节才见功夫。所以很多人在交代任务时，除了高情商的说一句“不知道我说清楚了吗”，还会再来一句，“你重复一遍呗”，就是这个道理。</p>
+<p>主动学习，就是一种深度学习，是理论和实践两条腿走路的学习。</p>
+<ul>
+<li>职场导师</li>
+</ul>
+<p>进入职场之后，进行过若干次专题技术分享，即针对自己遇到的问题，分析出难点，评估水平方案，给出最佳实践，最后举一反三提炼方法论，这个过程是导师教给我的，有一句话印象很深，“所谓的技术分享，其实最大的收获者是你自己”。确实是这么一回事儿。真正的高手，能用通俗易懂的语言把问题描述清楚并教会给别人，如果你能把别人也教会，说明就是真的掌握了，写博客，就是一场知识的传播教学。</p>
+<p>再多说点，关于<strong>体系化思考</strong>。</p>
+<p>从高中开始，老师就一直强调知识要进行体系化，为什么要体系化？</p>
+<p>我们平时接触到的知识，大多都是信息孤岛，只有整合孤岛，才有可能触类旁通。以目前的市面数据库产品为例，虽然每年都会涌现出新的技术产品，但是万变不离其宗的是底层数据结构，如果你知道它的底层数据结构，就立马能知道这个产品是什么尿性。例如，以B+树作为存储结构，那么他就是对查询更友好，因为写入可能会涉及到页的分裂；如果以日志作为存储结构，那么顺序追加的方式会对写入更加友好。</p>
+<p>三维世界的道理，万变不离其宗，物理规律逃不出声光热力电，世间道理相通，计算机科学也是如此。体系化的知识体系，可以视作一颗树形结构，最终的道理就是Root节点，由Root节点开始，道生一，一生二&hellip;&hellip;</p>
+<p>扯远了。。。</p>
+<h3 id="写什么">写什么</h3>
+<p>根据<a href="https://www.niaogebiji.com/article-113243-1.html">黄金圈法则</a>，上面已经介绍了关于博客的How和Why，下面来聊一聊What。</p>
+<p>我给自己博客定义的Slogan是：记录思考，见证成长。只要是对成长有帮助的，只要是经过自己思考的，都可以，内容题材不限，也不会强行限制在技术博客，正如上述所说，道理都是相同的。</p>
+<p>具体内容上，我不会写一些入门性的文章，例如软件的安装、API的调用等，<strong><a href="https://en.wikipedia.org/wiki/RTFM?useskin=vector">RTFM！</a></strong>，我主要会进行专题形式的记录，以某一问题为契机，以解决实际问题为目的，问题驱动式学习，不会空谈技术说教，因为技术如果一旦脱离了应用场景，一文不值。</p>
+<p>同时呢，生活不是只有技术，我也会不定期的来一些和我兴趣爱好密切相关的话题，例如跑步、摄影==。</p>
+<hr>
+<p>OK，That&rsquo;s All。</p>
+<p>博客Slogon：记录思考，见证成长。</p>
+<p>技术价值观：大道至简，知行合一。</p>
+<p>热爱可抵漫长岁月~</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>
