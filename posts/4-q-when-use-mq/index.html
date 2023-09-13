@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.118.2">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="" />
+  <meta property="og:url" content="https://hanchao666.top/posts/4-q-when-use-mq/" />
+  <link rel="canonical" href="https://hanchao666.top/posts/4-q-when-use-mq/" /><link rel="apple-touch-icon" href="/logo.png" />
+  <link rel="icon" href="/logo.png" />
+  <link rel="shortcut" href="/logo.png" /><link rel="alternate" type="application/atom+xml" href="https://hanchao666.top/index.xml" title="Hadoo&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/hanchao666.top\/"
+      },
+      "articleSection" : "posts",
+      "name" : "使用消息队列要考虑的四个问题",
+      "headline" : "使用消息队列要考虑的四个问题",
+      "description" : "0.如何进行消息队列的选型 1.消息队列的选择 开源：出现问题可以查看源码解决，而不是被动的等待新版本发布 社区活跃：其他人也会遇到相同的使用问题 生态环境：kafka的生态环境和大数据环境完全匹配兼容 基本特性：作为消息队列，要保证不丢消息，高可用，并且性能也要可观，能够满足绝大多数场景的性能需求 2.可供选择的消息队列 目前没有一款消息队列能够做到一统天下，这一块还是比较多元化的， 需要我们熟悉理解每个消息队列的特性，然后根据具体的业务场景，选用合适的消息队列\nRabbitMQ 关键词就是轻量级，使用Erlang语言编写，支持AMQP协议\n一个特色就是在生产者和队列之前加入了Exchange模块进行路由配置，路由规则是比较灵活的，可以手动进行配置\n缺点：\n1.对消息积压的支持并不好，他的设计理念认为消息队列就是一个通道，当消息积压时，性能会急剧下降\n2.性能不如其他的消息队列，正常情况下，普通的业务场景是可以满足的，但是当系统对性能要求比较高的时候，就不要选择这个了\n3.这玩意是使用Erlang语言开发的，比较冷门，不容易进行二次开发\nRocketMQ 阿里爸爸开发出来的消息队列，经历了世界上最大并发量、吞吐量的双十一的考验，可见是多么牛逼\n使用Java语言写的，因为阿里主要搞电商，RcoketMQ对在线业务的时延响应做了很多优化\nRocketMQ方方面面都不错如果非要挑出什么缺点，那么就是和kafka相比，生态还不够好\nkafka 消息队列这一块扛把子的老大哥，之前刚出来的时候是为了解决海量日志的，那时候还不能保证丢消息，但是发展到现在已经可以确保消息不丢了，整体设计采用大量的异步和批处理的思想，在所有消息队列里面性能算是最好的，但是正是因为kafka采用异步、批处理的思想，所以对于一些实时性比较高的在线业务来讲，时延会比较高，因为kafka的很多地方都是攒够一波一起发这样做的，如果消息不是那么多的时候，时延就会比较大\n如果消息队列不是业务系统的核心，我们对消息队列也没什么特别的要求，那么选择Rabbit就可以了，他就是为了开箱即用的特点诞生的，轻量级，也很OK\n如果业务系统对时延要求比较高，吞吐量也比较大的话，那么选用RocketMQ或者JMQ吧，不仅可以保证低时延，也可以保证金融级别的稳定\n如果需要处理海量的数据，或者说系统中使用了大数据生态系统中的东西，那么就直接选用kafka， 性能好，生态好\n不过我的了解是，目前很多的系统都是采用了不止一种消息队列，而是采用组合的方式，例如：RocketMQ\u002bKafka，分别用于在线业务和日志，这样就可以兼顾两个的优点，随之带来的问题就是开发维护成本变高了\n1.如何保证消息不丢 一个消息队列立足之根本，就是要保证消息不丢失，那么具体是如何实现的呢？哪些地方可能会导致消息丢失呢？\n无非就是以下三个阶段可能会导致消息丢失：\n生产阶段 存储阶段 消费阶段 现在市面上的主流消息队列都可以保证消息不丢，不管是网络出现问题，还是节点出现宕机，都可以保证消息不丢，很多情况下都是开发者使用不当导致的\n下面分别看一下这三个阶段，是如何做到不丢消息的：\n生产阶段： 生产阶段普遍采用的是请求确认机制，生产者发出消息之后，当Broker收到消息之后，会返回一个确认响应，如果生产者收到这个响应，那么说明发送成功， 如果没收到，就会进行超时重试，这里面会涉及到一个问题，为什么生产者没有收到响应？可能是两个原因：1.因为网络问题，消息确实在传输过程中丢了，这种情况下进行重试，可以保证Broker收到消息，2.Broker收到了消息，但是响应因为网络问题丢了，这个时候生产者还是会进行重发，这就会导致主题上面可能会有重复消息，这也是我们接下来需要考虑的一个问题，消息重复了怎么办？\n存储阶段： 存储阶段还是分两种情况，如果Broker是单机的，那么需要保证消息落盘之后，再返回确认响应，这时候消息已经在磁盘中进行了持久化，就不会丢，如果Broker是集群形式的，那么可以通过配置，当消息在其他Broker节点上进行复制成功之后，再返回确认响应，当一个Broker宕机之后，其他的就可以进行补上 消费阶段： 消费阶段和生产类似，也是通过确认机制来保证消息的不丢，当消费者客户端拿到消息之后，不要立即返回确认响应，而是在完成所有消费业务逻辑之后，再发送确认响应，这样如果在消费消息阶段失败了，那么下一次消费时可以继续消费上一次消费位置的消息，这里还有一种情况：如果消费者发出的消费确认响应丢了怎么办？这里还会涉及到重复消息的问题，后面我们一起讨论 一个合格的消息队列，上面的三个阶段都是可以严格保证消息不丢的，实际上我们在使用消息队列的时候，丢失消息的原因大多数是消费位置的不当导致的，因为目前大多数消息队列都是基于发布订阅模型的，每个消息都可以被多个消费者组消费，每个消费者组是互不影响的，而一个消费者组中的每个消费者是存在竞争关系的，当主题中的一个消息被一个消费者组消费完成之后，不能立即将消息删除，因为其他消费者组后面可能还会进行消费，这是我们需要为每个消费者组维持一个消费位置的变量\n2.消息重复怎么办 首先明确一个立场：不管是在哪一种消息队列中，都可能存在重复消息的情况。\n之前的问题中已经埋下了一个伏笔，也就是在生产者如果可能会将重复的消息发送到消息队列中，所有的消息队列都是At least Once级别的，之前就听说过Kafka可以保证Exactly Once级别，但是玥哥也是说了，这主要是为了配合流计算领域的实现，在消息的生产消费关系中，消息队列中 也是可能存在重复消息的！后面会单独写一篇文章，说一下事务和Exactly Once在流计算中是怎么搞的，既然消息队列中存在重复消息这件事情已经成为了既定的事实，那么我们只能通过在消费端的业务中实现幂等性来保证了，这样就可以满足：**At least once \u002b 幂等消费 = Exactly once\n下面是几种实现幂等性的方法：\n利用数据库的唯一性实现 大概的思路就是利用数据库的主键的特性，当消息重复时，消费者在数据库表中可以检测到主键冲突异常，这样就可以不用进行接下来的重复消费\n设置相关判定条件 比如，“将账户 X 的余额增加 100 元”这个操作并不满足幂等性，我们可以把这个操作加上一个前置条件，变为：“如果账户 X 当前的余额为 500 元，将余额加 100 元”，这个操作就具备了幂等性。对应到消息队列中的使用时，可以在发消息时在消息体中带上当前的余额，在消费的时候进行判断数据库中，当前余额是否与消息中的余额相等，只有相等才执行变更操作。",
+      "inLanguage" : "en-US",
+      "author" : "",
+      "creator" : "",
+      "publisher": "",
+      "accountablePerson" : "",
+      "copyrightHolder" : "",
+      "copyrightYear" : "2021",
+      "datePublished": "2021-10-17 17:45:58 \u002b0800 CST",
+      "dateModified" : "2021-10-17 17:45:58 \u002b0800 CST",
+      "url" : "https:\/\/hanchao666.top\/posts\/4-q-when-use-mq\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>使用消息队列要考虑的四个问题</title>
+  <meta property="og:title" content="使用消息队列要考虑的四个问题" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="0.如何进行消息队列的选型 1.消息队列的选择 开源：出现问题可以查看源码解决，而不是被动的等待新版本发布 社区活跃：其他人也会遇到相同的使用问题 生态环境：kafka的生态环境和大数据环境完全匹配兼容 基本特性：作为消息队列，要保证不丢消息，高可用，并且性能也要可观，能够满足绝大多数场景的性能需求 2.可供选择的消息队列 目前没有一款消息队列能够做到一统天下，这一块还是比较多元化的， 需要我们熟悉理解每个消息队列的特性，然后根据具体的业务场景，选用合适的消息队列
+RabbitMQ 关键词就是轻量级，使用Erlang语言编写，支持AMQP协议
+一个特色就是在生产者和队列之前加入了Exchange模块进行路由配置，路由规则是比较灵活的，可以手动进行配置
+缺点：
+1.对消息积压的支持并不好，他的设计理念认为消息队列就是一个通道，当消息积压时，性能会急剧下降
+2.性能不如其他的消息队列，正常情况下，普通的业务场景是可以满足的，但是当系统对性能要求比较高的时候，就不要选择这个了
+3.这玩意是使用Erlang语言开发的，比较冷门，不容易进行二次开发
+RocketMQ 阿里爸爸开发出来的消息队列，经历了世界上最大并发量、吞吐量的双十一的考验，可见是多么牛逼
+使用Java语言写的，因为阿里主要搞电商，RcoketMQ对在线业务的时延响应做了很多优化
+RocketMQ方方面面都不错如果非要挑出什么缺点，那么就是和kafka相比，生态还不够好
+kafka 消息队列这一块扛把子的老大哥，之前刚出来的时候是为了解决海量日志的，那时候还不能保证丢消息，但是发展到现在已经可以确保消息不丢了，整体设计采用大量的异步和批处理的思想，在所有消息队列里面性能算是最好的，但是正是因为kafka采用异步、批处理的思想，所以对于一些实时性比较高的在线业务来讲，时延会比较高，因为kafka的很多地方都是攒够一波一起发这样做的，如果消息不是那么多的时候，时延就会比较大
+如果消息队列不是业务系统的核心，我们对消息队列也没什么特别的要求，那么选择Rabbit就可以了，他就是为了开箱即用的特点诞生的，轻量级，也很OK
+如果业务系统对时延要求比较高，吞吐量也比较大的话，那么选用RocketMQ或者JMQ吧，不仅可以保证低时延，也可以保证金融级别的稳定
+如果需要处理海量的数据，或者说系统中使用了大数据生态系统中的东西，那么就直接选用kafka， 性能好，生态好
+不过我的了解是，目前很多的系统都是采用了不止一种消息队列，而是采用组合的方式，例如：RocketMQ&#43;Kafka，分别用于在线业务和日志，这样就可以兼顾两个的优点，随之带来的问题就是开发维护成本变高了
+1.如何保证消息不丢 一个消息队列立足之根本，就是要保证消息不丢失，那么具体是如何实现的呢？哪些地方可能会导致消息丢失呢？
+无非就是以下三个阶段可能会导致消息丢失：
+生产阶段 存储阶段 消费阶段 现在市面上的主流消息队列都可以保证消息不丢，不管是网络出现问题，还是节点出现宕机，都可以保证消息不丢，很多情况下都是开发者使用不当导致的
+下面分别看一下这三个阶段，是如何做到不丢消息的：
+生产阶段： 生产阶段普遍采用的是请求确认机制，生产者发出消息之后，当Broker收到消息之后，会返回一个确认响应，如果生产者收到这个响应，那么说明发送成功， 如果没收到，就会进行超时重试，这里面会涉及到一个问题，为什么生产者没有收到响应？可能是两个原因：1.因为网络问题，消息确实在传输过程中丢了，这种情况下进行重试，可以保证Broker收到消息，2.Broker收到了消息，但是响应因为网络问题丢了，这个时候生产者还是会进行重发，这就会导致主题上面可能会有重复消息，这也是我们接下来需要考虑的一个问题，消息重复了怎么办？
+存储阶段： 存储阶段还是分两种情况，如果Broker是单机的，那么需要保证消息落盘之后，再返回确认响应，这时候消息已经在磁盘中进行了持久化，就不会丢，如果Broker是集群形式的，那么可以通过配置，当消息在其他Broker节点上进行复制成功之后，再返回确认响应，当一个Broker宕机之后，其他的就可以进行补上 消费阶段： 消费阶段和生产类似，也是通过确认机制来保证消息的不丢，当消费者客户端拿到消息之后，不要立即返回确认响应，而是在完成所有消费业务逻辑之后，再发送确认响应，这样如果在消费消息阶段失败了，那么下一次消费时可以继续消费上一次消费位置的消息，这里还有一种情况：如果消费者发出的消费确认响应丢了怎么办？这里还会涉及到重复消息的问题，后面我们一起讨论 一个合格的消息队列，上面的三个阶段都是可以严格保证消息不丢的，实际上我们在使用消息队列的时候，丢失消息的原因大多数是消费位置的不当导致的，因为目前大多数消息队列都是基于发布订阅模型的，每个消息都可以被多个消费者组消费，每个消费者组是互不影响的，而一个消费者组中的每个消费者是存在竞争关系的，当主题中的一个消息被一个消费者组消费完成之后，不能立即将消息删除，因为其他消费者组后面可能还会进行消费，这是我们需要为每个消费者组维持一个消费位置的变量
+2.消息重复怎么办 首先明确一个立场：不管是在哪一种消息队列中，都可能存在重复消息的情况。
+之前的问题中已经埋下了一个伏笔，也就是在生产者如果可能会将重复的消息发送到消息队列中，所有的消息队列都是At least Once级别的，之前就听说过Kafka可以保证Exactly Once级别，但是玥哥也是说了，这主要是为了配合流计算领域的实现，在消息的生产消费关系中，消息队列中 也是可能存在重复消息的！后面会单独写一篇文章，说一下事务和Exactly Once在流计算中是怎么搞的，既然消息队列中存在重复消息这件事情已经成为了既定的事实，那么我们只能通过在消费端的业务中实现幂等性来保证了，这样就可以满足：**At least once &#43; 幂等消费 = Exactly once
+下面是几种实现幂等性的方法：
+利用数据库的唯一性实现 大概的思路就是利用数据库的主键的特性，当消息重复时，消费者在数据库表中可以检测到主键冲突异常，这样就可以不用进行接下来的重复消费
+设置相关判定条件 比如，“将账户 X 的余额增加 100 元”这个操作并不满足幂等性，我们可以把这个操作加上一个前置条件，变为：“如果账户 X 当前的余额为 500 元，将余额加 100 元”，这个操作就具备了幂等性。对应到消息队列中的使用时，可以在发消息时在消息体中带上当前的余额，在消费的时候进行判断数据库中，当前余额是否与消息中的余额相等，只有相等才执行变更操作。" />
+  <meta name="description" content="0.如何进行消息队列的选型 1.消息队列的选择 开源：出现问题可以查看源码解决，而不是被动的等待新版本发布 社区活跃：其他人也会遇到相同的使用问题 生态环境：kafka的生态环境和大数据环境完全匹配兼容 基本特性：作为消息队列，要保证不丢消息，高可用，并且性能也要可观，能够满足绝大多数场景的性能需求 2.可供选择的消息队列 目前没有一款消息队列能够做到一统天下，这一块还是比较多元化的， 需要我们熟悉理解每个消息队列的特性，然后根据具体的业务场景，选用合适的消息队列
+RabbitMQ 关键词就是轻量级，使用Erlang语言编写，支持AMQP协议
+一个特色就是在生产者和队列之前加入了Exchange模块进行路由配置，路由规则是比较灵活的，可以手动进行配置
+缺点：
+1.对消息积压的支持并不好，他的设计理念认为消息队列就是一个通道，当消息积压时，性能会急剧下降
+2.性能不如其他的消息队列，正常情况下，普通的业务场景是可以满足的，但是当系统对性能要求比较高的时候，就不要选择这个了
+3.这玩意是使用Erlang语言开发的，比较冷门，不容易进行二次开发
+RocketMQ 阿里爸爸开发出来的消息队列，经历了世界上最大并发量、吞吐量的双十一的考验，可见是多么牛逼
+使用Java语言写的，因为阿里主要搞电商，RcoketMQ对在线业务的时延响应做了很多优化
+RocketMQ方方面面都不错如果非要挑出什么缺点，那么就是和kafka相比，生态还不够好
+kafka 消息队列这一块扛把子的老大哥，之前刚出来的时候是为了解决海量日志的，那时候还不能保证丢消息，但是发展到现在已经可以确保消息不丢了，整体设计采用大量的异步和批处理的思想，在所有消息队列里面性能算是最好的，但是正是因为kafka采用异步、批处理的思想，所以对于一些实时性比较高的在线业务来讲，时延会比较高，因为kafka的很多地方都是攒够一波一起发这样做的，如果消息不是那么多的时候，时延就会比较大
+如果消息队列不是业务系统的核心，我们对消息队列也没什么特别的要求，那么选择Rabbit就可以了，他就是为了开箱即用的特点诞生的，轻量级，也很OK
+如果业务系统对时延要求比较高，吞吐量也比较大的话，那么选用RocketMQ或者JMQ吧，不仅可以保证低时延，也可以保证金融级别的稳定
+如果需要处理海量的数据，或者说系统中使用了大数据生态系统中的东西，那么就直接选用kafka， 性能好，生态好
+不过我的了解是，目前很多的系统都是采用了不止一种消息队列，而是采用组合的方式，例如：RocketMQ&#43;Kafka，分别用于在线业务和日志，这样就可以兼顾两个的优点，随之带来的问题就是开发维护成本变高了
+1.如何保证消息不丢 一个消息队列立足之根本，就是要保证消息不丢失，那么具体是如何实现的呢？哪些地方可能会导致消息丢失呢？
+无非就是以下三个阶段可能会导致消息丢失：
+生产阶段 存储阶段 消费阶段 现在市面上的主流消息队列都可以保证消息不丢，不管是网络出现问题，还是节点出现宕机，都可以保证消息不丢，很多情况下都是开发者使用不当导致的
+下面分别看一下这三个阶段，是如何做到不丢消息的：
+生产阶段： 生产阶段普遍采用的是请求确认机制，生产者发出消息之后，当Broker收到消息之后，会返回一个确认响应，如果生产者收到这个响应，那么说明发送成功， 如果没收到，就会进行超时重试，这里面会涉及到一个问题，为什么生产者没有收到响应？可能是两个原因：1.因为网络问题，消息确实在传输过程中丢了，这种情况下进行重试，可以保证Broker收到消息，2.Broker收到了消息，但是响应因为网络问题丢了，这个时候生产者还是会进行重发，这就会导致主题上面可能会有重复消息，这也是我们接下来需要考虑的一个问题，消息重复了怎么办？
+存储阶段： 存储阶段还是分两种情况，如果Broker是单机的，那么需要保证消息落盘之后，再返回确认响应，这时候消息已经在磁盘中进行了持久化，就不会丢，如果Broker是集群形式的，那么可以通过配置，当消息在其他Broker节点上进行复制成功之后，再返回确认响应，当一个Broker宕机之后，其他的就可以进行补上 消费阶段： 消费阶段和生产类似，也是通过确认机制来保证消息的不丢，当消费者客户端拿到消息之后，不要立即返回确认响应，而是在完成所有消费业务逻辑之后，再发送确认响应，这样如果在消费消息阶段失败了，那么下一次消费时可以继续消费上一次消费位置的消息，这里还有一种情况：如果消费者发出的消费确认响应丢了怎么办？这里还会涉及到重复消息的问题，后面我们一起讨论 一个合格的消息队列，上面的三个阶段都是可以严格保证消息不丢的，实际上我们在使用消息队列的时候，丢失消息的原因大多数是消费位置的不当导致的，因为目前大多数消息队列都是基于发布订阅模型的，每个消息都可以被多个消费者组消费，每个消费者组是互不影响的，而一个消费者组中的每个消费者是存在竞争关系的，当主题中的一个消息被一个消费者组消费完成之后，不能立即将消息删除，因为其他消费者组后面可能还会进行消费，这是我们需要为每个消费者组维持一个消费位置的变量
+2.消息重复怎么办 首先明确一个立场：不管是在哪一种消息队列中，都可能存在重复消息的情况。
+之前的问题中已经埋下了一个伏笔，也就是在生产者如果可能会将重复的消息发送到消息队列中，所有的消息队列都是At least Once级别的，之前就听说过Kafka可以保证Exactly Once级别，但是玥哥也是说了，这主要是为了配合流计算领域的实现，在消息的生产消费关系中，消息队列中 也是可能存在重复消息的！后面会单独写一篇文章，说一下事务和Exactly Once在流计算中是怎么搞的，既然消息队列中存在重复消息这件事情已经成为了既定的事实，那么我们只能通过在消费端的业务中实现幂等性来保证了，这样就可以满足：**At least once &#43; 幂等消费 = Exactly once
+下面是几种实现幂等性的方法：
+利用数据库的唯一性实现 大概的思路就是利用数据库的主键的特性，当消息重复时，消费者在数据库表中可以检测到主键冲突异常，这样就可以不用进行接下来的重复消费
+设置相关判定条件 比如，“将账户 X 的余额增加 100 元”这个操作并不满足幂等性，我们可以把这个操作加上一个前置条件，变为：“如果账户 X 当前的余额为 500 元，将余额加 100 元”，这个操作就具备了幂等性。对应到消息队列中的使用时，可以在发消息时在消息体中带上当前的余额，在消费的时候进行判断数据库中，当前余额是否与消息中的余额相等，只有相等才执行变更操作。" />
+  <meta property="og:locale" content="en-us" /><meta property="og:image" content="/logo.png" />
+  
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px;background-color:#f6f8fa}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Hadoo&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-53624533-8"></script><script src="https://cdn.jsdelivr.net/gh/joway/homepage/analytics.js"></script>
+</head>
+
+
+<body>
+  <article class="post " id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Hadoo&#39;s Blog</a
+    >
+  </div>
+  <div class="header-subtitle">大道至简，知行合一</div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://github.com/yeshadoo" target="_blank">About Me</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/yeshadoo" target="_blank">Github</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+   
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/cn/">Chinese</a>
+  </div>
+   
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">使用消息队列要考虑的四个问题</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2021-10-17 17:45:58 CST">
+                17 Oct 2021
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <h3 id="0如何进行消息队列的选型">0.如何进行消息队列的选型</h3>
+<h4 id="1消息队列的选择">1.消息队列的选择</h4>
+<ul>
+<li>开源：出现问题可以查看源码解决，而不是被动的等待新版本发布</li>
+<li>社区活跃：其他人也会遇到相同的使用问题</li>
+<li>生态环境：kafka的生态环境和大数据环境完全匹配兼容</li>
+<li>基本特性：作为消息队列，要保证不丢消息，高可用，并且性能也要可观，能够满足绝大多数场景的性能需求</li>
+</ul>
+<h4 id="2可供选择的消息队列">2.可供选择的消息队列</h4>
+<p>目前没有一款消息队列能够做到一统天下，这一块还是比较多元化的， 需要我们熟悉理解每个消息队列的特性，然后根据具体的业务场景，选用合适的消息队列</p>
+<ul>
+<li>RabbitMQ</li>
+</ul>
+<p>关键词就是轻量级，使用Erlang语言编写，支持AMQP协议</p>
+<p>一个特色就是在生产者和队列之前加入了Exchange模块进行路由配置，路由规则是比较灵活的，可以手动进行配置</p>
+<p>缺点：</p>
+<p>1.对消息积压的支持并不好，他的设计理念认为消息队列就是一个通道，当消息积压时，性能会急剧下降</p>
+<p>2.性能不如其他的消息队列，正常情况下，普通的业务场景是可以满足的，但是当系统对性能要求比较高的时候，就不要选择这个了</p>
+<p>3.这玩意是使用Erlang语言开发的，比较冷门，不容易进行二次开发</p>
+<ul>
+<li>RocketMQ</li>
+</ul>
+<p>阿里爸爸开发出来的消息队列，经历了世界上最大并发量、吞吐量的双十一的考验，可见是多么牛逼</p>
+<p>使用Java语言写的，因为阿里主要搞电商，RcoketMQ对在线业务的时延响应做了很多优化</p>
+<p>RocketMQ方方面面都不错如果非要挑出什么缺点，那么就是和kafka相比，生态还不够好</p>
+<ul>
+<li>kafka</li>
+</ul>
+<p>消息队列这一块扛把子的老大哥，之前刚出来的时候是为了解决海量日志的，那时候还不能保证丢消息，但是发展到现在已经可以确保消息不丢了，整体设计采用大量的异步和批处理的思想，在所有消息队列里面性能算是最好的，但是正是因为kafka采用异步、批处理的思想，所以对于一些实时性比较高的在线业务来讲，时延会比较高，因为kafka的很多地方都是攒够一波一起发这样做的，如果消息不是那么多的时候，时延就会比较大</p>
+<p>如果消息队列不是业务系统的核心，我们对消息队列也没什么特别的要求，那么选择Rabbit就可以了，他就是为了开箱即用的特点诞生的，轻量级，也很OK</p>
+<p>如果业务系统对时延要求比较高，吞吐量也比较大的话，那么选用RocketMQ或者JMQ吧，不仅可以保证低时延，也可以保证金融级别的稳定</p>
+<p>如果需要处理海量的数据，或者说系统中使用了大数据生态系统中的东西，那么就直接选用kafka， 性能好，生态好</p>
+<p>不过我的了解是，目前很多的系统都是采用了不止一种消息队列，而是采用组合的方式，例如：RocketMQ+Kafka，分别用于在线业务和日志，这样就可以兼顾两个的优点，随之带来的问题就是开发维护成本变高了</p>
+<h3 id="1如何保证消息不丢"><strong>1.如何保证消息不丢</strong></h3>
+<p>一个消息队列立足之根本，就是要保证消息不丢失，那么具体是如何实现的呢？哪些地方可能会导致消息丢失呢？</p>
+<p>无非就是以下三个阶段可能会导致消息丢失：</p>
+<ul>
+<li>生产阶段</li>
+<li>存储阶段</li>
+<li>消费阶段</li>
+</ul>
+<p>现在市面上的主流消息队列都可以保证消息不丢，不管是网络出现问题，还是节点出现宕机，都可以保证消息不丢，很多情况下都是开发者使用不当导致的</p>
+<p>下面分别看一下这三个阶段，是如何做到不丢消息的：</p>
+<ul>
+<li>生产阶段：</li>
+</ul>
+<p>生产阶段普遍采用的是请求确认机制，生产者发出消息之后，当Broker收到消息之后，会返回一个确认响应，如果生产者收到这个响应，那么说明发送成功， 如果没收到，就会进行超时重试，这里面会涉及到一个问题，为什么生产者没有收到响应？可能是两个原因：1.因为网络问题，消息确实在传输过程中丢了，这种情况下进行重试，可以保证Broker收到消息，2.Broker收到了消息，但是响应因为网络问题丢了，这个时候生产者还是会进行重发，这就会导致主题上面可能会有重复消息，这也是我们接下来需要考虑的一个问题，消息重复了怎么办？</p>
+<ul>
+<li>存储阶段：
+存储阶段还是分两种情况，如果Broker是单机的，那么需要保证消息落盘之后，再返回确认响应，这时候消息已经在磁盘中进行了持久化，就不会丢，如果Broker是集群形式的，那么可以通过配置，当消息在其他Broker节点上进行复制成功之后，再返回确认响应，当一个Broker宕机之后，其他的就可以进行补上</li>
+<li>消费阶段：
+消费阶段和生产类似，也是通过确认机制来保证消息的不丢，当消费者客户端拿到消息之后，不要立即返回确认响应，而是在完成所有消费业务逻辑之后，再发送确认响应，这样如果在消费消息阶段失败了，那么下一次消费时可以继续消费上一次消费位置的消息，这里还有一种情况：如果消费者发出的消费确认响应丢了怎么办？这里还会涉及到重复消息的问题，后面我们一起讨论</li>
+</ul>
+<p>一个合格的消息队列，上面的三个阶段都是可以严格保证消息不丢的，实际上我们在使用消息队列的时候，丢失消息的原因大多数是消费位置的不当导致的，因为目前大多数消息队列都是基于发布订阅模型的，每个消息都可以被多个消费者组消费，每个消费者组是互不影响的，而一个消费者组中的每个消费者是存在竞争关系的，当主题中的一个消息被一个消费者组消费完成之后，不能立即将消息删除，因为其他消费者组后面可能还会进行消费，这是我们需要为每个消费者组维持一个消费位置的变量</p>
+<h3 id="2消息重复怎么办"><strong>2.消息重复怎么办</strong></h3>
+<p><strong>首先明确一个立场：不管是在哪一种消息队列中，都可能存在重复消息的情况。</strong></p>
+<p>之前的问题中已经埋下了一个伏笔，也就是在生产者如果可能会将重复的消息发送到消息队列中，所有的消息队列都是At least Once级别的，之前就听说过Kafka可以保证Exactly Once级别，但是玥哥也是说了，这主要是为了配合流计算领域的实现，在消息的生产消费关系中，消息队列中 也是可能存在重复消息的！后面会单独写一篇文章，说一下事务和Exactly Once在流计算中是怎么搞的，既然消息队列中存在重复消息这件事情已经成为了既定的事实，那么我们只能通过在消费端的业务中实现幂等性来保证了，这样就可以满足：**<strong><strong>At least once + 幂等消费 = Exactly once</strong></strong></p>
+<p>下面是几种实现幂等性的方法：</p>
+<ul>
+<li>利用数据库的唯一性实现</li>
+</ul>
+<p>大概的思路就是利用数据库的主键的特性，当消息重复时，消费者在数据库表中可以检测到主键冲突异常，这样就可以不用进行接下来的重复消费</p>
+<ul>
+<li>设置相关判定条件</li>
+</ul>
+<p>比如，“将账户 X 的余额增加 100 元”这个操作并不满足幂等性，我们可以把这个操作加上一个前置条件，变为：“如果账户 X 当前的余额为 500 元，将余额加 100 元”，这个操作就具备了幂等性。对应到消息队列中的使用时，可以在发消息时在消息体中带上当前的余额，在消费的时候进行判断数据库中，当前余额是否与消息中的余额相等，只有相等才执行变更操作。</p>
+<p>还有一种比较通用的方法，借助了版本号这种思想，我们可以给数据加上一个版本号属性，每次更新数据前，比较当前数据的版本号和消息中数据的版本号是否匹配，如果不匹配就拒绝更新，更新数据的同时将版本号+1，可以实现幂等操作</p>
+<ul>
+<li>记录并检查</li>
+</ul>
+<p>具体的实现方法是，在发送消息时，给每条消息指定一个全局唯一的 ID，消费时，先根据这个 ID 检查这条消息是否有被消费过，如果没有消费过，才更新数据，然后将消费状态置为已消费。</p>
+<p>这种方法看起来比较理想，但是实现起来还是有一定难度的，因为这个方法一共涉及到三个操作，分别是：1.检查消息消费状态，2.更新数据，3.设置消费状态，这三种操作我们很难保证其原子性，可能会出现这样的问题：</p>
+<p>比如说，对于同一条消息：“全局 ID 为 8，操作为：给 ID 为 666 账户增加 100 元”，有可能出现这样的情况：t0 时刻：Consumer A 收到条消息，检查消息执行状态，发现消息未处理过，开始执行“账户增加 100 元”；t1 时刻：Consumer B 收到条消息，检查消息执行状态，发现消息未处理过，因为这个时刻，Consumer A 还未来得及更新消息执行状态。</p>
+<p>虽然说可以通过事务或者锁的方式实现，但是分布式系统中，无论是分布式事务，还是分布式锁都是比较难以解决的问题</p>
+<p>为什么消息队列中不实现Exactly Once，还是使用At least Once+幂等这种方式实现呢？我想大概有两点原因：1.虽然实现了Exactly Once，但是当消费者的确认响应丢失之后，还是需要在原来的位置进行消费，这样一来，就失去了Exactly Once的意义，2.代价很大，要想让消息队列实现严格意义上的Exactly Once，那么就需要在内部实现很多的业务逻辑进行判断，增加服务端的压力，这样就会导致整个消息队列的性能下降，这是必然的，得不偿失。</p>
+<h3 id="3消息积压该如何处理"><strong>3.消息积压该如何处理</strong></h3>
+<p>消息积压其实在消息队列中是一个比较正常的现象，但是问题是当消息大量积压的时候，时间长了系统可能就就会产生问题，例如消息队列的存储被填满无法提供服务，这样就会丢失消息</p>
+<p>处理消息积压，最根本的还是要要从生产者和消费者的协调度上解决，因为消息队列的性能不是瓶颈问题所在，对于绝大多数使用消息队列的业务系统来说，消息队列的处理能力是远远大于业务系统的，所以基本不会产生生产者生产消息过快，消息队列来不及接收的情况，那么当消息积压时，最根本的原因还是消费者消费的速度一直小于生产者的速度，所以我们在设计系统时，一定要保证消费端的消费性能要高于生产端的生产性能，这样的系统才能健康持续的运行，那么，当我们真的遇到了消息积压的情况，应该怎么办？</p>
+<p><strong><strong>监控</strong></strong>：消息队列基本都是自带监控的，我想这也是JMQ没有完全开源的原因，因为JMQ目前使用的监控也是京东自研的UMP，但是UMP那边还不想进行开源，所以整个JMQ就不能做到完全开源，说的有点远，出现问题的第一做法还是要查看监控日志定位问题，通过监控的数据，就比较容易定位问题，如果是生产者生产速度太快，例如双十一期间，那么我们的做法只能是下面的提高消费端消费能力，或者还有一种做法就是降流：<strong><strong>减少不重要业务的发送</strong></strong></p>
+<ul>
+<li><strong>消费端水平扩容</strong></li>
+</ul>
+<p>在条件允许的情况下，可以对消费端实例进行水平扩容，提高消费端的并行消费能力，但是一定要注意的一点是：必须同步扩容主题中的分区数量，这是很多人都容易忽视的地方，因为每个分区实际上只能支持单线程消费，如果仅仅是增加的消费端实例，没有进行分区的扩容，那么就不会起到效果</p>
+<p>还有一种非常错误的做法，这里引以为鉴，不要使用：</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230912174703825.png" alt="image-20230912174703825"></p>
+<p>这种方法看起来没什么问题，在OnMessage中只是进行消息的接收，不进行具体的处理，将消息全部放在内存队列中，然后真正负责业务逻辑处理的业务线程拿来进行处理，看上去进行了解耦，并且提高了并发能力，但是，如果节点发生宕机，内存队列中还没来得及进行处理的消息就会丢失！</p>
+<ul>
+<li>消费端代码优化</li>
+</ul>
+<p>这也是可行的，可能是消费端整体的代码设计消费性能比较差，这种情况下可以通过优化代码的方式来提高消费能力</p>
+<p>还有一种不太常见的情况，你通过监控发现，无论是发送消息的速度还是消费消息的速度和原来都没什么变化，这时候你需要检查一下你的消费端，是不是消费失败导致的一条消息反复消费这种情况比较多，这种情况也会拖慢整个系统的消费速度。</p>
+<blockquote>
+<p>待补充更多使用问题</p>
+</blockquote>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              <br/><br/><p>Subscribe：<a target="_blank" href="https://mailchi.mp/a1a0d59e7a19/joway"><b>Mailchimp</b></a></p><br/><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://blog.joway.io/images/cc.png" /></a>
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+<script src="/js/lazyload.min.js"></script>
+<script>
+  var lazyImage = new LazyLoad({
+    container: document.getElementById('article')
+  });
+</script>
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

@@ -3,7 +3,7 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://hanchao666.top/categories/</loc>
-    <lastmod>2023-09-08T10:52:26+08:00</lastmod>
+    <lastmod>2023-09-12T17:55:14+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="cn"
@@ -16,10 +16,13 @@
                 />
   </url><url>
     <loc>https://hanchao666.top/categories/</loc>
-    <lastmod>2023-09-08T10:52:26+08:00</lastmod>
+    <lastmod>2023-09-12T17:55:14+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/categories/design/</loc>
+    <lastmod>2023-09-12T17:55:14+08:00</lastmod>
   </url><url>
     <loc>https://hanchao666.top/</loc>
-    <lastmod>2023-09-08T10:52:26+08:00</lastmod>
+    <lastmod>2023-09-12T17:55:14+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="cn"
@@ -32,13 +35,127 @@
                 />
   </url><url>
     <loc>https://hanchao666.top/posts/</loc>
-    <lastmod>2023-09-08T10:52:26+08:00</lastmod>
+    <lastmod>2023-09-12T17:55:14+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/big-data-deduplicate/</loc>
+    <lastmod>2023-09-12T17:55:14+08:00</lastmod>
   </url><url>
     <loc>https://hanchao666.top/categories/thought/</loc>
     <lastmod>2023-09-08T10:52:26+08:00</lastmod>
   </url><url>
     <loc>https://hanchao666.top/posts/about-blog/</loc>
     <lastmod>2023-09-08T10:52:26+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/categories/db/</loc>
+    <lastmod>2023-09-07T18:56:01+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/mysql-binlog-redolog-undolog/</loc>
+    <lastmod>2023-09-07T18:56:01+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/categories/os/</loc>
+    <lastmod>2023-07-28T14:23:32+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/page-cache-and-buffer-cache/</loc>
+    <lastmod>2023-07-28T14:23:32+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/categories/coding/</loc>
+    <lastmod>2023-06-04T14:20:11+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/dirty-if-else-optimize/</loc>
+    <lastmod>2023-06-04T14:20:11+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/categories/frame/</loc>
+    <lastmod>2023-05-31T18:30:39+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/learn-about-springboot-autowire/</loc>
+    <lastmod>2023-05-31T18:30:39+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/fucking-reverse-proxy/</loc>
+    <lastmod>2023-04-13T14:18:04+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/refactor-unit-test/</loc>
+    <lastmod>2022-12-13T14:08:07+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/the-art-of-code-reading-note/</loc>
+    <lastmod>2022-08-24T14:16:28+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/about-java-schedule-frame/</loc>
+    <lastmod>2022-08-23T18:46:06+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/categories/cs/</loc>
+    <lastmod>2022-08-04T18:41:29+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/io-select-poll-epoll/</loc>
+    <lastmod>2022-08-04T18:41:29+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/categories/design-pattern/</loc>
+    <lastmod>2022-07-12T18:36:16+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/learn-design-pattern-from-frame/</loc>
+    <lastmod>2022-07-12T18:36:16+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/about-charset/</loc>
+    <lastmod>2022-06-24T18:38:50+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/think-about-ddd/</loc>
+    <lastmod>2022-06-03T18:34:08+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/distributed-system-consistency-avalibility/</loc>
+    <lastmod>2022-05-12T18:25:35+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/how-db-store-time/</loc>
+    <lastmod>2022-04-18T18:22:01+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/three-cache-way/</loc>
+    <lastmod>2022-04-03T17:36:04+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/my-programmer-english-thought/</loc>
+    <lastmod>2022-03-12T18:20:10+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/why-kafka-niubility/</loc>
+    <lastmod>2022-03-01T18:18:40+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/categories/midware/</loc>
+    <lastmod>2022-03-01T18:18:40+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/unit-test-pricinple/</loc>
+    <lastmod>2022-02-23T18:17:18+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/categories/network/</loc>
+    <lastmod>2022-02-22T18:13:43+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/understand-tcp/</loc>
+    <lastmod>2022-02-22T18:13:43+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/categories/java/</loc>
+    <lastmod>2022-01-12T17:59:27+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/confusing-list/</loc>
+    <lastmod>2022-01-12T17:59:27+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/log4j-attack/</loc>
+    <lastmod>2021-12-25T17:48:25+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/slow-sql-reason/</loc>
+    <lastmod>2021-11-07T17:22:19+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/singleton/</loc>
+    <lastmod>2021-11-03T16:48:51+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/4-q-when-use-mq/</loc>
+    <lastmod>2021-10-17T17:45:58+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/intreasting-trade-off-in-cs/</loc>
+    <lastmod>2021-09-13T14:13:51+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/thread-pool/</loc>
+    <lastmod>2021-09-09T17:24:49+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/arraylist/</loc>
+    <lastmod>2021-07-12T17:31:14+08:00</lastmod>
+  </url><url>
+    <loc>https://hanchao666.top/posts/understand-synchronized/</loc>
+    <lastmod>2021-07-01T18:09:27+08:00</lastmod>
   </url><url>
     <loc>https://hanchao666.top/categories/thought/</loc>
   </url><url>

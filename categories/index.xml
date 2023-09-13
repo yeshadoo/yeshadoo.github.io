@@ -6,13 +6,104 @@
     <description>Recent content in Categories on Hadoo&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 08 Sep 2023 10:52:26 +0800</lastBuildDate><atom:link href="https://hanchao666.top/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 12 Sep 2023 17:55:14 +0800</lastBuildDate><atom:link href="https://hanchao666.top/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Thought</title>
+      <title></title>
+      <link>https://hanchao666.top/categories/thought/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://hanchao666.top/categories/thought/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
+ <title>Thought</title>
       <link>https://hanchao666.top/categories/thought/</link>
       <pubDate>Fri, 08 Sep 2023 10:52:26 +0800</pubDate>
       
       <guid>https://hanchao666.top/categories/thought/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>DB</title>
+      <link>https://hanchao666.top/categories/db/</link>
+      <pubDate>Thu, 07 Sep 2023 18:56:01 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/categories/db/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>OS</title>
+      <link>https://hanchao666.top/categories/os/</link>
+      <pubDate>Fri, 28 Jul 2023 14:23:32 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/categories/os/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Coding</title>
+      <link>https://hanchao666.top/categories/coding/</link>
+      <pubDate>Sun, 04 Jun 2023 14:20:11 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/categories/coding/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Frame</title>
+      <link>https://hanchao666.top/categories/frame/</link>
+      <pubDate>Wed, 31 May 2023 18:30:39 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/categories/frame/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>CS</title>
+      <link>https://hanchao666.top/categories/cs/</link>
+      <pubDate>Thu, 04 Aug 2022 18:41:29 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/categories/cs/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Design Pattern</title>
+      <link>https://hanchao666.top/categories/design-pattern/</link>
+      <pubDate>Tue, 12 Jul 2022 18:36:16 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/categories/design-pattern/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Midware</title>
+      <link>https://hanchao666.top/categories/midware/</link>
+      <pubDate>Tue, 01 Mar 2022 18:18:40 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/categories/midware/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>NetWork</title>
+      <link>https://hanchao666.top/categories/network/</link>
+      <pubDate>Tue, 22 Feb 2022 18:13:43 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/categories/network/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Java</title>
+      <link>https://hanchao666.top/categories/java/</link>
+      <pubDate>Wed, 12 Jan 2022 17:59:27 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/categories/java/</guid>
       <description></description>
     </item>
     

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.118.2">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="" />
+  <meta property="og:url" content="https://hanchao666.top/posts/the-art-of-code-reading-note/" />
+  <link rel="canonical" href="https://hanchao666.top/posts/the-art-of-code-reading-note/" /><link rel="apple-touch-icon" href="/logo.png" />
+  <link rel="icon" href="/logo.png" />
+  <link rel="shortcut" href="/logo.png" /><link rel="alternate" type="application/atom+xml" href="https://hanchao666.top/index.xml" title="Hadoo&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/hanchao666.top\/"
+      },
+      "articleSection" : "posts",
+      "name" : "《代码的艺术》读书笔记",
+      "headline" : "《代码的艺术》读书笔记",
+      "description" : "书读的断断续续，所以读书笔记写的也是零零散散\n本书的作者是章淼老师，第一次邂逅是在他的个人公众号《章老师说》中，当时看了几节公开课，了解到章老师是清华大学计算机博士、百度代码规范委员会主席，于是就抱着崇拜的心理在京东下单了这本《代码的艺术》。\n首先这本书的书名就深得我心，一直以为，把代码写好真的是一门艺术，也是一名工程师应该有的追求，好的代码，如诗般优雅。在如今业务飞快发展的时代，工程师如果能够在时间紧、任务繁重的开发周期内，重视代码的可读性、可维护性，完善好相关文档，这种“慎独”式开发，真的是难能可贵。\n本书的主要内容主要围绕的是软件工程能力，这也是我大学本科的专业课程。曾经枯燥无味，应付期末考试的大学课程，如今在工作一年、经历了多次项目迭代、踩过很多次坑之后，让我对软件工程肃然起敬，看来人的见识格局还是会随着时间、阅历不断发展的。\n那什么是工程能力？\n使用系统化的方法，在保证质量的前提下，更高效率的为客户\/用户持续交付有价值的软件或服务的能力。\n短短的一句话，信息量巨大，且足以让我为之探索并努力整个职业生涯。\n系统化的方法 正如盖楼有很成熟的工序和方案，软件工程也是一个非常专业的领域。一个软件的生命周期，由产品设计、需求分析、系统设计、编码实现、质量保证、项目管理、系统运维和产品运营等多个模块组成，环环相扣。\n保证质量 在《软件开发的201个原则》中，作为一个软件项目，最重要也是最根本的原则，就是质量第一。没有保证质量，不管你使用多么巧妙的设计方案、多么优雅的设计模式，都狗屁不是，站不住脚的。但事实上是软件开发过程中的缺陷是无处不在、在所难免的，所以能够通过严谨的编码意识、科学的测试方法以及成熟的工程经验来把控项目质量，也是评判一个工程师是否优秀的标准。\n更高效率 说到效率，这里以我的自身经验，说一下入职以来导师对我的贯彻，因为那是进入职场第一天，所以尤其深刻。即：工具化思维，尤其在从事技术服务公司的平台类产品中，显的更为重要。会不会使用工具，是人和动物的根本区别，这是初中历史书的一句必考点。如今人类社会文明之高，很大程度上得益于对于工具的不断封装和升级改造，将既有智慧和既有能力沉淀为工具，在下一阶段进行复用，不断的迭代向前，这就是人类的牛逼之处，也是发展的趋势。正如我们想从北京开车到上海，不会去单独买个方向盘、买四个轮子，而是直接开着买来的车即可；正如互联网如火如荼的沉淀中台；正如公共框架对开发工作的简化\u0026hellip;\u0026hellip;\n研发的效率可提升的空间很大，且永无止境，我相信只要用心关注项目的细节，多想、敢想，总会有可以提高效率的点。\n持续 软件项目的研发和维护都是长周期的(去除部分圈钱上市跑路的项目)，一定得有长期维护、长期服务、持续改进优化的准备。这里我主要想到的就是重构。重构是伴随着项目整个生命周期的，好的项目并不是一开始设计出来的，而是演进出来的，在项目发展初期，可能由于业务理解不准确、未充分考虑后续兼容等，工程师可能会让项目的设计有所偏差，但毕竟谁都无法预测未来，所以我们要时刻警惕工程中的坏味道，持续重构，小步快跑，让项目的发展处于一个稳定高效的加速度中，而不是每次都从0到1的推到重来，这很重要，也是一个架构师的职责。\n价值 公司招聘工程师，就是为了解决问题、提供价值的。这句话可谓是充满了京东特色，因为“解决问题”，是老大的老大提出的，提供价值，是老大的老大的老大提出的。走出校园后，思维的一个变化点就是，之前总是从纯技术角度思考问题，喜欢使用复杂和高深的技术，觉得这更能体现工作价值，如今觉得，虽然技术很重要，但不能忽略业务，如果技术不能为业务创造价值，那么这个技术就没有价值(排除某些纯技术探索类项目)。技术，包括系统的设计和代码的编写，只是手段，不是目的。完成业务目标为第一，如果能够以更低的成本、更高的效率完成，那就更好了。工程师一定要业务和技术两条腿走路，业务为知，技术为行，知行合一，无往不利也。\n(\u0026mdash;\u0026mdash;\u0026mdash;\u0026mdash;\u0026ndash;知乎分割线\u0026mdash;\u0026mdash;\u0026mdash;\u0026mdash;\u0026ndash;)\n人在美国，刚下飞机(bushi)\n这本书的风格偏向理论化的工程知识，没有用大量的笔墨来描述工程细节，其实这种书籍是一个陷阱，虽然内容读起来很流畅、阅读速度也较快、内容也很认同，但实际上最重要的是吸收了多少、落地实践了多少。正如当时在极客时间学习《设计模式之美》专栏时，每一个设计原则、设计原则都理解起来并不难，但是如何能够根据项目的实际场景，将这些东西恰到火候的应用落地，才是最难的。书中看似简单通俗的话语，其实是大佬们在互联网工程领域摸爬滚打20多年总结的智慧，简单就是终极的复杂，这种书籍，一定是常读常新的。很庆幸刚进入这个行业，就能够接触到这样的书籍，很庆幸能够现在有不是那么固执落后的认知，而知易行难，软件开发的领域也是完成符合10000小时定律的，这要踩很多的坑、要走很多的弯路、要打很多的仗，加油吧少年！",
+      "inLanguage" : "en-US",
+      "author" : "",
+      "creator" : "",
+      "publisher": "",
+      "accountablePerson" : "",
+      "copyrightHolder" : "",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-08-24 14:16:28 \u002b0800 CST",
+      "dateModified" : "2022-08-24 14:16:28 \u002b0800 CST",
+      "url" : "https:\/\/hanchao666.top\/posts\/the-art-of-code-reading-note\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>《代码的艺术》读书笔记</title>
+  <meta property="og:title" content="《代码的艺术》读书笔记" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="书读的断断续续，所以读书笔记写的也是零零散散
+本书的作者是章淼老师，第一次邂逅是在他的个人公众号《章老师说》中，当时看了几节公开课，了解到章老师是清华大学计算机博士、百度代码规范委员会主席，于是就抱着崇拜的心理在京东下单了这本《代码的艺术》。
+首先这本书的书名就深得我心，一直以为，把代码写好真的是一门艺术，也是一名工程师应该有的追求，好的代码，如诗般优雅。在如今业务飞快发展的时代，工程师如果能够在时间紧、任务繁重的开发周期内，重视代码的可读性、可维护性，完善好相关文档，这种“慎独”式开发，真的是难能可贵。
+本书的主要内容主要围绕的是软件工程能力，这也是我大学本科的专业课程。曾经枯燥无味，应付期末考试的大学课程，如今在工作一年、经历了多次项目迭代、踩过很多次坑之后，让我对软件工程肃然起敬，看来人的见识格局还是会随着时间、阅历不断发展的。
+那什么是工程能力？
+使用系统化的方法，在保证质量的前提下，更高效率的为客户/用户持续交付有价值的软件或服务的能力。
+短短的一句话，信息量巨大，且足以让我为之探索并努力整个职业生涯。
+系统化的方法 正如盖楼有很成熟的工序和方案，软件工程也是一个非常专业的领域。一个软件的生命周期，由产品设计、需求分析、系统设计、编码实现、质量保证、项目管理、系统运维和产品运营等多个模块组成，环环相扣。
+保证质量 在《软件开发的201个原则》中，作为一个软件项目，最重要也是最根本的原则，就是质量第一。没有保证质量，不管你使用多么巧妙的设计方案、多么优雅的设计模式，都狗屁不是，站不住脚的。但事实上是软件开发过程中的缺陷是无处不在、在所难免的，所以能够通过严谨的编码意识、科学的测试方法以及成熟的工程经验来把控项目质量，也是评判一个工程师是否优秀的标准。
+更高效率 说到效率，这里以我的自身经验，说一下入职以来导师对我的贯彻，因为那是进入职场第一天，所以尤其深刻。即：工具化思维，尤其在从事技术服务公司的平台类产品中，显的更为重要。会不会使用工具，是人和动物的根本区别，这是初中历史书的一句必考点。如今人类社会文明之高，很大程度上得益于对于工具的不断封装和升级改造，将既有智慧和既有能力沉淀为工具，在下一阶段进行复用，不断的迭代向前，这就是人类的牛逼之处，也是发展的趋势。正如我们想从北京开车到上海，不会去单独买个方向盘、买四个轮子，而是直接开着买来的车即可；正如互联网如火如荼的沉淀中台；正如公共框架对开发工作的简化&amp;hellip;&amp;hellip;
+研发的效率可提升的空间很大，且永无止境，我相信只要用心关注项目的细节，多想、敢想，总会有可以提高效率的点。
+持续 软件项目的研发和维护都是长周期的(去除部分圈钱上市跑路的项目)，一定得有长期维护、长期服务、持续改进优化的准备。这里我主要想到的就是重构。重构是伴随着项目整个生命周期的，好的项目并不是一开始设计出来的，而是演进出来的，在项目发展初期，可能由于业务理解不准确、未充分考虑后续兼容等，工程师可能会让项目的设计有所偏差，但毕竟谁都无法预测未来，所以我们要时刻警惕工程中的坏味道，持续重构，小步快跑，让项目的发展处于一个稳定高效的加速度中，而不是每次都从0到1的推到重来，这很重要，也是一个架构师的职责。
+价值 公司招聘工程师，就是为了解决问题、提供价值的。这句话可谓是充满了京东特色，因为“解决问题”，是老大的老大提出的，提供价值，是老大的老大的老大提出的。走出校园后，思维的一个变化点就是，之前总是从纯技术角度思考问题，喜欢使用复杂和高深的技术，觉得这更能体现工作价值，如今觉得，虽然技术很重要，但不能忽略业务，如果技术不能为业务创造价值，那么这个技术就没有价值(排除某些纯技术探索类项目)。技术，包括系统的设计和代码的编写，只是手段，不是目的。完成业务目标为第一，如果能够以更低的成本、更高的效率完成，那就更好了。工程师一定要业务和技术两条腿走路，业务为知，技术为行，知行合一，无往不利也。
+(&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;ndash;知乎分割线&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;ndash;)
+人在美国，刚下飞机(bushi)
+这本书的风格偏向理论化的工程知识，没有用大量的笔墨来描述工程细节，其实这种书籍是一个陷阱，虽然内容读起来很流畅、阅读速度也较快、内容也很认同，但实际上最重要的是吸收了多少、落地实践了多少。正如当时在极客时间学习《设计模式之美》专栏时，每一个设计原则、设计原则都理解起来并不难，但是如何能够根据项目的实际场景，将这些东西恰到火候的应用落地，才是最难的。书中看似简单通俗的话语，其实是大佬们在互联网工程领域摸爬滚打20多年总结的智慧，简单就是终极的复杂，这种书籍，一定是常读常新的。很庆幸刚进入这个行业，就能够接触到这样的书籍，很庆幸能够现在有不是那么固执落后的认知，而知易行难，软件开发的领域也是完成符合10000小时定律的，这要踩很多的坑、要走很多的弯路、要打很多的仗，加油吧少年！" />
+  <meta name="description" content="书读的断断续续，所以读书笔记写的也是零零散散
+本书的作者是章淼老师，第一次邂逅是在他的个人公众号《章老师说》中，当时看了几节公开课，了解到章老师是清华大学计算机博士、百度代码规范委员会主席，于是就抱着崇拜的心理在京东下单了这本《代码的艺术》。
+首先这本书的书名就深得我心，一直以为，把代码写好真的是一门艺术，也是一名工程师应该有的追求，好的代码，如诗般优雅。在如今业务飞快发展的时代，工程师如果能够在时间紧、任务繁重的开发周期内，重视代码的可读性、可维护性，完善好相关文档，这种“慎独”式开发，真的是难能可贵。
+本书的主要内容主要围绕的是软件工程能力，这也是我大学本科的专业课程。曾经枯燥无味，应付期末考试的大学课程，如今在工作一年、经历了多次项目迭代、踩过很多次坑之后，让我对软件工程肃然起敬，看来人的见识格局还是会随着时间、阅历不断发展的。
+那什么是工程能力？
+使用系统化的方法，在保证质量的前提下，更高效率的为客户/用户持续交付有价值的软件或服务的能力。
+短短的一句话，信息量巨大，且足以让我为之探索并努力整个职业生涯。
+系统化的方法 正如盖楼有很成熟的工序和方案，软件工程也是一个非常专业的领域。一个软件的生命周期，由产品设计、需求分析、系统设计、编码实现、质量保证、项目管理、系统运维和产品运营等多个模块组成，环环相扣。
+保证质量 在《软件开发的201个原则》中，作为一个软件项目，最重要也是最根本的原则，就是质量第一。没有保证质量，不管你使用多么巧妙的设计方案、多么优雅的设计模式，都狗屁不是，站不住脚的。但事实上是软件开发过程中的缺陷是无处不在、在所难免的，所以能够通过严谨的编码意识、科学的测试方法以及成熟的工程经验来把控项目质量，也是评判一个工程师是否优秀的标准。
+更高效率 说到效率，这里以我的自身经验，说一下入职以来导师对我的贯彻，因为那是进入职场第一天，所以尤其深刻。即：工具化思维，尤其在从事技术服务公司的平台类产品中，显的更为重要。会不会使用工具，是人和动物的根本区别，这是初中历史书的一句必考点。如今人类社会文明之高，很大程度上得益于对于工具的不断封装和升级改造，将既有智慧和既有能力沉淀为工具，在下一阶段进行复用，不断的迭代向前，这就是人类的牛逼之处，也是发展的趋势。正如我们想从北京开车到上海，不会去单独买个方向盘、买四个轮子，而是直接开着买来的车即可；正如互联网如火如荼的沉淀中台；正如公共框架对开发工作的简化&amp;hellip;&amp;hellip;
+研发的效率可提升的空间很大，且永无止境，我相信只要用心关注项目的细节，多想、敢想，总会有可以提高效率的点。
+持续 软件项目的研发和维护都是长周期的(去除部分圈钱上市跑路的项目)，一定得有长期维护、长期服务、持续改进优化的准备。这里我主要想到的就是重构。重构是伴随着项目整个生命周期的，好的项目并不是一开始设计出来的，而是演进出来的，在项目发展初期，可能由于业务理解不准确、未充分考虑后续兼容等，工程师可能会让项目的设计有所偏差，但毕竟谁都无法预测未来，所以我们要时刻警惕工程中的坏味道，持续重构，小步快跑，让项目的发展处于一个稳定高效的加速度中，而不是每次都从0到1的推到重来，这很重要，也是一个架构师的职责。
+价值 公司招聘工程师，就是为了解决问题、提供价值的。这句话可谓是充满了京东特色，因为“解决问题”，是老大的老大提出的，提供价值，是老大的老大的老大提出的。走出校园后，思维的一个变化点就是，之前总是从纯技术角度思考问题，喜欢使用复杂和高深的技术，觉得这更能体现工作价值，如今觉得，虽然技术很重要，但不能忽略业务，如果技术不能为业务创造价值，那么这个技术就没有价值(排除某些纯技术探索类项目)。技术，包括系统的设计和代码的编写，只是手段，不是目的。完成业务目标为第一，如果能够以更低的成本、更高的效率完成，那就更好了。工程师一定要业务和技术两条腿走路，业务为知，技术为行，知行合一，无往不利也。
+(&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;ndash;知乎分割线&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;&amp;ndash;)
+人在美国，刚下飞机(bushi)
+这本书的风格偏向理论化的工程知识，没有用大量的笔墨来描述工程细节，其实这种书籍是一个陷阱，虽然内容读起来很流畅、阅读速度也较快、内容也很认同，但实际上最重要的是吸收了多少、落地实践了多少。正如当时在极客时间学习《设计模式之美》专栏时，每一个设计原则、设计原则都理解起来并不难，但是如何能够根据项目的实际场景，将这些东西恰到火候的应用落地，才是最难的。书中看似简单通俗的话语，其实是大佬们在互联网工程领域摸爬滚打20多年总结的智慧，简单就是终极的复杂，这种书籍，一定是常读常新的。很庆幸刚进入这个行业，就能够接触到这样的书籍，很庆幸能够现在有不是那么固执落后的认知，而知易行难，软件开发的领域也是完成符合10000小时定律的，这要踩很多的坑、要走很多的弯路、要打很多的仗，加油吧少年！" />
+  <meta property="og:locale" content="en-us" /><meta property="og:image" content="/logo.png" />
+  
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px;background-color:#f6f8fa}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Hadoo&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-53624533-8"></script><script src="https://cdn.jsdelivr.net/gh/joway/homepage/analytics.js"></script>
+</head>
+
+
+<body>
+  <article class="post " id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Hadoo&#39;s Blog</a
+    >
+  </div>
+  <div class="header-subtitle">大道至简，知行合一</div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://github.com/yeshadoo" target="_blank">About Me</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/yeshadoo" target="_blank">Github</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+   
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/cn/">Chinese</a>
+  </div>
+   
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">《代码的艺术》读书笔记</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-08-24 14:16:28 CST">
+                24 Aug 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>书读的断断续续，所以读书笔记写的也是零零散散</p>
+<p>本书的作者是章淼老师，第一次邂逅是在他的个人公众号《章老师说》中，当时看了几节公开课，了解到章老师是清华大学计算机博士、百度代码规范委员会主席，于是就抱着崇拜的心理在京东下单了这本《代码的艺术》。</p>
+<p>首先这本书的书名就深得我心，一直以为，把代码写好真的是一门艺术，也是一名工程师应该有的追求，好的代码，如诗般优雅。在如今业务飞快发展的时代，工程师如果能够在时间紧、任务繁重的开发周期内，重视代码的可读性、可维护性，完善好相关文档，这种“慎独”式开发，真的是难能可贵。</p>
+<p>本书的主要内容主要围绕的是软件工程能力，这也是我大学本科的专业课程。曾经枯燥无味，应付期末考试的大学课程，如今在工作一年、经历了多次项目迭代、踩过很多次坑之后，让我对软件工程肃然起敬，看来人的见识格局还是会随着时间、阅历不断发展的。</p>
+<p>那什么是工程能力？</p>
+<blockquote>
+<p>使用<strong>系统化</strong>的方法，在<strong>保证质量</strong>的前提下，<strong>更高效率</strong>的为客户/用户<strong>持续</strong>交付<strong>有价值</strong>的软件或服务的能力。</p>
+</blockquote>
+<p>短短的一句话，信息量巨大，且足以让我为之探索并努力整个职业生涯。</p>
+<ul>
+<li>系统化的方法</li>
+</ul>
+<p>正如盖楼有很成熟的工序和方案，软件工程也是一个非常专业的领域。一个软件的生命周期，由产品设计、需求分析、系统设计、编码实现、质量保证、项目管理、系统运维和产品运营等多个模块组成，环环相扣。</p>
+<ul>
+<li>保证质量</li>
+</ul>
+<p>在《软件开发的201个原则》中，作为一个软件项目，最重要也是最根本的原则，就是质量第一。没有保证质量，不管你使用多么巧妙的设计方案、多么优雅的设计模式，都狗屁不是，站不住脚的。但事实上是软件开发过程中的缺陷是无处不在、在所难免的，所以能够通过严谨的编码意识、科学的测试方法以及成熟的工程经验来把控项目质量，也是评判一个工程师是否优秀的标准。</p>
+<ul>
+<li>更高效率</li>
+</ul>
+<p>说到效率，这里以我的自身经验，说一下入职以来导师对我的贯彻，因为那是进入职场第一天，所以尤其深刻。即：工具化思维，尤其在从事技术服务公司的平台类产品中，显的更为重要。会不会使用工具，是人和动物的根本区别，这是初中历史书的一句必考点。如今人类社会文明之高，很大程度上得益于对于工具的不断封装和升级改造，将既有智慧和既有能力沉淀为工具，在下一阶段进行复用，不断的迭代向前，这就是人类的牛逼之处，也是发展的趋势。正如我们想从北京开车到上海，不会去单独买个方向盘、买四个轮子，而是直接开着买来的车即可；正如互联网如火如荼的沉淀中台；正如公共框架对开发工作的简化&hellip;&hellip;</p>
+<p>研发的效率可提升的空间很大，且永无止境，我相信只要用心关注项目的细节，多想、敢想，总会有可以提高效率的点。</p>
+<ul>
+<li>持续</li>
+</ul>
+<p>软件项目的研发和维护都是长周期的(去除部分圈钱上市跑路的项目)，一定得有长期维护、长期服务、持续改进优化的准备。这里我主要想到的就是重构。重构是伴随着项目整个生命周期的，好的项目并不是一开始设计出来的，而是演进出来的，在项目发展初期，可能由于业务理解不准确、未充分考虑后续兼容等，工程师可能会让项目的设计有所偏差，但毕竟谁都无法预测未来，所以我们要时刻警惕工程中的坏味道，持续重构，小步快跑，让项目的发展处于一个稳定高效的加速度中，而不是每次都从0到1的推到重来，这很重要，也是一个架构师的职责。</p>
+<ul>
+<li>价值</li>
+</ul>
+<p>公司招聘工程师，就是为了解决问题、提供价值的。这句话可谓是充满了京东特色，因为“解决问题”，是老大的老大提出的，提供价值，是老大的老大的老大提出的。走出校园后，思维的一个变化点就是，之前总是从纯技术角度思考问题，喜欢使用复杂和高深的技术，觉得这更能体现工作价值，如今觉得，虽然技术很重要，但不能忽略业务，如果技术不能为业务创造价值，那么这个技术就没有价值(排除某些纯技术探索类项目)。技术，包括系统的设计和代码的编写，只是手段，不是目的。完成业务目标为第一，如果能够以更低的成本、更高的效率完成，那就更好了。工程师一定要业务和技术两条腿走路，业务为知，技术为行，知行合一，无往不利也。</p>
+<hr>
+<p>(&mdash;&mdash;&mdash;&mdash;&ndash;知乎分割线&mdash;&mdash;&mdash;&mdash;&ndash;)</p>
+<p>人在美国，刚下飞机(bushi)</p>
+<p>这本书的风格偏向理论化的工程知识，没有用大量的笔墨来描述工程细节，其实这种书籍是一个陷阱，虽然内容读起来很流畅、阅读速度也较快、内容也很认同，但实际上最重要的是吸收了多少、落地实践了多少。正如当时在极客时间学习《设计模式之美》专栏时，每一个设计原则、设计原则都理解起来并不难，但是如何能够根据项目的实际场景，将这些东西恰到火候的应用落地，才是最难的。书中看似简单通俗的话语，其实是大佬们在互联网工程领域摸爬滚打20多年总结的智慧，简单就是终极的复杂，这种书籍，一定是常读常新的。很庆幸刚进入这个行业，就能够接触到这样的书籍，很庆幸能够现在有不是那么固执落后的认知，而知易行难，软件开发的领域也是完成符合10000小时定律的，这要踩很多的坑、要走很多的弯路、要打很多的仗，加油吧少年！</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              <br/><br/><p>Subscribe：<a target="_blank" href="https://mailchi.mp/a1a0d59e7a19/joway"><b>Mailchimp</b></a></p><br/><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://blog.joway.io/images/cc.png" /></a>
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+<script src="/js/lazyload.min.js"></script>
+<script>
+  var lazyImage = new LazyLoad({
+    container: document.getElementById('article')
+  });
+</script>
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

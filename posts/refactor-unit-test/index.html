@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.118.2">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="" />
+  <meta property="og:url" content="https://hanchao666.top/posts/refactor-unit-test/" />
+  <link rel="canonical" href="https://hanchao666.top/posts/refactor-unit-test/" /><link rel="apple-touch-icon" href="/logo.png" />
+  <link rel="icon" href="/logo.png" />
+  <link rel="shortcut" href="/logo.png" /><link rel="alternate" type="application/atom+xml" href="https://hanchao666.top/index.xml" title="Hadoo&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/hanchao666.top\/"
+      },
+      "articleSection" : "posts",
+      "name" : "【代码精进之路】- 重构\u0026单元测试",
+      "headline" : "【代码精进之路】- 重构\u0026单元测试",
+      "description" : "博客开了一个新的菜单，名为【代码精进之路】，主要用于记录学习与实践过程中关于代码质量的思考与经验总结。\n本篇文章题目较大，后续会不断进行内容的补充完善，文章内容主要出自笔者本人重构项目的思考总结，以及极客时间《设计模式之美》的学习内容。\n一 概述 什么是重构？ 软件设计大师、《重构》作者Martin Fowler如此定义：”重构是一种对软件内部结构的改善，目的是在不改变软件的可见行为的情况下，使其更容易理解，修改成本更低。“\n为什么要重构？ 根据熵增定律，所有事物都在向着无规律、无序和混乱发展，例如屋子不收拾会变乱、手机会越来越卡、耳机线会变凌乱\u0026hellip;\u0026hellip;同样的，代码质量也逃不过。项目在演进，随着需求的增多，代码在不停的堆砌，同时也在朝着混乱的方向发展，如果没有人为代码质量负责，那么量变引起质变，代码腐败到维护成本甚至会高过重新开发一套新代码的成本，这会影响到项目的迭代与交付效率，往大了说，在之前国内互联网圈地跑马阶段，迭代交付的慢就会错过商机，所以，重构是一个研发团队保持稳定高效输出的有力手段。\n重构无法避免。优秀的代码或架构绝不是一开始就设计好的，而是演进出来的。我们无法100%遇见未来的需求，也没有足够的精力、时间、资源为遥远的未来买单，所以随着系统的演进，我们要接受重构是一个常态化行为。\n什么时候重构？ 持续重构。\n这是一种可持续、可演进的方式，这要求我们时刻具有持续重构意识，才能避免开发初期就进行过度设计而追求完美、避免代码维护过程中质量的下降，可以在日常迭代开发中掺入”小动作“，例如在修改、添加某个功能代码的时候，可以顺手把不符合编码规范、不好的设计重构一下，把它和单元测试、CodeReview一样，作为一种开发习惯。\n如何重构？ 按照规模，重构可以笼统的分为大型重构和小型重构，\n对于大型重构，往往涉及的模块、代码较多，很可能会出现越改越多、越改越乱的情况，另外在如今迭代周期普遍较为紧张的情况下，也很难找出一整块完整的时间来进行整个项目的重构。\n一个建议就是大型重构一定要提前做好完善的重构计划，有条不紊的分阶段进行，每个阶段完成一小部分代码的重构，然后提交、测试、运行，发现没问题后，再继续进行下一阶段，尽量保证代码仓库中的代码一直处于可运行、逻辑正确的状态。每个阶段都要控制好重构的影响范围以及持续时间，小步快走的方式很重要！\n而小规模层次的重构，因为影响范围小，改动耗时短，可以随时穿插着做。\n二 重构的技术保障手段-单元测试 ！！！单元测试！！！\n主观因素：重构开发者的技术实力 客观因素：科学化技术手段 从主观上来看，需要开发者对所重构的业务和代码要有足够的了解，也需要开发者技术够硬，能hold的住，这没的说。\n从客观上来看，最可落地执行、最有效的保证重构不出错的手段，就是单元测试。当重构完成之后，如果新的代码仍然能够通过单元测试，那就说明代码原有逻辑的正确性未被破坏，原有的外部可见行为没变。\n下面来主要探讨一下【单元测试】那些事。\n单元测试的测试对象是类或函数，用来测试一个类或函数是否都按预期的逻辑执行，由程序员自己来书写以验证自己写的代码的正确性。\n单元测试可能会被很多开发团队或工程师忽略，笔者以前同样认为编写并维护单元测试是一件”没必要“的事，然而被现实给上了一课，测试以及用户反馈的一个个bug，绝大多数都是由于代码的方法中的”小问题“导致的，这些问题或者是由于粗心笔误、或者是由于修改后未及时回归，所以说，做好测试的第一步也是最重要的一步就是：要重视单元测试。搞好单元测试，Bug Free不是梦！\n除了让我们及时有效的以fail-fast的方式发现代码逻辑问题，单测也能够帮助我们发现设计上的问题，如果你垫的单元测试写起来很吃力，那往往意味着代码设计的不够合理，例如第三方依赖mock不掉、大量使用静态函数或全局变量、代码高度耦合等，代码的可测试性也是衡量代码质量的重要参考因素哦。\n另外在我们刚刚接触一个新的项目时，如学习某开源项目，那么推荐的一个方式就是从单测入手，阅读单测可以帮助我们快速的熟悉代码，单元测试一般是一个独立的小功能，好的单测也是见名知意的，借助于此我们可以不再像无头苍蝇一样寻找代码的逻辑链路，可以更省力的知道代码实现了什么功能。\n不要觉得有了测试团队，写单测就是浪费时间，现在很多公司的开发模式还仍然是写好代码直接提交，然后丢给黑盒测试拼命的测，测出问题就反馈给开发团队修改，测不出的问题就留在线上出问题了再修复，作为一名有追求的开发者，我们要对自己写的代码负责。\n三 单元测试如何做 上述两节较为理论化，下面以一个实际的案例来说明。\n代码如下所示，其中Transaction是一个简化后的电商系统交易类，用来记录每笔订单交易的情况。Transaction中的execute()负责执行转账操作，将钱从买家的钱包转到卖家的钱包中。真正的转账操作是WallRpcService的RPC服务来完成的。除此以外，代码中还涉及一个分布式锁DistributedLock单例类，用来避免Tracnsaction并发执行，导致用户的钱被重复转出。\n针对核心逻辑execute()方法，设计出以下6个测试用例：\n设计完测试用例，当我们将他们落实到具体的代码实现时，却有很多不顺利的地方，以第一个测试用例为例，其代码实现为：\nexecute()函数的执行依赖两个外部服务，一个是RedisDistributedLock，一个是WalletRpcService，导致这个用例存在以下问题：\n这个方法对于两个外部服务是强依赖的，如果这两个服务没有提供线下测试环境，我们可能需要自己搭建。 即使RPC服务有线下测试环境，但如果服务提供者是另外一个团队维护，我们输入正确的入参，结果也不一定返回成功，即RPC的对端也可能是不可靠的，这需要联调。 Redis、RPC依赖网络通信，耗时可能比较长，对单测的执行性能会有影响。 网络的中断、超时、Redis、RPC服务的不可用，都需要考虑。 而单元测试的目的，是为了测试程序员自己编写的代码逻辑是否正确，并非是端到端的集成测试，无需验证所依赖的外部系统的逻辑正确性。所以，我们需要将被测代码与外部系统依赖解耦，采用的方式就是mock。所谓mock就是以假乱真，用mock的服务输出我们想要的数据。\nmock的方式主要有两种，框架mock和手动mock。框架mock例如@Mokito，可以简化代码的编写，这里演示一下使用手动mock的方式。\n通过继承WalletrpcService类，并且重写其中的moveMoney()函数的方式来实现mock，使其返回我们任意想要的数据，而不进行真正的网络通信。\n接下来使用依赖注入的方式优化一下execute()函数的可测试性，因为WalletRpcService是通过new(0的方式创建的，我们无法对其实现进行替换，可以借助依赖注入这个神器，将WalletrpcService对象的创建反转给上层逻辑，在外部创建好之后，再注入到Transaction中，如下所示：\n然后在单元测试中WalletRpcService实现类进行替换，\n接下来看一下RedisDistributedLock，这家伙更棘手，因为它是一个单例类，相当于一个全局变量，我们无法通过继承并重写的方式mock，也无法通过依赖注入的方式来替换。\n如果RedisDistributedLock是我们自己维护的，可以将其实现修改为非静态单例类的模式，或抽出一个接口，比如IDistributedLock，让RedisDistributedLock实现这个接口，我们也就可以通过依赖注入的方式对其进行替换，可是如果这个类不是我们自己维护的，怎么办？\n我们可以对上锁这部分逻辑重新封装一下，如下：\n代码重构后，使用如下的单元测试代码，即可mock掉外部依赖，测试我们自己的代码逻辑了！\n加下来再看一个测试用例3：交易已过期(createTimeStamp超过14天)，交易状态设置为EXPIRED，返回false。写出的单测代码如下：\n看起来没啥问题，把时间戳设置为14天前，transaction一定处于过期状态，但是如果createTimeStamp没有暴露set方法呢？例如createTimeStamp的业务定义是在交易生成时自动获取的系统时间，不应该放开修改权限那怎么测？\n对于时间和随机函数等这种”未决行为“，一般的处理方式是将未决行为逻辑进行重新封装，将是否交易过期的逻辑封装到isExpired()函数即可，代码如下：\n针对重构之后的代码，新的测试用例代码如下：\n破坏代码可测试性的行为 未决行为 未决行为逻辑即代码的输出是随机的或者是不确定的，比如跟时间、随机数有关的代码，一个有效的解决方法就是封装不确定性。\n全局变量 全局变量是一种面向过程的编码风格，对代码的可测试性非常不友好，因为每个测试用例都可以对全局变量进行修改导致测试用例之间的数据耦合。\n静态方法 静态方法也是一种面向过程的编码风格，这也会影响代码的可测试性，静态方法不容易mock。\n复杂继承 如果父类需要mock某个依赖对象才能进行单元测试，那所有的子类、孙子类在编写单测的时候，都需要mock这个依赖对象，如果对于层次很深、结构复杂的继承关系，那么越底层的子类需要mock的对象可能就会越多，麻烦的很。\n所以推荐尽可能的使用组合而非继承来组织类之间的关系，类之间的结构层次比较扁平，在编写单元测试的时候只需要mock类所组合依赖的对象即可。\n四 大型重构之解耦 为什么要解耦",
+      "inLanguage" : "en-US",
+      "author" : "",
+      "creator" : "",
+      "publisher": "",
+      "accountablePerson" : "",
+      "copyrightHolder" : "",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-12-13 14:08:07 \u002b0800 CST",
+      "dateModified" : "2022-12-13 14:08:07 \u002b0800 CST",
+      "url" : "https:\/\/hanchao666.top\/posts\/refactor-unit-test\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>【代码精进之路】- 重构&amp;单元测试</title>
+  <meta property="og:title" content="【代码精进之路】- 重构&amp;单元测试" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="博客开了一个新的菜单，名为【代码精进之路】，主要用于记录学习与实践过程中关于代码质量的思考与经验总结。
+本篇文章题目较大，后续会不断进行内容的补充完善，文章内容主要出自笔者本人重构项目的思考总结，以及极客时间《设计模式之美》的学习内容。
+一 概述 什么是重构？ 软件设计大师、《重构》作者Martin Fowler如此定义：”重构是一种对软件内部结构的改善，目的是在不改变软件的可见行为的情况下，使其更容易理解，修改成本更低。“
+为什么要重构？ 根据熵增定律，所有事物都在向着无规律、无序和混乱发展，例如屋子不收拾会变乱、手机会越来越卡、耳机线会变凌乱&amp;hellip;&amp;hellip;同样的，代码质量也逃不过。项目在演进，随着需求的增多，代码在不停的堆砌，同时也在朝着混乱的方向发展，如果没有人为代码质量负责，那么量变引起质变，代码腐败到维护成本甚至会高过重新开发一套新代码的成本，这会影响到项目的迭代与交付效率，往大了说，在之前国内互联网圈地跑马阶段，迭代交付的慢就会错过商机，所以，重构是一个研发团队保持稳定高效输出的有力手段。
+重构无法避免。优秀的代码或架构绝不是一开始就设计好的，而是演进出来的。我们无法100%遇见未来的需求，也没有足够的精力、时间、资源为遥远的未来买单，所以随着系统的演进，我们要接受重构是一个常态化行为。
+什么时候重构？ 持续重构。
+这是一种可持续、可演进的方式，这要求我们时刻具有持续重构意识，才能避免开发初期就进行过度设计而追求完美、避免代码维护过程中质量的下降，可以在日常迭代开发中掺入”小动作“，例如在修改、添加某个功能代码的时候，可以顺手把不符合编码规范、不好的设计重构一下，把它和单元测试、CodeReview一样，作为一种开发习惯。
+如何重构？ 按照规模，重构可以笼统的分为大型重构和小型重构，
+对于大型重构，往往涉及的模块、代码较多，很可能会出现越改越多、越改越乱的情况，另外在如今迭代周期普遍较为紧张的情况下，也很难找出一整块完整的时间来进行整个项目的重构。
+一个建议就是大型重构一定要提前做好完善的重构计划，有条不紊的分阶段进行，每个阶段完成一小部分代码的重构，然后提交、测试、运行，发现没问题后，再继续进行下一阶段，尽量保证代码仓库中的代码一直处于可运行、逻辑正确的状态。每个阶段都要控制好重构的影响范围以及持续时间，小步快走的方式很重要！
+而小规模层次的重构，因为影响范围小，改动耗时短，可以随时穿插着做。
+二 重构的技术保障手段-单元测试 ！！！单元测试！！！
+主观因素：重构开发者的技术实力 客观因素：科学化技术手段 从主观上来看，需要开发者对所重构的业务和代码要有足够的了解，也需要开发者技术够硬，能hold的住，这没的说。
+从客观上来看，最可落地执行、最有效的保证重构不出错的手段，就是单元测试。当重构完成之后，如果新的代码仍然能够通过单元测试，那就说明代码原有逻辑的正确性未被破坏，原有的外部可见行为没变。
+下面来主要探讨一下【单元测试】那些事。
+单元测试的测试对象是类或函数，用来测试一个类或函数是否都按预期的逻辑执行，由程序员自己来书写以验证自己写的代码的正确性。
+单元测试可能会被很多开发团队或工程师忽略，笔者以前同样认为编写并维护单元测试是一件”没必要“的事，然而被现实给上了一课，测试以及用户反馈的一个个bug，绝大多数都是由于代码的方法中的”小问题“导致的，这些问题或者是由于粗心笔误、或者是由于修改后未及时回归，所以说，做好测试的第一步也是最重要的一步就是：要重视单元测试。搞好单元测试，Bug Free不是梦！
+除了让我们及时有效的以fail-fast的方式发现代码逻辑问题，单测也能够帮助我们发现设计上的问题，如果你垫的单元测试写起来很吃力，那往往意味着代码设计的不够合理，例如第三方依赖mock不掉、大量使用静态函数或全局变量、代码高度耦合等，代码的可测试性也是衡量代码质量的重要参考因素哦。
+另外在我们刚刚接触一个新的项目时，如学习某开源项目，那么推荐的一个方式就是从单测入手，阅读单测可以帮助我们快速的熟悉代码，单元测试一般是一个独立的小功能，好的单测也是见名知意的，借助于此我们可以不再像无头苍蝇一样寻找代码的逻辑链路，可以更省力的知道代码实现了什么功能。
+不要觉得有了测试团队，写单测就是浪费时间，现在很多公司的开发模式还仍然是写好代码直接提交，然后丢给黑盒测试拼命的测，测出问题就反馈给开发团队修改，测不出的问题就留在线上出问题了再修复，作为一名有追求的开发者，我们要对自己写的代码负责。
+三 单元测试如何做 上述两节较为理论化，下面以一个实际的案例来说明。
+代码如下所示，其中Transaction是一个简化后的电商系统交易类，用来记录每笔订单交易的情况。Transaction中的execute()负责执行转账操作，将钱从买家的钱包转到卖家的钱包中。真正的转账操作是WallRpcService的RPC服务来完成的。除此以外，代码中还涉及一个分布式锁DistributedLock单例类，用来避免Tracnsaction并发执行，导致用户的钱被重复转出。
+针对核心逻辑execute()方法，设计出以下6个测试用例：
+设计完测试用例，当我们将他们落实到具体的代码实现时，却有很多不顺利的地方，以第一个测试用例为例，其代码实现为：
+execute()函数的执行依赖两个外部服务，一个是RedisDistributedLock，一个是WalletRpcService，导致这个用例存在以下问题：
+这个方法对于两个外部服务是强依赖的，如果这两个服务没有提供线下测试环境，我们可能需要自己搭建。 即使RPC服务有线下测试环境，但如果服务提供者是另外一个团队维护，我们输入正确的入参，结果也不一定返回成功，即RPC的对端也可能是不可靠的，这需要联调。 Redis、RPC依赖网络通信，耗时可能比较长，对单测的执行性能会有影响。 网络的中断、超时、Redis、RPC服务的不可用，都需要考虑。 而单元测试的目的，是为了测试程序员自己编写的代码逻辑是否正确，并非是端到端的集成测试，无需验证所依赖的外部系统的逻辑正确性。所以，我们需要将被测代码与外部系统依赖解耦，采用的方式就是mock。所谓mock就是以假乱真，用mock的服务输出我们想要的数据。
+mock的方式主要有两种，框架mock和手动mock。框架mock例如@Mokito，可以简化代码的编写，这里演示一下使用手动mock的方式。
+通过继承WalletrpcService类，并且重写其中的moveMoney()函数的方式来实现mock，使其返回我们任意想要的数据，而不进行真正的网络通信。
+接下来使用依赖注入的方式优化一下execute()函数的可测试性，因为WalletRpcService是通过new(0的方式创建的，我们无法对其实现进行替换，可以借助依赖注入这个神器，将WalletrpcService对象的创建反转给上层逻辑，在外部创建好之后，再注入到Transaction中，如下所示：
+然后在单元测试中WalletRpcService实现类进行替换，
+接下来看一下RedisDistributedLock，这家伙更棘手，因为它是一个单例类，相当于一个全局变量，我们无法通过继承并重写的方式mock，也无法通过依赖注入的方式来替换。
+如果RedisDistributedLock是我们自己维护的，可以将其实现修改为非静态单例类的模式，或抽出一个接口，比如IDistributedLock，让RedisDistributedLock实现这个接口，我们也就可以通过依赖注入的方式对其进行替换，可是如果这个类不是我们自己维护的，怎么办？
+我们可以对上锁这部分逻辑重新封装一下，如下：
+代码重构后，使用如下的单元测试代码，即可mock掉外部依赖，测试我们自己的代码逻辑了！
+加下来再看一个测试用例3：交易已过期(createTimeStamp超过14天)，交易状态设置为EXPIRED，返回false。写出的单测代码如下：
+看起来没啥问题，把时间戳设置为14天前，transaction一定处于过期状态，但是如果createTimeStamp没有暴露set方法呢？例如createTimeStamp的业务定义是在交易生成时自动获取的系统时间，不应该放开修改权限那怎么测？
+对于时间和随机函数等这种”未决行为“，一般的处理方式是将未决行为逻辑进行重新封装，将是否交易过期的逻辑封装到isExpired()函数即可，代码如下：
+针对重构之后的代码，新的测试用例代码如下：
+破坏代码可测试性的行为 未决行为 未决行为逻辑即代码的输出是随机的或者是不确定的，比如跟时间、随机数有关的代码，一个有效的解决方法就是封装不确定性。
+全局变量 全局变量是一种面向过程的编码风格，对代码的可测试性非常不友好，因为每个测试用例都可以对全局变量进行修改导致测试用例之间的数据耦合。
+静态方法 静态方法也是一种面向过程的编码风格，这也会影响代码的可测试性，静态方法不容易mock。
+复杂继承 如果父类需要mock某个依赖对象才能进行单元测试，那所有的子类、孙子类在编写单测的时候，都需要mock这个依赖对象，如果对于层次很深、结构复杂的继承关系，那么越底层的子类需要mock的对象可能就会越多，麻烦的很。
+所以推荐尽可能的使用组合而非继承来组织类之间的关系，类之间的结构层次比较扁平，在编写单元测试的时候只需要mock类所组合依赖的对象即可。
+四 大型重构之解耦 为什么要解耦" />
+  <meta name="description" content="博客开了一个新的菜单，名为【代码精进之路】，主要用于记录学习与实践过程中关于代码质量的思考与经验总结。
+本篇文章题目较大，后续会不断进行内容的补充完善，文章内容主要出自笔者本人重构项目的思考总结，以及极客时间《设计模式之美》的学习内容。
+一 概述 什么是重构？ 软件设计大师、《重构》作者Martin Fowler如此定义：”重构是一种对软件内部结构的改善，目的是在不改变软件的可见行为的情况下，使其更容易理解，修改成本更低。“
+为什么要重构？ 根据熵增定律，所有事物都在向着无规律、无序和混乱发展，例如屋子不收拾会变乱、手机会越来越卡、耳机线会变凌乱&amp;hellip;&amp;hellip;同样的，代码质量也逃不过。项目在演进，随着需求的增多，代码在不停的堆砌，同时也在朝着混乱的方向发展，如果没有人为代码质量负责，那么量变引起质变，代码腐败到维护成本甚至会高过重新开发一套新代码的成本，这会影响到项目的迭代与交付效率，往大了说，在之前国内互联网圈地跑马阶段，迭代交付的慢就会错过商机，所以，重构是一个研发团队保持稳定高效输出的有力手段。
+重构无法避免。优秀的代码或架构绝不是一开始就设计好的，而是演进出来的。我们无法100%遇见未来的需求，也没有足够的精力、时间、资源为遥远的未来买单，所以随着系统的演进，我们要接受重构是一个常态化行为。
+什么时候重构？ 持续重构。
+这是一种可持续、可演进的方式，这要求我们时刻具有持续重构意识，才能避免开发初期就进行过度设计而追求完美、避免代码维护过程中质量的下降，可以在日常迭代开发中掺入”小动作“，例如在修改、添加某个功能代码的时候，可以顺手把不符合编码规范、不好的设计重构一下，把它和单元测试、CodeReview一样，作为一种开发习惯。
+如何重构？ 按照规模，重构可以笼统的分为大型重构和小型重构，
+对于大型重构，往往涉及的模块、代码较多，很可能会出现越改越多、越改越乱的情况，另外在如今迭代周期普遍较为紧张的情况下，也很难找出一整块完整的时间来进行整个项目的重构。
+一个建议就是大型重构一定要提前做好完善的重构计划，有条不紊的分阶段进行，每个阶段完成一小部分代码的重构，然后提交、测试、运行，发现没问题后，再继续进行下一阶段，尽量保证代码仓库中的代码一直处于可运行、逻辑正确的状态。每个阶段都要控制好重构的影响范围以及持续时间，小步快走的方式很重要！
+而小规模层次的重构，因为影响范围小，改动耗时短，可以随时穿插着做。
+二 重构的技术保障手段-单元测试 ！！！单元测试！！！
+主观因素：重构开发者的技术实力 客观因素：科学化技术手段 从主观上来看，需要开发者对所重构的业务和代码要有足够的了解，也需要开发者技术够硬，能hold的住，这没的说。
+从客观上来看，最可落地执行、最有效的保证重构不出错的手段，就是单元测试。当重构完成之后，如果新的代码仍然能够通过单元测试，那就说明代码原有逻辑的正确性未被破坏，原有的外部可见行为没变。
+下面来主要探讨一下【单元测试】那些事。
+单元测试的测试对象是类或函数，用来测试一个类或函数是否都按预期的逻辑执行，由程序员自己来书写以验证自己写的代码的正确性。
+单元测试可能会被很多开发团队或工程师忽略，笔者以前同样认为编写并维护单元测试是一件”没必要“的事，然而被现实给上了一课，测试以及用户反馈的一个个bug，绝大多数都是由于代码的方法中的”小问题“导致的，这些问题或者是由于粗心笔误、或者是由于修改后未及时回归，所以说，做好测试的第一步也是最重要的一步就是：要重视单元测试。搞好单元测试，Bug Free不是梦！
+除了让我们及时有效的以fail-fast的方式发现代码逻辑问题，单测也能够帮助我们发现设计上的问题，如果你垫的单元测试写起来很吃力，那往往意味着代码设计的不够合理，例如第三方依赖mock不掉、大量使用静态函数或全局变量、代码高度耦合等，代码的可测试性也是衡量代码质量的重要参考因素哦。
+另外在我们刚刚接触一个新的项目时，如学习某开源项目，那么推荐的一个方式就是从单测入手，阅读单测可以帮助我们快速的熟悉代码，单元测试一般是一个独立的小功能，好的单测也是见名知意的，借助于此我们可以不再像无头苍蝇一样寻找代码的逻辑链路，可以更省力的知道代码实现了什么功能。
+不要觉得有了测试团队，写单测就是浪费时间，现在很多公司的开发模式还仍然是写好代码直接提交，然后丢给黑盒测试拼命的测，测出问题就反馈给开发团队修改，测不出的问题就留在线上出问题了再修复，作为一名有追求的开发者，我们要对自己写的代码负责。
+三 单元测试如何做 上述两节较为理论化，下面以一个实际的案例来说明。
+代码如下所示，其中Transaction是一个简化后的电商系统交易类，用来记录每笔订单交易的情况。Transaction中的execute()负责执行转账操作，将钱从买家的钱包转到卖家的钱包中。真正的转账操作是WallRpcService的RPC服务来完成的。除此以外，代码中还涉及一个分布式锁DistributedLock单例类，用来避免Tracnsaction并发执行，导致用户的钱被重复转出。
+针对核心逻辑execute()方法，设计出以下6个测试用例：
+设计完测试用例，当我们将他们落实到具体的代码实现时，却有很多不顺利的地方，以第一个测试用例为例，其代码实现为：
+execute()函数的执行依赖两个外部服务，一个是RedisDistributedLock，一个是WalletRpcService，导致这个用例存在以下问题：
+这个方法对于两个外部服务是强依赖的，如果这两个服务没有提供线下测试环境，我们可能需要自己搭建。 即使RPC服务有线下测试环境，但如果服务提供者是另外一个团队维护，我们输入正确的入参，结果也不一定返回成功，即RPC的对端也可能是不可靠的，这需要联调。 Redis、RPC依赖网络通信，耗时可能比较长，对单测的执行性能会有影响。 网络的中断、超时、Redis、RPC服务的不可用，都需要考虑。 而单元测试的目的，是为了测试程序员自己编写的代码逻辑是否正确，并非是端到端的集成测试，无需验证所依赖的外部系统的逻辑正确性。所以，我们需要将被测代码与外部系统依赖解耦，采用的方式就是mock。所谓mock就是以假乱真，用mock的服务输出我们想要的数据。
+mock的方式主要有两种，框架mock和手动mock。框架mock例如@Mokito，可以简化代码的编写，这里演示一下使用手动mock的方式。
+通过继承WalletrpcService类，并且重写其中的moveMoney()函数的方式来实现mock，使其返回我们任意想要的数据，而不进行真正的网络通信。
+接下来使用依赖注入的方式优化一下execute()函数的可测试性，因为WalletRpcService是通过new(0的方式创建的，我们无法对其实现进行替换，可以借助依赖注入这个神器，将WalletrpcService对象的创建反转给上层逻辑，在外部创建好之后，再注入到Transaction中，如下所示：
+然后在单元测试中WalletRpcService实现类进行替换，
+接下来看一下RedisDistributedLock，这家伙更棘手，因为它是一个单例类，相当于一个全局变量，我们无法通过继承并重写的方式mock，也无法通过依赖注入的方式来替换。
+如果RedisDistributedLock是我们自己维护的，可以将其实现修改为非静态单例类的模式，或抽出一个接口，比如IDistributedLock，让RedisDistributedLock实现这个接口，我们也就可以通过依赖注入的方式对其进行替换，可是如果这个类不是我们自己维护的，怎么办？
+我们可以对上锁这部分逻辑重新封装一下，如下：
+代码重构后，使用如下的单元测试代码，即可mock掉外部依赖，测试我们自己的代码逻辑了！
+加下来再看一个测试用例3：交易已过期(createTimeStamp超过14天)，交易状态设置为EXPIRED，返回false。写出的单测代码如下：
+看起来没啥问题，把时间戳设置为14天前，transaction一定处于过期状态，但是如果createTimeStamp没有暴露set方法呢？例如createTimeStamp的业务定义是在交易生成时自动获取的系统时间，不应该放开修改权限那怎么测？
+对于时间和随机函数等这种”未决行为“，一般的处理方式是将未决行为逻辑进行重新封装，将是否交易过期的逻辑封装到isExpired()函数即可，代码如下：
+针对重构之后的代码，新的测试用例代码如下：
+破坏代码可测试性的行为 未决行为 未决行为逻辑即代码的输出是随机的或者是不确定的，比如跟时间、随机数有关的代码，一个有效的解决方法就是封装不确定性。
+全局变量 全局变量是一种面向过程的编码风格，对代码的可测试性非常不友好，因为每个测试用例都可以对全局变量进行修改导致测试用例之间的数据耦合。
+静态方法 静态方法也是一种面向过程的编码风格，这也会影响代码的可测试性，静态方法不容易mock。
+复杂继承 如果父类需要mock某个依赖对象才能进行单元测试，那所有的子类、孙子类在编写单测的时候，都需要mock这个依赖对象，如果对于层次很深、结构复杂的继承关系，那么越底层的子类需要mock的对象可能就会越多，麻烦的很。
+所以推荐尽可能的使用组合而非继承来组织类之间的关系，类之间的结构层次比较扁平，在编写单元测试的时候只需要mock类所组合依赖的对象即可。
+四 大型重构之解耦 为什么要解耦" />
+  <meta property="og:locale" content="en-us" /><meta property="og:image" content="/logo.png" />
+  
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px;background-color:#f6f8fa}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Hadoo&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-53624533-8"></script><script src="https://cdn.jsdelivr.net/gh/joway/homepage/analytics.js"></script>
+</head>
+
+
+<body>
+  <article class="post " id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Hadoo&#39;s Blog</a
+    >
+  </div>
+  <div class="header-subtitle">大道至简，知行合一</div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://github.com/yeshadoo" target="_blank">About Me</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/yeshadoo" target="_blank">Github</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+   
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/cn/">Chinese</a>
+  </div>
+   
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">【代码精进之路】- 重构&amp;单元测试</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-12-13 14:08:07 CST">
+                13 Dec 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <blockquote>
+<p>博客开了一个新的菜单，名为【代码精进之路】，主要用于记录学习与实践过程中关于代码质量的思考与经验总结。</p>
+<p>本篇文章题目较大，后续会不断进行内容的补充完善，文章内容主要出自笔者本人重构项目的思考总结，以及极客时间《设计模式之美》的学习内容。</p>
+</blockquote>
+<h2 id="一-概述">一 概述</h2>
+<ul>
+<li>什么是重构？</li>
+</ul>
+<p>软件设计大师、《重构》作者Martin Fowler如此定义：”<strong>重构是一种对软件内部结构的改善，目的是在不改变软件的可见行为的情况下，使其更容易理解，修改成本更低。</strong>“</p>
+<ul>
+<li>为什么要重构？</li>
+</ul>
+<p>根据<a href="https://zhuanlan.zhihu.com/p/72896309" title="推荐阅读">熵增定律</a>，所有事物都在向着无规律、无序和混乱发展，例如屋子不收拾会变乱、手机会越来越卡、耳机线会变凌乱&hellip;&hellip;同样的，代码质量也逃不过。项目在演进，随着需求的增多，代码在不停的堆砌，同时也在朝着混乱的方向发展，如果没有人为代码质量负责，那么量变引起质变，代码腐败到维护成本甚至会高过重新开发一套新代码的成本，这会影响到项目的迭代与交付效率，往大了说，在之前国内互联网圈地跑马阶段，迭代交付的慢就会错过商机，所以，<strong>重构是一个研发团队保持稳定高效输出的有力手段</strong>。</p>
+<p><strong>重构无法避免</strong>。优秀的代码或架构绝不是一开始就设计好的，而是演进出来的。我们无法100%遇见未来的需求，也没有足够的精力、时间、资源为遥远的未来买单，所以随着系统的演进，我们要接受重构是一个常态化行为。</p>
+<ul>
+<li>什么时候重构？</li>
+</ul>
+<p><strong>持续重构。</strong></p>
+<p>这是一种可持续、可演进的方式，这要求我们时刻具有持续重构意识，才能避免开发初期就进行过度设计而追求完美、避免代码维护过程中质量的下降，可以在日常迭代开发中掺入”小动作“，例如在修改、添加某个功能代码的时候，可以顺手把不符合编码规范、不好的设计重构一下，把它和单元测试、CodeReview一样，作为一种开发习惯。</p>
+<ul>
+<li>如何重构？</li>
+</ul>
+<p>按照规模，重构可以笼统的分为大型重构和小型重构，</p>
+<p>对于大型重构，往往涉及的模块、代码较多，很可能会出现越改越多、越改越乱的情况，另外在如今迭代周期普遍较为紧张的情况下，也很难找出一整块完整的时间来进行整个项目的重构。</p>
+<p>一个建议就是大型重构一定要提前做好完善的重构计划，有条不紊的分阶段进行，每个阶段完成一小部分代码的重构，然后提交、测试、运行，发现没问题后，再继续进行下一阶段，尽量保证代码仓库中的代码一直处于可运行、逻辑正确的状态。每个阶段都要控制好重构的影响范围以及持续时间，小步快走的方式很重要！</p>
+<p>而小规模层次的重构，因为影响范围小，改动耗时短，可以随时穿插着做。</p>
+<h2 id="二-重构的技术保障手段-单元测试">二 重构的技术保障手段-单元测试</h2>
+<p><strong>！！！单元测试！！！</strong></p>
+<ul>
+<li>主观因素：重构开发者的技术实力</li>
+<li>客观因素：科学化技术手段</li>
+</ul>
+<p>从主观上来看，需要开发者对所重构的业务和代码要有足够的了解，也需要开发者技术够硬，能hold的住，这没的说。</p>
+<p>从客观上来看，最可落地执行、最有效的保证重构不出错的手段，就是单元测试。当重构完成之后，如果新的代码仍然能够通过单元测试，那就说明代码原有逻辑的正确性未被破坏，原有的外部可见行为没变。</p>
+<p>下面来主要探讨一下【单元测试】那些事。</p>
+<p>单元测试的测试对象是类或函数，用来测试一个类或函数是否都按预期的逻辑执行，由程序员自己来书写以验证自己写的代码的正确性。</p>
+<p>单元测试可能会被很多开发团队或工程师忽略，笔者以前同样认为编写并维护单元测试是一件”没必要“的事，然而被现实给上了一课，测试以及用户反馈的一个个bug，绝大多数都是由于代码的方法中的”小问题“导致的，这些问题或者是由于粗心笔误、或者是由于修改后未及时回归，所以说，做好测试的第一步也是最重要的一步就是：<strong>要重视单元测试</strong>。搞好单元测试，Bug Free不是梦！</p>
+<p>除了让我们及时有效的以fail-fast的方式发现代码逻辑问题，单测也能够帮助我们发现设计上的问题，如果你垫的单元测试写起来很吃力，那往往意味着代码设计的不够合理，例如第三方依赖mock不掉、大量使用静态函数或全局变量、代码高度耦合等，代码的可测试性也是衡量代码质量的重要参考因素哦。</p>
+<p>另外在我们刚刚接触一个新的项目时，如学习某开源项目，那么推荐的一个方式就是从单测入手，阅读单测可以帮助我们快速的熟悉代码，单元测试一般是一个独立的小功能，好的单测也是见名知意的，借助于此我们可以不再像无头苍蝇一样寻找代码的逻辑链路，可以更省力的知道代码实现了什么功能。</p>
+<p>不要觉得有了测试团队，写单测就是浪费时间，现在很多公司的开发模式还仍然是写好代码直接提交，然后丢给黑盒测试拼命的测，测出问题就反馈给开发团队修改，测不出的问题就留在线上出问题了再修复，作为一名有追求的开发者，我们要对自己写的代码负责。</p>
+<h2 id="三-单元测试如何做">三 单元测试如何做</h2>
+<p>上述两节较为理论化，下面以一个实际的案例来说明。</p>
+<p>代码如下所示，其中Transaction是一个简化后的电商系统交易类，用来记录每笔订单交易的情况。Transaction中的execute()负责执行转账操作，将钱从买家的钱包转到卖家的钱包中。真正的转账操作是WallRpcService的RPC服务来完成的。除此以外，代码中还涉及一个分布式锁DistributedLock单例类，用来避免Tracnsaction并发执行，导致用户的钱被重复转出。</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/2326565333.png" alt="image.png"></p>
+<p>针对核心逻辑execute()方法，设计出以下6个测试用例：</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/355921606.png" alt="image.png"></p>
+<p>设计完测试用例，当我们将他们落实到具体的代码实现时，却有很多不顺利的地方，以第一个测试用例为例，其代码实现为：</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/3067359928-20230913140951531.png" alt="image.png"></p>
+<p>execute()函数的执行依赖两个外部服务，一个是RedisDistributedLock，一个是WalletRpcService，导致这个用例存在以下问题：</p>
+<ul>
+<li>这个方法对于两个外部服务是强依赖的，如果这两个服务没有提供线下测试环境，我们可能需要自己搭建。</li>
+<li>即使RPC服务有线下测试环境，但如果服务提供者是另外一个团队维护，我们输入正确的入参，结果也不一定返回成功，即RPC的对端也可能是不可靠的，这需要联调。</li>
+<li>Redis、RPC依赖网络通信，耗时可能比较长，对单测的执行性能会有影响。</li>
+<li>网络的中断、超时、Redis、RPC服务的不可用，都需要考虑。</li>
+</ul>
+<p>而单元测试的目的，是为了测试程序员自己编写的代码逻辑是否正确，并非是端到端的集成测试，无需验证所依赖的外部系统的逻辑正确性。所以，我们需要将被测代码与外部系统依赖解耦，采用的方式就是mock。所谓mock就是以假乱真，用mock的服务输出我们想要的数据。</p>
+<p>mock的方式主要有两种，框架mock和手动mock。框架mock例如@Mokito，可以简化代码的编写，这里演示一下使用手动mock的方式。</p>
+<p>通过继承WalletrpcService类，并且重写其中的moveMoney()函数的方式来实现mock，使其返回我们任意想要的数据，而不进行真正的网络通信。</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/3641133576-20230913141021382.png" alt="image.png"></p>
+<p>接下来使用依赖注入的方式优化一下execute()函数的可测试性，因为WalletRpcService是通过new(0的方式创建的，我们无法对其实现进行替换，可以借助依赖注入这个神器，将WalletrpcService对象的创建反转给上层逻辑，在外部创建好之后，再注入到Transaction中，如下所示：</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/3469364008.png" alt="image.png"></p>
+<p>然后在单元测试中WalletRpcService实现类进行替换，</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/2697025591.png" alt="image.png"></p>
+<p>接下来看一下RedisDistributedLock，这家伙更棘手，因为它是一个单例类，相当于一个全局变量，我们无法通过继承并重写的方式mock，也无法通过依赖注入的方式来替换。</p>
+<p>如果RedisDistributedLock是我们自己维护的，可以将其实现修改为非静态单例类的模式，或抽出一个接口，比如IDistributedLock，让RedisDistributedLock实现这个接口，我们也就可以通过依赖注入的方式对其进行替换，可是如果这个类不是我们自己维护的，怎么办？</p>
+<p>我们可以对上锁这部分逻辑重新封装一下，如下：</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230913141110281.png" alt="image-20230913141110281"></p>
+<p>代码重构后，使用如下的单元测试代码，即可mock掉外部依赖，测试我们自己的代码逻辑了！</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/3609860435.png" alt="image.png"></p>
+<hr>
+<p>加下来再看一个测试用例3：交易已过期(createTimeStamp超过14天)，交易状态设置为EXPIRED，返回false。写出的单测代码如下：</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/1178222194.png" alt="image.png"></p>
+<p>看起来没啥问题，把时间戳设置为14天前，transaction一定处于过期状态，但是如果createTimeStamp没有暴露set方法呢？例如createTimeStamp的业务定义是在交易生成时自动获取的系统时间，不应该放开修改权限那怎么测？</p>
+<p>对于时间和随机函数等这种”未决行为“，一般的处理方式是将未决行为逻辑进行重新封装，将是否交易过期的逻辑封装到isExpired()函数即可，代码如下：</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/3457672506-20230913141139875.png" alt="image.png"></p>
+<p>针对重构之后的代码，新的测试用例代码如下：</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/2421464458.png" alt="image.png"></p>
+<h3 id="破坏代码可测试性的行为">破坏代码可测试性的行为</h3>
+<ul>
+<li>未决行为</li>
+</ul>
+<p>未决行为逻辑即代码的输出是随机的或者是不确定的，比如跟时间、随机数有关的代码，一个有效的解决方法就是封装不确定性。</p>
+<ul>
+<li>全局变量</li>
+</ul>
+<p>全局变量是一种面向过程的编码风格，对代码的可测试性非常不友好，因为每个测试用例都可以对全局变量进行修改导致测试用例之间的数据耦合。</p>
+<ul>
+<li>静态方法</li>
+</ul>
+<p>静态方法也是一种面向过程的编码风格，这也会影响代码的可测试性，静态方法不容易mock。</p>
+<ul>
+<li>复杂继承</li>
+</ul>
+<p>如果父类需要mock某个依赖对象才能进行单元测试，那所有的子类、孙子类在编写单测的时候，都需要mock这个依赖对象，如果对于层次很深、结构复杂的继承关系，那么越底层的子类需要mock的对象可能就会越多，麻烦的很。</p>
+<p>所以推荐尽可能的使用组合而非继承来组织类之间的关系，类之间的结构层次比较扁平，在编写单元测试的时候只需要mock类所组合依赖的对象即可。</p>
+<h2 id="四-大型重构之解耦">四 大型重构之解耦</h2>
+<blockquote>
+<p>为什么要解耦</p>
+</blockquote>
+<p>根据前面的熵增定律，软件总会朝着复杂性的方向发展，而我们研发的任务就是应对复杂性。而人处理复杂性的能力是有限的，过于复杂性的代码在可读性、可维护性上都不友好，俗称”屎山“。而解耦，就是解构复杂最关键的手段。</p>
+<p>”高内聚、松耦合“的特性可以让我们聚焦在某一模块或类中，不需要了解太多其他模块或类的代码，让我们的焦点不至于过于发散。而且因为依赖关系简单、耦合小，修改代码不至于牵一发而动全身，引入bug的风险也会减少很多。同时也有利于代码的可测试性，容易mock或者很少需要mock外部依赖的模块或类。</p>
+<blockquote>
+<p>如何解耦</p>
+</blockquote>
+<ul>
+<li>封装和抽象</li>
+</ul>
+<p>封装和抽象是两个非常通用的设计思想，可以有效的隐藏实现的复杂性，隔离实现的易变性，给依赖的模板提供稳定且易用的抽象接口。</p>
+<p>比如，Unix系统提供的open()文件操作函数，底层非常复杂，涉及权限控制、并发控制、物理存储等，通过将其封装成一个抽象的open()函数，能够有效的控制代码复杂性的蔓延，将复杂性封装在局部代码之中。当我们以后想要修改open()函数底层实现的时候，并不需要改动依赖它的上层代码。</p>
+<ul>
+<li>中间层</li>
+</ul>
+<p><strong>计算机世界的很多难题都可以引用中间层来解决。</strong></p>
+<p>下面这张图是引入中间层前后的依赖关系对比图：</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/1852334758-20230913141203055.png" alt="image.png"></p>
+<p>在引入数据存储中间层以前，A、B、C三个模块都依赖内存一级缓存、Redis二级缓存、DB持久化存储三个模块，在引入中间层之后，三个模块只需要依赖数据存储一个模块即可，引入中间层简化了依赖关系，让代码结构更加清晰。</p>
+<ul>
+<li>模块化</li>
+</ul>
+<p><strong>应对复杂性的手段是解耦，解耦的方式是模块化</strong>，具体来说就是对复杂问题进行分层分类。</p>
+<p>将复杂的系统划分为各个独立的模块，每个小的团队聚焦于一个独立的高内聚模块来开发，最终像搭积木一样将各个模块组装起来，构建一个超级复杂的系统。<strong>追本溯源，模块化的底层思想就是分而治之</strong>。</p>
+<h2 id="五-总结">五 总结</h2>
+<p>发散思考。</p>
+<p>入行程序员一年以来，深刻的体会到，能把代码写的优雅、可维护、质量高、易扩展，是一个手艺活，是需要火候的。在如今Java的繁荣生态圈里面，形形色色高度封装且易用的框架，已经大大的降低了我们的开发难度和门槛，不管采用怎样的方式，我们似乎都能如约的完成一次需求迭代并交差。</p>
+<p>但是作为有追求的程序员，我们要让代码变的优雅，要为项目的可持续发展负责，所以我们要做持续化重构，让项目易维护。重构是一个技术活，执行者不仅要熟悉项目的业务和代码细节，还要深刻的领会设计思想、设计原则，以及灵活巧妙的践行设计模式。其实这些思想和原则，不仅仅适用于二进制世界，在三维世界里面，一切的道理规律都是通用的，所以参透这些道理和规律，可能是我们一辈子的追求。而每个人的世界观是不同的，所以通常来讲每个架构师的行事风格也是不同的，所以架构不是某个学科，而是各种条件的权衡和抉择，就像我们对待人生的一个个关键路口一样。我所信奉的，”简单就是终极的复杂“。这是一个熵增的世界，”人活着就是在对抗熵增定律，生命以负熵为生“，这句话是薛定谔说的。</p>
+<p>回到二进制世界，一切设计和原则的运用都要注重”度“。</p>
+<ul>
+<li>文章主题内容强调了很多”高内聚、低耦合“，这固然好处多多，但如果对代码为了实现高内聚而拆的过于分散，就得不偿失了。</li>
+<li>项目设计阶段，既要充分考虑到全局情况以及预判一下未来的走向，也要避免过度设计的发生。</li>
+<li>代码注释既不能太多，也不能都没有。</li>
+<li>方法大小，行数太多不易读，不易测，行数太少逻辑太分散</li>
+<li>&hellip;&hellip;</li>
+</ul>
+<p>知易行难，要知行合一，努力吧少年！</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              <br/><br/><p>Subscribe：<a target="_blank" href="https://mailchi.mp/a1a0d59e7a19/joway"><b>Mailchimp</b></a></p><br/><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://blog.joway.io/images/cc.png" /></a>
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+<script src="/js/lazyload.min.js"></script>
+<script>
+  var lazyImage = new LazyLoad({
+    container: document.getElementById('article')
+  });
+</script>
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

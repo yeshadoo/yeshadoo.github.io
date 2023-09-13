@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Design Pattern on Hadoo&#39;s Blog</title>
+    <link>https://hanchao666.top/categories/design-pattern/</link>
+    <description>Recent content in Design Pattern on Hadoo&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 12 Jul 2022 18:36:16 +0800</lastBuildDate><atom:link href="https://hanchao666.top/categories/design-pattern/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>从Spring及Mybatis框架源码中学习设计模式(创建型)</title>
+      <link>https://hanchao666.top/posts/learn-design-pattern-from-frame/</link>
+      <pubDate>Tue, 12 Jul 2022 18:36:16 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/posts/learn-design-pattern-from-frame/</guid>
+      <description>设计模式是解决问题的方案，从大神的代码中学习对设计模式的使用，可以有效提升个人编码及设计代码的能力。本文主要看一下创建型的几个设计模式，即，单例模式、各种工厂模式 及 建造者模式。
+单例模式 个人理解 确保某个类只有一个实例，并提供该实例的获取方法。实际应用很多，不管是框架、JDK 还是实际的项目开发，但大都会使用“饿汉式”或“枚举”来实现单例。“懒汉式”也有一些应用，但通过“双检锁机制”来保证单例的实现很少见。
+实现方式 最简单的就是 使用一个私有构造函数、一个私有静态变量，以及一个公共静态方法的方式来实现。懒汉式、饿汉式等简单实现就不赘述咯，这里强调一下双检锁懒汉式实现的坑，以及枚举方式的实现吧，最后再结合 spring 源码 扩展一下单例 bean 的实现原理。
+1. 双检锁实现的坑
+/** * 双检锁 懒汉式，实现线程安全的单例 * 关键词：JVM指令重排、volatile、反射攻击 */ public class Singleton3 { /** * 对于我们初级开发来说，这个volatile在实际开发中可能见过，但很少会用到 * 这里加个volatile进行修饰，也是本单例模式的精髓所在。 * 下面的 instance = new Singleton3(); 这行代码在JVM中其实是分三步执行的： * 1、分配内存空间； * 2、初始化对象； * 3、将instance指向分配的内存地址。 * 但JVM具有指令重排的特性，实际的执行顺序可能会是1、3、2，导致多线程情况下出问题， * 使用volatile修饰instance变量 可以 避免上述的指令重排 * tips：不太理解的是 第一个线程在执行第2步之前就已经释放了锁吗？导致其它线程进入synchronized代码块 * 执行 instance == null 的判断？ * 回答：第一个线程在执行第2步之前就已经释放了锁吗？（没有）。如果不使用volatile修饰instance变量，那么其他线程进来的时候，看到的instance就有可能不是null的，因为已经执行了第3步，那么此时这个线程（执行 return instance;）使用的instance是一个没有初始化的instance，就会有问题。 */ private volatile static Singleton3 instance; private Singleton3(){ } public static Singleton3 getInstance(){ if(instance == null){ synchronized(Singleton3.</description>
+    </item>
+    
+    <item>
+      <title>单例模式</title>
+      <link>https://hanchao666.top/posts/singleton/</link>
+      <pubDate>Wed, 03 Nov 2021 16:48:51 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/posts/singleton/</guid>
+      <description>概述：
+单例模式用来保证一个类只有一个实例存在，避免对象的重复创建，减少创建对象的时间消耗，如果一个对象可以贯穿整个应用程序，起到统一控制管理的作用，例如线程池，那么单例模式是一个不错的选择。
+下面介绍单例模式的实现方法：
+1.饿汉模式 public class Singleton{ private static Singleton instance = new Singleton(); private Singleton(){} public static Singleton newInstance(){ return instance; } } 类的构造方法定义为private，保证其他类不能实例化此类，然后提供了一个静态实例并返回给调用者。饿汉模式在类加载的时候就创建，优点是只在类加载的时候创建一次实例，多线程同时调用getInstance()方法不会出现线程安全问题，多个线程同时调用不会在内存中创建多个对象，只要调用这个方法就会立即返回对象，这是一种用空间换取时间的行为，但是缺点就是可能创建好之后在内存中不会被使用，造成了空间的浪费饿汉模式适合单例占用内存比较小，而且会被用到的概率比较大的情况，如果单例比较大，就使用下面的懒加载模式
+2.懒汉模式 public class Singleton{ private static Singleton instance = null; private Singleton(){} public static Singleton newInstance(){ if(null == instance){ instance = new Singleton(); } return instance; } } 这种模式是需要单例的时候采取创建，但是最大的缺点就是线程安全问题，如果多个线程同时调用getInstance()方法，那么就会创建多个实例
+下面是加锁形式：
+3.双重检查锁 public static Singleton getInstanceDC() { if (_instance == null) { // Single Checked synchronized (Singleton.</description>
+    </item>
+    
+  </channel>
+</rss>

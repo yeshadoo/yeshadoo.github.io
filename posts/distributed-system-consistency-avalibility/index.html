@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.118.2">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="" />
+  <meta property="og:url" content="https://hanchao666.top/posts/distributed-system-consistency-avalibility/" />
+  <link rel="canonical" href="https://hanchao666.top/posts/distributed-system-consistency-avalibility/" /><link rel="apple-touch-icon" href="/logo.png" />
+  <link rel="icon" href="/logo.png" />
+  <link rel="shortcut" href="/logo.png" /><link rel="alternate" type="application/atom+xml" href="https://hanchao666.top/index.xml" title="Hadoo&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/hanchao666.top\/"
+      },
+      "articleSection" : "posts",
+      "name" : "分布式系统一致性和可用性的权衡方法论",
+      "headline" : "分布式系统一致性和可用性的权衡方法论",
+      "description" : "0.理论基础：CAP和BASE CAP理论 理论出处：https:\/\/groups.csail.mit.edu\/tds\/papers\/Gilbert\/Brewer2.pdf\n什么是CAP 指的是在一个分布式系统中，Consistency（一致性）、 Availability（可用性）、Partition tolerance（分区容错性）这三个基本需求，最多只能同时满足其中的2个。\n一致性：数据在多个副本之间能够保持一致的特性 可用性：系统提供的服务一直处于可用的状态，每次请求都能获得正确的响应。 分区容错性：分布式系统在遇到分区故障的时候，仍然能够对外提供服务。 什么是分区？\n在分布式系统中，不同的节点可能分布在不同的机房或子网络中，由于不可避免的故障，例如机器损坏、网络分区等，这些节点之间就会出现无法通信的情况，导致整个系统的环境被分离开来，出现分区。\n上面已经提过，在分布式系统中，C、A、P三种特性最多只能选择两种。但这道选择题就像别人在问你“小明的父亲有三个孩子，老大叫大朗，老二叫二郎，请问老三叫什么”一样。在以分布式存系统为限定条件的 CAP 世界里，P 是早已经确定的答案，P 是必须的。\n因为，在分布式系统内，P 是必然的发生的，不选 P，一旦发生分区错误，整个分布式系统就完全无法使用了，这是不符合实际需要的。所以，对于分布式系统，我们只能能考虑当发生分区错误时，如何选择一致性和可用性。而根据一致性和可用性的选择不同，开源的分布式系统往往又被分为 CP 系统和 AP 系统。\n当一套系统在发生分区故障后，客户端的任何请求都被卡死或者超时，但是，系统的每个节点总是会返回一致的数据，则这套系统就是 CP 系统，经典的比如 Zookeeper。\n如果一套系统发生分区故障后，客户端依然可以访问系统，但是获取的数据有的是新的数据，有的还是老数据，那么这套系统就是 AP 系统，经典的比如 Eureka。\n用大白话来形容下 CAP ，CAP 就是告诉程序员们当分布式系统出现内部问题了，你要做两种选择：\n要么迁就外部服务，像外包公司。 要么让外部服务迁就你，像银行。 迁就外部服务就是我们不能因为我们自己的问题让外部服务的业务运行受到影响，所以要优先可用性。而让外部服务迁就我们，就要优先一致性。所以我们还是要在具体的情景内进行权衡。\nBASE理论 BASE 是 Basically Available（基本可用） 、Soft-state（软状态） 和 Eventually Consistent（最终一致性） 三个短语的缩写。\n基本可用 什么是基本可用呢？假如系统出现了不可预知故障，允许损失部分可用性，当然也不能完全不可用。\n损失的这部分可用性指的是什么？\n1.响应时间上的损失 ：正常情况下的搜索引擎0.5秒即返回给用户结果，而基本可用的搜索引擎可以在2秒作用返回结果。\n2.功能上的损失 ：在一个电商网站上，正常情况下，用户可以顺利完成每一笔订单。但是到了大促期间，为了保护购物系统的稳定性，部分消费者可能会被引导到一个降级页面。\n软状态 软状态指允许系统中的数据存在中间状态（CAP 理论中的数据不一致 ），并认为该中间状态的存在不会影响系统的整体可用性，即允许系统在不同节点的数据副本之间进行数据同步的过程存在延时。\n最终一致性 最终一致性强调的是系统中所有的数据副本，在经过一段时间的同步后，最终能够达到一个一致的状态。因此，最终一致性的本质是需要系统保证最终数据能够达到一致，而不需要实时保证系统数据的强一致性。\nBASE 理论是对 CAP 中一致性 C 和可用性 A 权衡的结果，其核心思想是：",
+      "inLanguage" : "en-US",
+      "author" : "",
+      "creator" : "",
+      "publisher": "",
+      "accountablePerson" : "",
+      "copyrightHolder" : "",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-05-12 18:25:35 \u002b0800 CST",
+      "dateModified" : "2022-05-12 18:25:35 \u002b0800 CST",
+      "url" : "https:\/\/hanchao666.top\/posts\/distributed-system-consistency-avalibility\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>分布式系统一致性和可用性的权衡方法论</title>
+  <meta property="og:title" content="分布式系统一致性和可用性的权衡方法论" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="0.理论基础：CAP和BASE CAP理论 理论出处：https://groups.csail.mit.edu/tds/papers/Gilbert/Brewer2.pdf
+什么是CAP 指的是在一个分布式系统中，Consistency（一致性）、 Availability（可用性）、Partition tolerance（分区容错性）这三个基本需求，最多只能同时满足其中的2个。
+一致性：数据在多个副本之间能够保持一致的特性 可用性：系统提供的服务一直处于可用的状态，每次请求都能获得正确的响应。 分区容错性：分布式系统在遇到分区故障的时候，仍然能够对外提供服务。 什么是分区？
+在分布式系统中，不同的节点可能分布在不同的机房或子网络中，由于不可避免的故障，例如机器损坏、网络分区等，这些节点之间就会出现无法通信的情况，导致整个系统的环境被分离开来，出现分区。
+上面已经提过，在分布式系统中，C、A、P三种特性最多只能选择两种。但这道选择题就像别人在问你“小明的父亲有三个孩子，老大叫大朗，老二叫二郎，请问老三叫什么”一样。在以分布式存系统为限定条件的 CAP 世界里，P 是早已经确定的答案，P 是必须的。
+因为，在分布式系统内，P 是必然的发生的，不选 P，一旦发生分区错误，整个分布式系统就完全无法使用了，这是不符合实际需要的。所以，对于分布式系统，我们只能能考虑当发生分区错误时，如何选择一致性和可用性。而根据一致性和可用性的选择不同，开源的分布式系统往往又被分为 CP 系统和 AP 系统。
+当一套系统在发生分区故障后，客户端的任何请求都被卡死或者超时，但是，系统的每个节点总是会返回一致的数据，则这套系统就是 CP 系统，经典的比如 Zookeeper。
+如果一套系统发生分区故障后，客户端依然可以访问系统，但是获取的数据有的是新的数据，有的还是老数据，那么这套系统就是 AP 系统，经典的比如 Eureka。
+用大白话来形容下 CAP ，CAP 就是告诉程序员们当分布式系统出现内部问题了，你要做两种选择：
+要么迁就外部服务，像外包公司。 要么让外部服务迁就你，像银行。 迁就外部服务就是我们不能因为我们自己的问题让外部服务的业务运行受到影响，所以要优先可用性。而让外部服务迁就我们，就要优先一致性。所以我们还是要在具体的情景内进行权衡。
+BASE理论 BASE 是 Basically Available（基本可用） 、Soft-state（软状态） 和 Eventually Consistent（最终一致性） 三个短语的缩写。
+基本可用 什么是基本可用呢？假如系统出现了不可预知故障，允许损失部分可用性，当然也不能完全不可用。
+损失的这部分可用性指的是什么？
+1.响应时间上的损失 ：正常情况下的搜索引擎0.5秒即返回给用户结果，而基本可用的搜索引擎可以在2秒作用返回结果。
+2.功能上的损失 ：在一个电商网站上，正常情况下，用户可以顺利完成每一笔订单。但是到了大促期间，为了保护购物系统的稳定性，部分消费者可能会被引导到一个降级页面。
+软状态 软状态指允许系统中的数据存在中间状态（CAP 理论中的数据不一致 ），并认为该中间状态的存在不会影响系统的整体可用性，即允许系统在不同节点的数据副本之间进行数据同步的过程存在延时。
+最终一致性 最终一致性强调的是系统中所有的数据副本，在经过一段时间的同步后，最终能够达到一个一致的状态。因此，最终一致性的本质是需要系统保证最终数据能够达到一致，而不需要实时保证系统数据的强一致性。
+BASE 理论是对 CAP 中一致性 C 和可用性 A 权衡的结果，其核心思想是：" />
+  <meta name="description" content="0.理论基础：CAP和BASE CAP理论 理论出处：https://groups.csail.mit.edu/tds/papers/Gilbert/Brewer2.pdf
+什么是CAP 指的是在一个分布式系统中，Consistency（一致性）、 Availability（可用性）、Partition tolerance（分区容错性）这三个基本需求，最多只能同时满足其中的2个。
+一致性：数据在多个副本之间能够保持一致的特性 可用性：系统提供的服务一直处于可用的状态，每次请求都能获得正确的响应。 分区容错性：分布式系统在遇到分区故障的时候，仍然能够对外提供服务。 什么是分区？
+在分布式系统中，不同的节点可能分布在不同的机房或子网络中，由于不可避免的故障，例如机器损坏、网络分区等，这些节点之间就会出现无法通信的情况，导致整个系统的环境被分离开来，出现分区。
+上面已经提过，在分布式系统中，C、A、P三种特性最多只能选择两种。但这道选择题就像别人在问你“小明的父亲有三个孩子，老大叫大朗，老二叫二郎，请问老三叫什么”一样。在以分布式存系统为限定条件的 CAP 世界里，P 是早已经确定的答案，P 是必须的。
+因为，在分布式系统内，P 是必然的发生的，不选 P，一旦发生分区错误，整个分布式系统就完全无法使用了，这是不符合实际需要的。所以，对于分布式系统，我们只能能考虑当发生分区错误时，如何选择一致性和可用性。而根据一致性和可用性的选择不同，开源的分布式系统往往又被分为 CP 系统和 AP 系统。
+当一套系统在发生分区故障后，客户端的任何请求都被卡死或者超时，但是，系统的每个节点总是会返回一致的数据，则这套系统就是 CP 系统，经典的比如 Zookeeper。
+如果一套系统发生分区故障后，客户端依然可以访问系统，但是获取的数据有的是新的数据，有的还是老数据，那么这套系统就是 AP 系统，经典的比如 Eureka。
+用大白话来形容下 CAP ，CAP 就是告诉程序员们当分布式系统出现内部问题了，你要做两种选择：
+要么迁就外部服务，像外包公司。 要么让外部服务迁就你，像银行。 迁就外部服务就是我们不能因为我们自己的问题让外部服务的业务运行受到影响，所以要优先可用性。而让外部服务迁就我们，就要优先一致性。所以我们还是要在具体的情景内进行权衡。
+BASE理论 BASE 是 Basically Available（基本可用） 、Soft-state（软状态） 和 Eventually Consistent（最终一致性） 三个短语的缩写。
+基本可用 什么是基本可用呢？假如系统出现了不可预知故障，允许损失部分可用性，当然也不能完全不可用。
+损失的这部分可用性指的是什么？
+1.响应时间上的损失 ：正常情况下的搜索引擎0.5秒即返回给用户结果，而基本可用的搜索引擎可以在2秒作用返回结果。
+2.功能上的损失 ：在一个电商网站上，正常情况下，用户可以顺利完成每一笔订单。但是到了大促期间，为了保护购物系统的稳定性，部分消费者可能会被引导到一个降级页面。
+软状态 软状态指允许系统中的数据存在中间状态（CAP 理论中的数据不一致 ），并认为该中间状态的存在不会影响系统的整体可用性，即允许系统在不同节点的数据副本之间进行数据同步的过程存在延时。
+最终一致性 最终一致性强调的是系统中所有的数据副本，在经过一段时间的同步后，最终能够达到一个一致的状态。因此，最终一致性的本质是需要系统保证最终数据能够达到一致，而不需要实时保证系统数据的强一致性。
+BASE 理论是对 CAP 中一致性 C 和可用性 A 权衡的结果，其核心思想是：" />
+  <meta property="og:locale" content="en-us" /><meta property="og:image" content="/logo.png" />
+  
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px;background-color:#f6f8fa}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Hadoo&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-53624533-8"></script><script src="https://cdn.jsdelivr.net/gh/joway/homepage/analytics.js"></script>
+</head>
+
+
+<body>
+  <article class="post " id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Hadoo&#39;s Blog</a
+    >
+  </div>
+  <div class="header-subtitle">大道至简，知行合一</div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://github.com/yeshadoo" target="_blank">About Me</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/yeshadoo" target="_blank">Github</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+   
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/cn/">Chinese</a>
+  </div>
+   
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">分布式系统一致性和可用性的权衡方法论</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-05-12 18:25:35 CST">
+                12 May 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <h2 id="0理论基础cap和base">0.理论基础：CAP和BASE</h2>
+<h3 id="cap理论">CAP理论</h3>
+<blockquote>
+<p>理论出处：https://groups.csail.mit.edu/tds/papers/Gilbert/Brewer2.pdf</p>
+</blockquote>
+<ul>
+<li>什么是CAP</li>
+</ul>
+<p>指的是在一个分布式系统中，<code>Consistency（一致性）</code>、 <code>Availability（可用性）</code>、<code>Partition tolerance（分区容错性）</code>这三个基本需求，最多只能同时满足其中的2个。</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230912182635911.png" alt="image-20230912182635911"></p>
+<ul>
+<li>一致性：数据在多个副本之间能够保持一致的特性</li>
+<li>可用性：系统提供的服务一直处于可用的状态，每次请求都能获得正确的响应。</li>
+<li>分区容错性：分布式系统在遇到分区故障的时候，仍然能够对外提供服务。</li>
+</ul>
+<blockquote>
+<p>什么是分区？</p>
+<p>在分布式系统中，不同的节点可能分布在不同的机房或子网络中，由于不可避免的故障，例如机器损坏、网络分区等，这些节点之间就会出现无法通信的情况，导致整个系统的环境被分离开来，出现分区。</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230912182706438.png" alt="image-20230912182706438"></p>
+</blockquote>
+<p>上面已经提过，在分布式系统中，C、A、P三种特性最多只能选择两种。但这道选择题就像别人在问你“小明的父亲有三个孩子，老大叫大朗，老二叫二郎，请问老三叫什么”一样。在以分布式存系统为限定条件的 CAP 世界里，P 是早已经确定的答案，P 是必须的。</p>
+<p>因为，在分布式系统内，P 是必然的发生的，不选 P，一旦发生分区错误，整个分布式系统就完全无法使用了，这是不符合实际需要的。所以，对于分布式系统，我们只能能考虑当发生分区错误时，如何选择一致性和可用性。而根据一致性和可用性的选择不同，开源的分布式系统往往又被分为 CP 系统和 AP 系统。</p>
+<p>当一套系统在发生分区故障后，客户端的任何请求都被卡死或者超时，但是，系统的每个节点总是会返回一致的数据，则这套系统就是 CP 系统，经典的比如 Zookeeper。</p>
+<p>如果一套系统发生分区故障后，客户端依然可以访问系统，但是获取的数据有的是新的数据，有的还是老数据，那么这套系统就是 AP 系统，经典的比如 Eureka。</p>
+<p>用大白话来形容下 CAP ，CAP 就是告诉程序员们当分布式系统出现内部问题了，你要做两种选择：</p>
+<ul>
+<li>要么迁就外部服务，像外包公司。</li>
+<li>要么让外部服务迁就你，像银行。</li>
+</ul>
+<p>迁就外部服务就是我们不能因为我们自己的问题让外部服务的业务运行受到影响，所以要优先可用性。而让外部服务迁就我们，就要优先一致性。所以我们还是要在具体的情景内进行权衡。</p>
+<h3 id="base理论">BASE理论</h3>
+<p><strong>BASE</strong> 是 <strong>Basically Available（基本可用）</strong> 、<strong>Soft-state（软状态）</strong> 和 <strong>Eventually Consistent（最终一致性）</strong> 三个短语的缩写。</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230912182836473.png" alt="image-20230912182836473"></p>
+<ul>
+<li>基本可用</li>
+</ul>
+<p>什么是基本可用呢？假如系统出现了不可预知故障，允许损失部分可用性，当然也不能完全不可用。</p>
+<p>损失的这部分可用性指的是什么？</p>
+<p>1.<strong>响应时间上的损失</strong> ：正常情况下的搜索引擎0.5秒即返回给用户结果，而基本可用的搜索引擎可以在2秒作用返回结果。</p>
+<p>2.<strong>功能上的损失</strong> ：在一个电商网站上，正常情况下，用户可以顺利完成每一笔订单。但是到了大促期间，为了保护购物系统的稳定性，部分消费者可能会被引导到一个降级页面。</p>
+<ul>
+<li>软状态</li>
+</ul>
+<p>软状态指允许系统中的数据存在中间状态（<strong>CAP 理论中的数据不一致</strong> ），并认为该中间状态的存在不会影响系统的整体可用性，即允许系统在不同节点的数据副本之间进行数据同步的过程存在延时。</p>
+<ul>
+<li>最终一致性</li>
+</ul>
+<p>最终一致性强调的是系统中所有的数据副本，在经过一段时间的同步后，最终能够达到一个一致的状态。因此，最终一致性的本质是需要系统保证最终数据能够达到一致，而不需要实时保证系统数据的强一致性。</p>
+<p>BASE 理论是对 CAP 中一致性 C 和可用性 A 权衡的结果，其<strong>核心思想</strong>是：</p>
+<p>即使无法做到强一致性（Strong consistency），但每个应用都可以根据自身的业务特点，采用适当的方式来使系统达到最终一致性（Eventual consistency）。</p>
+<p>BASE 是 CAP 理论中 AP 方案的延伸，BASE理论面向的是大型高可用、可扩展的分布式系统。与传统ACID特性相反，不是强一致性模型，BASE提出通过牺牲强一致性来获得可用性，并允许数据一段时间内的不一致，但是最终需要达到一致状态。</p>
+<h2 id="1一致性可用性平衡方法论">1.一致性、可用性平衡方法论</h2>
+<p>在存储领域，保证系统高可用最基础也是最本质的方法就是<strong>冗余</strong>。冗余就是为系统准备多个副本或多个实例，他们提供同样的服务，共同工作。这样即使其中一个副本或者实例出现了故障，其他的实例仍然可以替这个故障实例承担工作，保证系统持续可用。存储系统都是有状态的，对于这种有状态系统，需要维护多个副本的数据一致性。例如MySQL的主从同步、Redis的RDB、AOF，都是基于复制状态机理论来进行副本数据的一致性维护。</p>
+<p>而在分布式系统中，让系统中多个实例的状态保持一致，是一个比较难处理的问题。尤其是当系统出现故障时，系统能否始终保持一致性，很大程度上影响了系统的可用性和数据的可靠性。为了保证一致性，在数据更新时，往往需要协调参与的各个模块，确保他们同步更新，比如使用各种分布式事务，但这会导致多个模块在可用性上紧密耦合在一起，从而降低了系统的可用性。</p>
+<p>下面从高可用视角来评估一下数据的一致性问题，以及如何在可用性和一致性上取得相对的平衡。</p>
+<h3 id="非必要情况下不增加副本">非必要情况下不增加副本</h3>
+<p>我们已经意识到，在分布式系统中解决一致性问题需要付出很大的代价，例如：可用性降低、性能下降、用户体验变差或者是极大的增加了系统的复杂度。因此，我们应该尽量避免一致性难题，不要人为制造。当然，为系统中为状态数据设计多个副本的情况是很常见的，那我们到底该如何权衡嘞？</p>
+<p>架构设计时权衡的艺术，当我们选择某种设计或架构时，一定要充分了解当前选择的优势和代价，确保优势是我们所需要的，代价是我们所能接收的。这样的设计才是当前场景下的最优选择。</p>
+<p>对于是否增加副本的场景，我们需要为维护数据的一致性花费很大的大家，但是副本机制确实是系统进行高可用的有力手段，我们只需要在设计过程中避免未经仔细思考随意增加副本的行为即可，例如下面就是一个错误示例：</p>
+<ul>
+<li>仅仅是为了写代码的时候更方便地读取数据，就随意增加副本。比如，为了便于查询，将数据库中 A 表中的部分字段，在 B 表中也保存一份。</li>
+<li>系统中存在多个外部存储，为了读写方便，在每个外部存储都保存一份数据副本。比如，集群的元数据保存在 ZooKeeper 中，为了方便管理控制台操作，也在 MySQL 中保存一份同样的数据。</li>
+<li>不考虑系统的性能实际要求，为了让系统速度更快一些，在 Redis 和内存中缓存数据。</li>
+</ul>
+<h3 id="一致性和可用性的三大矛盾难题">一致性和可用性的三大矛盾难题</h3>
+<p>在现有硬件技术条件下，对分布式系统中每个节点更新操作，总会有先后，不可能做到绝对的“同时”，也就无法保证系统的多个副本在“任何时刻”状态都相同。因此，这里我们讨论的一致性是，系统作为一个整体对外部所表现出的一致性。换句话说就是，分布式系统内部可以存在不一致的状态，但只要这种不一致的状态对外部是不可见的，那就可以认为这个系统具备一致性。</p>
+<p>把分布式系统抽象成一个最简模型：一个只有两个有状态节点系统。下面以这个最简模型来分析为什么同时保证高可用和一致性是几乎不可能实现的，即主要面临的三个矛盾难题是什么。</p>
+<h4 id="1如何处理更新操作失败的情况">1.如何处理更新操作失败的情况</h4>
+<p>要保持两个节点上状态的一致性，理论上需要每次更新状态时同步更新两个节点上的状态。如果某一个节点上的更新操作失败了，系统将变成如下不一致的状态：一个节点更新成功，而另外一个节点更新失败。在这种情况下，还要保持系统的一致性，就需要将这种不一致状态隔离在系统内部，不能让外部系统感知，并且尽快修复不一致的状态。要修复这种不一致状态，一般有两种方法，分别是<strong>重试</strong>和<strong>回滚</strong>。</p>
+<ul>
+<li>重试指的是，让失败的节点重新执行更新操作。如果重试成功，系统将重新回到一致的状态。</li>
+<li>回滚指的是，让之前更新成功的节点执行回滚操作，回到更新前的状态，也可以让系统重新回到一致状态。但重试和回滚的实现代价都很大。</li>
+</ul>
+<p>通过重试来解决一致性的前提是，被重试的更新操作必须具备幂等性和原子性。幂等性，可以保证多次重试同一个更新操作不会改变状态的正确性；原子性，则可以避免在更新具有复杂数据结构的状态失败时，只更新了部分状态的尴尬局面。如果系统的状态不是保存在关系型数据库中，要实现幂等性和原子性其实很不容易。实现回滚同样要保证原子性，此外为了能将状态恢复到更新之前，需要在执行更新操作之前记录原始状态，系统还要考虑如何处理回滚失败的问题。</p>
+<h4 id="2如何在其中一个节点不可用的情况保证系统一致性">2.如何在其中一个节点不可用的情况保证系统一致性</h4>
+<p>当系统其中的一个节点不可用时，另外一个节点仍然可以提供读写服务。当故障节点恢复后，理论上只要把状态数据从可用节点同步到之前故障的节点上，系统就可以重新回到一致性状态了。而在现实中实现好数据同步，既要做到快速同步，又要保证不重不漏，难度和代价都比较大。</p>
+<p>最简单的方法是全量数据同步，清空故障节点上的状态数据，然后将可用节点上的状态数据全部复制到故障节点上。全量同步相对比较耗时，如果数据量比较大，就必须采用增量同步的方法。</p>
+<p>而增量同步，则需要精准地界定出哪些数据属于“增量数据”。这对于大多数采用多线程并行处理请求的服务来说，几乎不可能实现。同时，另一个不得不考虑的极端情况是，如果在一段时间内两个节点交替多次出现不可用的情况，系统将很难判定哪个节点上的状态才是“正确可信的状态”，也就无法恢复系统的一致性状态。</p>
+<h4 id="3如何在分区的情况下保证系统的一致性">3.如何在分区的情况下保证系统的一致性</h4>
+<p>网络分区，指的是由于网络设备故障，造成网络分裂为多个独立的区域。典型场景是两个机房间的网络中断，这两个机房就形成了两个互不联通的分区。假设发生了网络分区，系统的两个节点恰巧分别位于不同分区，这种情况下，虽然没有节点不可用，但节点间无法通信，也就无法保证系统一致性。如果系统不能容忍“不一致”，唯一的办法就是在网络分区期间停止对外提供服务，也就是说需要牺牲“可用性”。</p>
+<p>上面我们讨论的情况，就是著名的 CAP 理论的一种典型场景：在网络分区的情况下，一致性和可用性只能二选其一。鉴于一致性与可用性存在冲突，以及实现一致性的代价过高这两个原因，在设计分布式系统时，放弃对严格一致性的约束，让系统去适应相对宽松一致性，从而在一致性、可用性和性能上取得相对可接受的平衡，是更加理性的选择。</p>
+<p>所谓“宽松一致”，是在隔离性和性能等方面适当放宽要求后的一系列降级版一致性。相对的，我们之前讨论的一致性，也被称为“强一致”。最终一致是普遍采用的一种宽松一致。比如上面的例子，在网络分区的情况下，如果可以接受最终一致，则系统仍然可以在其中的一个分区提供提供读写服务，另一个分区提供只读服务，极大增强系统的可用性。只要待网络故障结束后，再通过单向数据同步即可恢复系统一致性。</p>
+<h3 id="在一致性和可用性之间保持平衡">在一致性和可用性之间保持平衡</h3>
+<p><em><strong>BASE。</strong></em></p>
+<p>BASE中的最终一致允许不一致的中间状态被外部可见，但需要在短时间内恢复为一致状态，这里面的短时间能够被量化呢？</p>
+<p>我们需要分系统正常和故障二种情况来分别讨论。</p>
+<p>在系统正常时，达成最终一致的时间要求是“在系统外部几乎不可感知”，具体来说应该与需要同步状态的节点之间的网络时延差不多。比如，如果系统的节点都部署在同一个数据中心内，达成最终一致的时延不应超过几个毫秒；对于一个全球部署的系统，达成最终一致的时延可能需要几十至几百毫秒。在系统发生网络分区故障时，为了尽可能保证系统的可用性，需要进一步牺牲达成最终一致的时延，最长可能需要等到故障恢复后系统才能达成最终一致。</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230912182856410.png" alt="image-20230912182856410"></p>
+<p><strong>但牺牲一致性要守住两个底线：防止脑裂和保证单调读写</strong></p>
+<ul>
+<li>防止脑裂</li>
+</ul>
+<blockquote>
+<p>脑裂：</p>
+<p>举例说明。</p>
+<p>在Elasticsearch、ZooKeeper这些集群环境中，有一个共同的特点，就是它们有一个“大脑”。比如，Elasticsearch集群中有Master节点，ZooKeeper集群中有Leader节点。</p>
+<p>集群中的Master或Leader节点往往是通过选举产生的。在网络正常的情况下，可以顺利的选举出Leader（后续以Zookeeper命名为例）。但当两个机房之间的网络通信出现故障时，选举机制就有可能在不同的网络分区中选出两个Leader。当网络恢复时，这两个Leader该如何处理数据同步？又该听谁的？这也就出现了“脑裂”现象。</p>
+<p>又比如传统 MySQL 主从结构中，如果主库宕机，或者网络分区导致无法访问主库，也不应该去更新从库中的数据，否则在故障结束后，系统面对主库和从库二份不一样的数据，是无法自动恢复的。这种情况被称为“脑裂（Split-brain）”，出现脑裂后，理论上系统的一致性不可恢复。</p>
+</blockquote>
+<p>关键是确保故障后能够恢复最终一致。其前提是，系统需要具备足够的信息，以判断最新的状态。然后才能将所有的副本状态都恢复至这一状态，在系统故障时，为了保证可用性，也不应该违反更新操作的一致性约束。</p>
+<p>这里，“更新操作的一致性约束”指的是，系统为了保证一致性，而对状态更新操作施加的约束条件。比如，最简单的主从模式下，只能通过主副本更新状态，无论任何原因无法更新主副本，那就要让本次更新失败，牺牲更新操作的可用性。</p>
+<ul>
+<li>单调读写</li>
+</ul>
+<p>最终一致系统在故障时，为了保证系统持续可用，应允许客户端从任意一个尚可访问的节点上读取状态数据。尽管这个时候，客户端读到的可能并非最新状态。对于绝大多数系统来说，短时间内读到一个并非最新状态都是可接受的。</p>
+<p>先来看第一个例子。小明用手机银行给小华转了 100 元，当小明完成了转账操作后，实际上这笔钱已经转入到小华的账户。如果这个时候因为系统故障，小华的手机银行上显示尚未到账，然后过了一段时间之后才显示到账，也并非是完全不可接受。</p>
+<p>然后我们再来看第二个例子，同样还是以小明给小华转账来说明。如图二所示，在一个只有主从二副本的最终一致性系统中，转账成功后主副本的状态已更新，小明转给小华的钱已到账，小华的账户余额是 100 元。但由于同步延迟，从副本中转账还未到账，小华的账户余额还是 0 元。</p>
+<p>假设小华第一次查询账户的请求被分配到主副本上，App 显示余额 100 元。小华再次查询，这次查询请求被分配到了从副本上，App 显示余额 0 元！刚到账的钱没了！对小明来说也可能出现类似的问题，转账成功后再查询账户，如果这个查询请求被分配到了从副本上（这在配置了读写分离的数据库集群上是默认的行为），发现账户余额并没有减少，小明以为转账没成功，再次发起了转账，结果多转了 100 元。</p>
+<p>以上这两种情况，对外部系统来说无法判断读到的状态是否准确，显然是不可接受的。</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230912182911461.png" alt="image-20230912182911461"></p>
+<p>要避免这两个问题，就需要保证在客户端视角的一致性。所谓单调读写，要求对每一个客户端来说，每次读到的状态不能比上次一读写到的状态更旧。简单的说就是“不能时序错乱”。实现单调读写有两种常用的方法。</p>
+<ul>
+<li>保持会话</li>
+</ul>
+<p>让同一个客户端的请求总是由与之建立会话的哪个特定服务节点处理。客户端只与服务端的一个节点交互，自然不会出现时序错乱的问题。保持会话的方式可以是使用网关内置的保持会话的功能，或者是服务端自己通过返回唯一标识的方式实现。</p>
+<p>但这种方式的问题是牺牲了系统的弹性，容易出现热点问题，并且扩缩容也会收到会话的限制，且一旦保持会话节点出现故障，需进行会话切换，这个过程仍然可能发生时序错乱问题。</p>
+<ul>
+<li>版本号</li>
+</ul>
+<p>系统需要为状态数据维护一个版本号系统，状态版本号是状态的一部分，并且要确保每次状态更新，对应版本号都单调递增。这个状态版本号的目的是，标记状态更新的先后顺序。</p>
+<p>客户端需要记录上一次读写状态的版本号，然后在每一次读取状态之前比对本次版本号和上次版本号，如果本次版本号不小于上次版本号，就可以认为本次读取的状态是可信的。否则，需要丢弃本次读取结果，等待一会儿或者连接其它服务端重试，以获取新版本的状态数据。通过状态版本号的方式实现单调读写，可以完美地保证客户端视角的一致性，但服务端的实现则更加复杂。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              <br/><br/><p>Subscribe：<a target="_blank" href="https://mailchi.mp/a1a0d59e7a19/joway"><b>Mailchimp</b></a></p><br/><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://blog.joway.io/images/cc.png" /></a>
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+<script src="/js/lazyload.min.js"></script>
+<script>
+  var lazyImage = new LazyLoad({
+    container: document.getElementById('article')
+  });
+</script>
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

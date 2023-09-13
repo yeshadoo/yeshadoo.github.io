@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Java on Hadoo&#39;s Blog</title>
+    <link>https://hanchao666.top/categories/java/</link>
+    <description>Recent content in Java on Hadoo&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 12 Jan 2022 17:59:27 +0800</lastBuildDate><atom:link href="https://hanchao666.top/categories/java/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>List的坑儿</title>
+      <link>https://hanchao666.top/posts/confusing-list/</link>
+      <pubDate>Wed, 12 Jan 2022 17:59:27 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/posts/confusing-list/</guid>
+      <description>有一个著名的公式：程序=数据结构+算法。Java的集合类包括Map和Collection两大类，而Collection又包括List、Set和Queue三个小类，其中List在业务代码中几乎是最经常使用的，下面梳理一下使用List常见的几个坑。
+Arrays.asList使用 基本数据类型数组转换为List不能使用Arrays.asList() 如下代码：
+int[] arr = {1, 2, 3}; List list = Arrays.asList(arr); log.info(&amp;#34;list:{},size:{},class:{}&amp;#34;, list, list.size(), list.get(0).getClass()); 执行结果为：list:[[I@4bc222e],size:1,class:class [I
+结果并不是我们期待的输出List{1,2,3}数组，List包含的是一个int数组，元素类型是整数数组。原因是虽然Java支持int到Integer的自动装箱，但是不支持int[]到Integer[]的自动装箱，而Arrays.asList的源码为：
+public static &amp;lt;T&amp;gt; List&amp;lt;T&amp;gt; asList(T... a) { return new ArrayList&amp;lt;&amp;gt;(a); } asList方法传入的是一个泛型T的可变参数，最终int数组整体作为了一个对象成为了泛型类型T。
+改进修复方式有两种：
+如果是Java8以上版本，可以使用Arrays.stream进行转换 int[] arr = {1,2,3}; List&amp;lt;Integer&amp;gt; collect = Arrays.stream(arr).boxed().collect(Collectors.toList()); log.info(&amp;#34;list:{},size:{},class:{}&amp;#34;, collect, collect.size(), collect.get(0).getClass()); 2.把int数组声明为Integer数组进行转换
+修复之后，我们可以得到一个List列表，但是接下来的使用操作还有坑。
+如下代码：
+String[] arr1 = {&amp;#34;1&amp;#34;, &amp;#34;2&amp;#34;, &amp;#34;3&amp;#34;}; List&amp;lt;String&amp;gt; stringList = Arrays.asList(arr1); arr1[1] = &amp;#34;4&amp;#34;; try { stringList.add(&amp;#34;5&amp;#34;); } catch (Exception e) { e.</description>
+    </item>
+    
+    <item>
+      <title>线程池的理解和总结</title>
+      <link>https://hanchao666.top/posts/thread-pool/</link>
+      <pubDate>Thu, 09 Sep 2021 17:24:49 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/posts/thread-pool/</guid>
+      <description>1.为什么要使用线程池
+其实这个问题和数据库连接池、字符串常量一样，都是使用了池化技术，池化技术可以降低每次重复创建和销毁的开销，尤其是对于线程或者数据库连接这种大对象，使用池化技术是非常必要的，如果并发的线程数量比较多，每个线程只是执行一个时间很短的任务就结束了，这样频繁的创建和销毁线程会大大降低系统的性能
+那么下面来详细说一下线程池的好处：
+降低资源消耗：通过重复利用已创建的线程来降低线程创建和销毁的消耗 提高响应速度：当任务到达时，不必等待创建新的线程，任务到达可以立即执行 提高系统的管理性：线程是一个很大的对象，不能无限制的创建，需要使用线程池来进行统一的控制 2.线程池基本结构 线程池的工作模型主要两部分组成，一部分是运行Runnable的Thread对象，另一部分就是阻塞队列。
+由线程池创建的Thread对象其内部的run方法会通过阻塞队列的take方法获取一个Runnable对象，然后执行这个Runnable对象的run方法（即，在Thread的run方法中调用Runnable对象的run方法）。当Runnable对象的run方法执行完毕以后，Thread中的run方法又循环的从阻塞队列中获取下一个Runnable对象继续执行。这样就实现了Thread对象的重复利用，也就减少了创建线程和销毁线程所消耗的资源。
+当需要向线程池提交任务时会调用阻塞队列的offer方法向队列的尾部添加任务。提交的任务实际上就是是Runnable对象或Callable对象。
+3.Java中的ThreadPoolExecutor类 java.uitl.concurrent.ThreadPoolExecutor类是线程池中最核心的一个类，如果我们想要深入理解线程池，就一定要熟悉这个类
+ThreadPoolExecutor类提供了四个构造方法：
+public ThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue&amp;lt;Runnable&amp;gt; workQueue) { this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, Executors.defaultThreadFactory(), defaultHandler); } public ThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue&amp;lt;Runnable&amp;gt; workQueue, ThreadFactory threadFactory) { this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, defaultHandler); } public ThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue&amp;lt;Runnable&amp;gt; workQueue, RejectedExecutionHandler handler) { this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, Executors.</description>
+    </item>
+    
+    <item>
+      <title>Java ArrayList源码解析</title>
+      <link>https://hanchao666.top/posts/arraylist/</link>
+      <pubDate>Mon, 12 Jul 2021 17:31:14 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/posts/arraylist/</guid>
+      <description>1. ArrayList为什么线程不安全 public class ArrayList&amp;lt;E&amp;gt; extends AbstractList&amp;lt;E&amp;gt; implements List&amp;lt;E&amp;gt;, RandomAccess, Cloneable, java.io.Serializable { /** * 列表元素集合数组 * 如果新建ArrayList对象时没有指定大小，那么会将DEFAULTCAPACITY_EMPTY_ELEMENTDATA赋值给elementData， * 并在第一次添加元素时，将列表容量设置为DEFAULT_CAPACITY */ transient Object[] elementData; /** * 列表大小，elementData中存储的元素个数 */ private int size; } 通过这两个字段我们可以看出，ArrayList的实现主要就是用了一个Object的数组，用来保存所有的元素，以及一个size变量用来保存当前数组中已经添加了多少元素。
+接下来查看add方法源码：
+/** * Appends the specified element to the end of this list. * * @param e element to be appended to this list * @return &amp;lt;tt&amp;gt;true&amp;lt;/tt&amp;gt; (as specified by {@link Collection#add}) */ public boolean add(E e) { ensureCapacityInternal(size + 1); // Increments modCount!</description>
+    </item>
+    
+    <item>
+      <title>synchronized关键字的理解</title>
+      <link>https://hanchao666.top/posts/understand-synchronized/</link>
+      <pubDate>Thu, 01 Jul 2021 18:09:27 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/posts/understand-synchronized/</guid>
+      <description>1.概述 我们知道在并发编程中最为重要的就是线程安全问题，而线程安全的主要体现，就是原子性、可见性和有序性。当存在多个线程操作共享数据时，需要保证同一时刻有且只有一个线程在操作共享数据，其他线程必须等到该线程处理完数据后再进行，这种方式有个高尚的名称叫互斥锁，即能达到互斥访问目的的锁，也就是说当一个共享数据被当前正在访问的线程加上互斥锁后，在同一个时刻，其他线程只能处于等待的状态，直到当前线程处理完毕释放该锁。而synchronied关键字，可以很好的实现上述要求
+synchronized关键字主要有三种应用方式：
+修饰实例方法，作用于当前实例加锁，进入同步代码前要获得当前实例的锁 修饰静态方法，作用于当前类对象加锁，进入同步代码前要获得当前类对象的锁 修饰代码块，指定加锁对象，对给定对象加锁，进入同步代码库前要获得给定对象的锁。 上面三种方式的具体实现这里就不一一列举了，因为这篇文章的着重点还是在于理解，所以那种基本的实现就不赘述了，这里说一下同步代码块的事情，有的时候我们编写的方法体很大，其中可能还会包含很多耗时的操作，而需要同步的只有一小部分，如果直接对整个方法进行同步代价是很大的，这个时候我们使用同步代码块对那一小部分进行同步就好了
+synchronized关键字不仅可以保证操作的原子性、可见性，还可以避免指令重排产生的问题。使用这个关键字也就是将访问当前共享资源的数目限制2为单线程，单线程的情况下可以保证不会出现原子性问题，同时，也就保证了可见性，因为synchronized关键字每次进行加锁操作时都是从主存中读取数据，每次释放锁时都需要刷新主存，这种方法比较暴力，也就是说处理的粒度很大，这一点可以采用轻量级的、小粒度的volatile关键字实现，那么synchronized关键字是如何避免指令重排问题的呢？**	**sync关键字并没有禁止指令重排，指令重排只会在多线程情况下出现问题，而使用sync关键字之后相当于对共享数据进行单线程操作了，所以是有指令重排，但是没关系
+2.synchronized关键字底层原理 如果说到synchronized的底层，就一定要提到monitor对象，不管是同步方法还是同步代码块，都是通过这个对象进行同步的，那么这个对象是什么呢？
+我们知道对象的内存布局一共分为三部分：
+实例变量：存放类的属性数据信息，包括父类的属性信息，如果是数组的实例部分还包括数组的长度，这部分内存按4字节对齐 填充数据：虚拟机要求对象的其实地址必须是8字节的整数倍，填充数据不是必须存在的，仅仅是为了字节对齐。 下面重点来看一下对象头。
+一般来说，synchronized关键字使用的锁对象是存储在Java对象头里面的，对象头主要包括两部分数据：Mark Word（标记字段）、Class Pointer（类型指针）。
+Mark Word 用于存储对象自身的运行时数据，如哈希码（HashCode）、GC分代年龄、锁状态标志、线程持有的锁、偏向线程 ID、偏向时间戳等。
+以下是32位JVM的Mark Word默认存储结构：
+锁状态 25bit 4bit 1bit是否是偏向锁 2bit 锁标志位 无锁状态 对象HashCode 对象分代年龄 0 01 对象头的信息是与对象自身定义的数据没有关系的额外存储成本，考虑到JVM的空间效率，Mark Word被设计为一个非固定的数据结构，以便复用。除了以上默认存储结构以外，还可能有如下变化的结构：
+其中，重量级锁，也就是synchronized锁标识位为10，其中指针指向的是monitor对象的起始地址，每个对象都存在着一个monitor与之关联，在HotSpot虚拟机中，monitor是由ObjectMonitir实现的，其主要数据结构如下：
+ObjectMonitor() { _header = NULL; _count = 0; //记录个数 _waiters = 0, _recursions = 0; _object = NULL; _owner = NULL; _WaitSet = NULL; //处于wait状态的线程，会被加入到_WaitSet _WaitSetLock = 0 ; _Responsible = NULL ; _succ = NULL ; _cxq = NULL ; FreeNext = NULL ; _EntryList = NULL ; //处于等待锁block状态的线程，会被加入到该列表 _SpinFreq = 0 ; _SpinClock = 0 ; OwnerIsThread = 0 ; } ObjectMonitor中有两个队列WaitSet和EntrySet，用来保存ObjectWaiter对象列表(每个等待锁的线程都会被封装成ObjectWaiter对象)，_owner指向持有ObjectMonitor对象的线程，当多个线程同时访问一段同步代码时，首先会进入EntryList集合，当线程获取到对象的monitor之后进入owner区域把owner变量设置为当前线程，并为monitor中计数器count+1，若线程调用wait()方法，将释放当前持有的monitor，owner变量恢复为null，count&amp;ndash;，同时该线程进入WaitSet集合中等待被唤醒。若当前线程执行完毕也将释放monitor(锁)并恢复owner变量值为null，以便其他线程进入获取monitor(锁)，流程如下图所示：</description>
+    </item>
+    
+  </channel>
+</rss>

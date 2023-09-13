@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>NetWork on Hadoo&#39;s Blog</title>
+    <link>https://hanchao666.top/categories/network/</link>
+    <description>Recent content in NetWork on Hadoo&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 22 Feb 2022 18:13:43 +0800</lastBuildDate><atom:link href="https://hanchao666.top/categories/network/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>理解TCP拥塞控制原理</title>
+      <link>https://hanchao666.top/posts/understand-tcp/</link>
+      <pubDate>Tue, 22 Feb 2022 18:13:43 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/posts/understand-tcp/</guid>
+      <description>TCP作为一个世界通用的协议，由于需要考虑到所有的兼容情况，例如重传、流控等，是一个超级复杂的庞大存在。本篇文章主要探索一下其中的拥塞控制机制，目的是能够理解其流程机制(切忌死记硬背)，来学习其处理问题的思路。
+拥塞控制主要包括四个核心算法：慢开始、拥塞避免、快重传、快恢复。
+下面选取一个生活中的情景，来比拟一下TCP的拥塞控制机制，道理都是相同的嘛~
+故事背景：
+汽车厂商，想要给4儿子店发送一批新出厂的汽车
+其中：
+汽车厂商：发送端
+4儿子店：接收端
+一批汽车：要发送的数据(车辆需严格按照序列号接收)
+两地之间的道路：网络
+我们的目的，就是能够保证这一批汽车能够完整的到达目的地，这中间我们需要考虑：避免道路拥堵。
+下面来看一下，TCP协议是如何解决这一难题的(会分别对应现实案例)：
+1.慢启动 概念先行：
+cwnd，即Congestion Window，拥塞窗口，用于控制发送端的发送速率 ssthresh，即slow start threshold，慢启动执行的阈值 慢启动算法如下：
+1）连接建好的开始先初始化cwnd = 1，表明可以传一个MSS大小的数据。
+2）每当收到一个ACK，cwnd++; 呈线性上升
+3）每当过了一个RTT，cwnd = cwnd*2; 呈指数让升
+4）ssthresh是一个上限，当cwnd &amp;gt;= ssthresh时，就会进入“拥塞避免算法”
+慢启动算法是指数增长，在网速给力的情况下，一个RTT很短，每个ack的返回就很快，其实他一点也不慢~
+回到上面的故事，汽车运输专线道路刚刚建立好之后(TCP建立完成)，汽车厂商肯定不会一开始就大批量的往道路上发放汽车，因为这条道路是否拥堵、是否有沟沟坎坎，我们都是未知的，所以一般都会先放一辆试试(cwnd = 1)，打仗行军也是有侦察兵这个概念的对吧，如果第一辆车成功到达4儿子店，那么4儿子店就会给厂商打一个电话(ack)，通知已经收到这辆车了，在这之后，厂商才会逐渐的增加投放的数量(指数级别)，当到达了一个门槛之后(道路的理论可承载力)，进入拥塞避免阶段~
+2.拥塞避免 ssthresh（slow start threshold），是一个上限，当cwnd &amp;gt;= ssthresh时，就会进入“拥塞避免算法”。一般来说ssthresh的值是65535，单位是字节，当cwnd达到这个值时后，算法如下：
+1）收到一个ACK时，cwnd = cwnd + 1/cwnd
+2）当每过一个RTT时，cwnd = cwnd + 1
+拥塞避免的主要机制是“加法增大”，也就是将慢启动中的指数增长变为线性增长
+解释一下上面的算法：拥塞窗口值的大小就代表能够发送出去的但还没有收到ACK的最大数据报文段，当前窗口的所有报文段全部ack之后，cwnd+1
+回到上面的故事，在慢启动中，我把ssthresh叫做“道路的理论可承载力”，理论 表示的是道路修建好之后的参考建议值，其实际的承载力可能更大，厂商作为一个资本家，肯定是想把这条路的运载能力榨干的，所以加下来车辆的发放速度就变指数为线性，如果上一批车辆全部到达了，那么下一批就会再增加一辆，来逐渐接近道路的最大承载力。所以这个过程也是存在风险的，一旦突破最大承载力道路拥堵(出现网络拥塞)，怎么办？
+继续来看TCP是如何解决的。
+3.快重传 &amp;amp; 快恢复 拥塞状态时的算法
+当丢包的时候，会有两种情况：
+1）等到RTO超时，重传数据包。TCP认为这种情况太糟糕，反应也很强烈。
+sshthresh = cwnd /2 cwnd 重置为 1 进入慢启动过程 2）发送方收到3个duplicate ACK时就开启重传，而不用等到RTO超时。</description>
+    </item>
+    
+  </channel>
+</rss>

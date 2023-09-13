@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>OS on Hadoo&#39;s Blog</title>
+    <link>https://hanchao666.top/categories/os/</link>
+    <description>Recent content in OS on Hadoo&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 28 Jul 2023 14:23:32 +0800</lastBuildDate><atom:link href="https://hanchao666.top/categories/os/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Page Cache and Buffer Cache</title>
+      <link>https://hanchao666.top/posts/page-cache-and-buffer-cache/</link>
+      <pubDate>Fri, 28 Jul 2023 14:23:32 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/posts/page-cache-and-buffer-cache/</guid>
+      <description>区分 先上一个Linux的文件I/O系统图， 上图红色部分就是page cache，由此可见其存在于os kernel的内存区域。内存管理分配的基本单位是page，page cache由多个页组成，对应于磁盘上的若干数据块。
+Linux上的页供用户访问的页有两种：
+File-backed pages：文件备份页ME1693830146631.png也就是page cache中的page Anonymous pages：匿名页是进程运行的内存空间，包括方法栈、局部变量表等 在终端执行free命令，
+其中cached列表示的就是page cache的占用量，而buffers列表示当前的buffer cache占用量。
+二者的区别用一句话解释就是：page cache用于缓存文件的页数据，buffer cache用于缓存块设备(如磁盘)的块数据。
+页是逻辑上的概念，因此page cache是与文件系统同级的； 块是物理上的概念，因此buffer cache是与块设备驱动程序同级的。 在Linux 2.4版本的内核之前，二者是完全分离的。但块设备大多是磁盘，磁盘上的数据大多又通过文件系统来组织，这样导致数据被缓存的两次，
+在Linux 2.4版本内核之后，两块缓存近似融合到了一起：如果一个文件的页加载到了page cache，那么buffer cache只需要维护块指向页的指针就可以了。只有那些没有文件表示的块，或者绕过了文件系统直接操作（如dd命令）的块，才会真正放到buffer cache里。
+因此，现在提起page cache，基本就是同时指的是两者。
+预读机制 操作系统为基于page cache的读缓存机制提供了预读机制，例如，
+用户线程仅仅请求读取磁盘上文件 A 的 offset 为 0-3KB 范围内的数据，由于磁盘的基本读写单位为 block（4KB），于是操作系统至少会读 0-4KB 的内容，这恰好可以在一个 page 中装下。 但是操作系统出于局部性原理会选择将磁盘块 offset [4KB,8KB)、[8KB,12KB) 以及 [12KB,16KB) 都加载到内存，于是额外在内存中申请了 3 个 page； ME1693830198441.png
+上图中，应用程序利用 read 系统调动读取 4KB 数据，实际上内核使用 readahead 机制完成了 16KB 数据的读取。
+优势 page cache能够加速数据访问，如果能够命中缓存，就可以缩短直接访问磁盘的gap，
+同时基于操作系统为page cache提供的预读机制，基于程序的局部性原理，可以减少磁盘加载缓存次数，进而提高吞吐量。</description>
+    </item>
+    
+  </channel>
+</rss>

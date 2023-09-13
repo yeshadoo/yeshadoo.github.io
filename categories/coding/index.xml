@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Coding on Hadoo&#39;s Blog</title>
+    <link>https://hanchao666.top/categories/coding/</link>
+    <description>Recent content in Coding on Hadoo&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 04 Jun 2023 14:20:11 +0800</lastBuildDate><atom:link href="https://hanchao666.top/categories/coding/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>烂怂if-else代码优化方案</title>
+      <link>https://hanchao666.top/posts/dirty-if-else-optimize/</link>
+      <pubDate>Sun, 04 Jun 2023 14:20:11 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/posts/dirty-if-else-optimize/</guid>
+      <description>0.问题概述 代码可读性是衡量代码质量的重要标准，可读性也是可维护性、可扩展性的保证，因为代码是连接程序员和机器的中间桥梁，要对双边友好。Quora 上有一个帖子： “What are some of the most basic things every programmer should know?”
+其中：
+Code that’s hard to understand is hard to maintain.
+Code that’s hard to maintain is next to useless.
+也强调了&amp;quot;easy understand&amp;quot;代码的重要性。
+写这篇文章的契机是在研读Apache ShenYu项目时，看到了很大一坨的if else语句，如下：
+这里并非评论这段代码写法有问题，因为我还并没有深入到项目细节之中，可能这已经是多轮优化的结果嘞。
+但是这个多层if else的形式引发了我的思考，因为我也曾在项目代码中引入过如此繁重的if else结构，并在Code Review中被指出了问题。从那以后，我对if else的最大容忍层数就是三层。
+我把大量if else的场景按照深度和广度两个维度划分为两种情况：
+嵌套层级过深 平铺范围太广 下面就讨论一下，当代码中存在大量这样结构的代码的时候，该如何优化？
+1.解决方案 1.1 尽早返回 又称卫语句，即Guard Statement
+WikiPedia:
+In computer programming, a guard is a boolean expression that must evaluate to true if the program execution is to continue in the branch in question.</description>
+    </item>
+    
+  </channel>
+</rss>

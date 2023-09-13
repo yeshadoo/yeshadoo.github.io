@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>CS on Hadoo&#39;s Blog</title>
+    <link>https://hanchao666.top/categories/cs/</link>
+    <description>Recent content in CS on Hadoo&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 04 Aug 2022 18:41:29 +0800</lastBuildDate><atom:link href="https://hanchao666.top/categories/cs/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>IO模式与select 、poll、epoll</title>
+      <link>https://hanchao666.top/posts/io-select-poll-epoll/</link>
+      <pubDate>Thu, 04 Aug 2022 18:41:29 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/posts/io-select-poll-epoll/</guid>
+      <description>五大IO模型 在Linux系统中，对于一次IO访问，数据会先被拷贝到操作系统内核的缓冲区中，然后才会从操作系统内核的缓冲区拷贝到应用程序的地址空间。所以，一个IO操作会经历两个阶段：
+等待数据准备好 从内核向进程复制数据 基于此，Linux系统有五种IO模型：
+阻塞式IO 非阻塞式IO IO复用 信号驱动式 异步IO 阻塞式IO 应用进程被阻塞，直到数据从内核缓冲区复制到应用进程缓冲区才返回。
+例如当用户进程调用了recvfrom这个系统调用，kernel就开始了IO的第一个阶段：准备数据。这个过程需要等待，因为数据从磁盘或网络被拷贝到内核的缓冲区是需要时间的，而用户进程这边，整个进程会被阻塞，当kernel中数据准备就绪，继续把kernel中的数据拷贝到用户内存，然后kernel结果，用户进程接触阻塞，重新run。
+非阻塞IO 应用进程执行系统调用之后，内核返回一个错误码，应用进程可以继续执行，但是需要不断的轮询执行系统调用来获知IO是否完成。
+IO复用 使用select或poll等待数据，并且可以等待多个套接字中的任何一个变为可读，这一过程会被阻塞，当某个套接字可读时返回，之后再使用recvfrom把数据从内核复制到进程中。她得基本原理就是select 、poll会不断的轮询所负责的所有socket，当某个socket有数据到达了，就通知用户进程。它让单个进程具有处理多个IO事件的能力，又称为事件驱动。
+如果一个服务器没有IO复用，那么每个socket连接都需要创建一个线程去处理，如果同时有几万个连接，那么就需要创建相同数量的线程。相比于多进程或多线程技术，IO复用不需要进程线程创建和切换的开销，系统开销更小。
+信号驱动IO 应用进程使用sigaction系统调用，内核立即返回，应用进程可以继续执行，也就是说等待数据阶段应用进程是非阻塞的。内核在数据到达时向应用进程发送SIGO信号，应用进程收到之后再信号处理程序中调用recvfrom将数据从内核复制到应用进程中。
+异步IO 应用进程执行aio_read系统调用会立即返回，应用进程可以立即执行，不会被阻塞，内核会在完成所有操作之后向应用进程发送信号。异步IO与信号驱动IO的区别在于，异步IO的信号是通知应用进程IO完成，而信号驱动是通知应用进程开始IO。
+比较 同步IO：将数据从内核缓冲区复制到应用进程缓冲区的阶段，应用进程会阻塞。 异步IO：第二阶段应用进程不会阻塞。 同步IO包括阻塞式IO、非阻塞IO、IO复用和信号驱动IO，他们第二阶段都会使应用进程阻塞，区别在于第一阶段，非阻塞IO、信号驱动在第一阶段不会阻塞，
+而异步IO两个阶段都不会阻塞。
+IO多路复用之select | poll | epoll select、poll、epoll都是IO多路复用的机制，IO多路复用就是通过一种机制，一个进程可以监视多个描述符，一旦某个描述符读写事件就绪，通知程序进行相应的读写操作。三者本质上都是同步IO，因为他们都需要在读写事件就绪后自己负责读写，这个读写过程是阻塞的，而异步IO则无需自己负责读写，其实现机制会完成数据从内核复制到用户空间，完成后通知应用进程即可。
+select int select(int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+select 允许应用程序监视一组文件描述符，等待一个或者多个描述符成为就绪状态，从而完成 I/O 操作。
+fd_set 使用数组实现，数组大小使用 FD_SETSIZE 定义，所以只能监听少于 FD_SETSIZE 数量的描述符。有三种类型的描述符类型：readset、writeset、exceptset，分别对应读、写、异常条件的描述符集合。 timeout 为超时参数，调用 select 会一直阻塞直到有描述符的事件到达或者等待的时间超过 timeout。 成功调用返回结果大于 0，出错返回结果为 -1，超时返回结果为 0。 fd_set fd_in, fd_out; struct timeval tv; // Reset the sets FD_ZERO( &amp;amp;fd_in ); FD_ZERO( &amp;amp;fd_out ); // Monitor sock1 for input events FD_SET( sock1, &amp;amp;fd_in ); // Monitor sock2 for output events FD_SET( sock2, &amp;amp;fd_out ); // Find out which socket has the largest numeric value as select requires it int largest_sock = sock1 &amp;gt; sock2 ?</description>
+    </item>
+    
+    <item>
+      <title>关于字符集</title>
+      <link>https://hanchao666.top/posts/about-charset/</link>
+      <pubDate>Fri, 24 Jun 2022 18:38:50 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/posts/about-charset/</guid>
+      <description>何为字符集？ 字符是各种文字和符号的统称，包括各个国家文字、标点符号、表情、数字等等。 字符集 就是一系列字符的集合。字符集的种类较多，每个字符集可以表示的字符范围通常不同，就比如说有些字符集是无法表示汉字的。
+计算机只能存储二进制的数据，那英文、汉字、表情等字符应该如何存储呢？
+我们要将这些字符和二进制的数据一一对应起来，比如说字符“a”对应“01100001”，反之，“01100001”对应 “a”。我们将字符对应二进制数据的过程称为&amp;quot; 字符编码 &amp;ldquo;，反之，二进制数据解析成字符的过程称为“ 字符解码 ”。
+有哪些常见的字符集？ 常见的字符集有 ASCII、GB2312、GBK、UTF-8&amp;hellip;&amp;hellip;。
+不同的字符集的主要区别在于：
+可以表示的字符范围 编码方式 ASCII ASCII (American Standard Code for Information Interchange，美国信息交换标准代码) 是一套主要用于现代美国英语的字符集（这也是 ASCII 字符集的局限性所在）。
+为什么 ASCII 字符集没有考虑到中文等其他字符呢？ 因为计算机是美国人发明的，当时，计算机的发展还处于比较雏形的时代，还未在其他国家大规模使用。因此，美国发布 ASCII 字符集的时候没有考虑兼容其他国家的语言。
+ASCII 字符集至今为止共定义了 128 个字符一个 ASCII 码长度是一个字节也就是 8 个 bit，比如“a”对应的 ASCII 码是“01100001”。不过，最高位是 0 仅仅作为校验位，其余 7 位使用 0 和 1 进行组合，所以，ASCII 字符集可以定义 128（2^7）个字符。
+由于，ASCII 码可以表示的字符实在是太少了。后来，人们对其进行了扩展得到了 ASCII 扩展字符集 。ASCII 扩展字符集使用 8 位（bits）表示一个字符，所以，ASCII 扩展字符集可以定义 256（2^8）个字符。
+GB2312 我们上面说了，ASCII 字符集是一种现代美国英语适用的字符集。因此，很多国家都捣鼓了一个适合自己国家语言的字符集。
+GB2312 字符集是一种对汉字比较友好的字符集，基本涵盖了绝大部分常用汉字。不过，GB2312 字符集不支持绝大部分的生僻字和繁体字。对于英语字符，GB2312 编码和 ASCII 码是相同的，1 字节编码即可。对于非英字符，需要 2 字节编码。</description>
+    </item>
+    
+  </channel>
+</rss>

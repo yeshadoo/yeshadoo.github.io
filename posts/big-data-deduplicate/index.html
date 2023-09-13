@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.118.2">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="" />
+  <meta property="og:url" content="https://hanchao666.top/posts/big-data-deduplicate/" />
+  <link rel="canonical" href="https://hanchao666.top/posts/big-data-deduplicate/" /><link rel="apple-touch-icon" href="/logo.png" />
+  <link rel="icon" href="/logo.png" />
+  <link rel="shortcut" href="/logo.png" /><link rel="alternate" type="application/atom+xml" href="https://hanchao666.top/index.xml" title="Hadoo&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/hanchao666.top\/"
+      },
+      "articleSection" : "posts",
+      "name" : "大数据量系统去重方案",
+      "headline" : "大数据量系统去重方案",
+      "description" : "0.概述 大数据去重是一个经典的业务场景，包括统计网站登录用户的UV、网页爬虫对URL去重等，下面对其解决方案进行调研学习。\n可以将去重情景分成几个维度：\n实时还是离线 是否要求绝对精准 单进程还是分布式 下面分别介绍几种常见的去重方式\n1.方案 1.1 HashMap\u0026mdash;\u0026gt;BitMap\u0026mdash;\u0026gt;Roaring BitMap 最原始的方案就是使用HashMap，在业务代码中经常使用HashMap来保存key-value的映射关系，当要判断一个key是否已经存在时，使用map.get()获取对应的value来进行判断。\n随着数据量的增大，这种数据结构就会暴露出弊端。加入我们创建的hashMap为Intege类型，那么存储一个元素需要使用4个Btye的空间，如果我们存在2亿个元素，那么机器的内存肯定是扛不住的。及时是使用Byte类型的hashMap，2亿个元素也需要(2亿 * 1 \/ 1024 \/ 1024)M的内存空间。\n使用HashMap每次存储的value就是一个boolean类型的value，使用Byte这样的空间显的有些浪费，使用0 1就可以解决，在计算机世界里面，最小的表示0 1的存储单元是bit，1 byte = 8 bit，这样我们就可以把存储空间进行压缩。\nBitMap的最大占用空间由元素中最大的数值决定，如果待判断元素分布的极为不均匀，例如[1,1000000]，那么BitMap也需要开辟出1000000这样大的存储空间，有点浪费。虽然bit已经是可以使用的最小单位了，但还是可以采用压缩算法，及Roaring BitMap(压缩位图)，相比于BitMap，这种结构在性能和空间利用率上有了显著的提升。\n压缩位图的主要流程：\n我们将 32-bit 的范围 ([0, n)) 划分为 2^16 个桶，每一个桶有一个 Container 来存放一个数值的低16位； 在存储和查询数值的时候，我们将一个数值 k 划分为高 16 位(k % 2^16)和低 16 位(k mod 2^16)，取高 16 位找到对应的桶，然后在低 16 位存放在相应的 Container 中； 容器的话， RBM 使用两种容器结构： Array Container 和 Bitmap Container。Array Container 存放稀疏的数据，Bitmap Container 存放稠密的数据。即，若一个 Container 里面的 Integer 数量小于 4096，就用 Short 类型的有序数组来存储值。若大于 4096，就用 Bitmap 来存储值。 举个例子：",
+      "inLanguage" : "en-US",
+      "author" : "",
+      "creator" : "",
+      "publisher": "",
+      "accountablePerson" : "",
+      "copyrightHolder" : "",
+      "copyrightYear" : "2023",
+      "datePublished": "2023-09-12 17:55:14 \u002b0800 CST",
+      "dateModified" : "2023-09-12 17:55:14 \u002b0800 CST",
+      "url" : "https:\/\/hanchao666.top\/posts\/big-data-deduplicate\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>大数据量系统去重方案</title>
+  <meta property="og:title" content="大数据量系统去重方案" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="0.概述 大数据去重是一个经典的业务场景，包括统计网站登录用户的UV、网页爬虫对URL去重等，下面对其解决方案进行调研学习。
+可以将去重情景分成几个维度：
+实时还是离线 是否要求绝对精准 单进程还是分布式 下面分别介绍几种常见的去重方式
+1.方案 1.1 HashMap&amp;mdash;&amp;gt;BitMap&amp;mdash;&amp;gt;Roaring BitMap 最原始的方案就是使用HashMap，在业务代码中经常使用HashMap来保存key-value的映射关系，当要判断一个key是否已经存在时，使用map.get()获取对应的value来进行判断。
+随着数据量的增大，这种数据结构就会暴露出弊端。加入我们创建的hashMap为Intege类型，那么存储一个元素需要使用4个Btye的空间，如果我们存在2亿个元素，那么机器的内存肯定是扛不住的。及时是使用Byte类型的hashMap，2亿个元素也需要(2亿 * 1 / 1024 / 1024)M的内存空间。
+使用HashMap每次存储的value就是一个boolean类型的value，使用Byte这样的空间显的有些浪费，使用0 1就可以解决，在计算机世界里面，最小的表示0 1的存储单元是bit，1 byte = 8 bit，这样我们就可以把存储空间进行压缩。
+BitMap的最大占用空间由元素中最大的数值决定，如果待判断元素分布的极为不均匀，例如[1,1000000]，那么BitMap也需要开辟出1000000这样大的存储空间，有点浪费。虽然bit已经是可以使用的最小单位了，但还是可以采用压缩算法，及Roaring BitMap(压缩位图)，相比于BitMap，这种结构在性能和空间利用率上有了显著的提升。
+压缩位图的主要流程：
+我们将 32-bit 的范围 ([0, n)) 划分为 2^16 个桶，每一个桶有一个 Container 来存放一个数值的低16位； 在存储和查询数值的时候，我们将一个数值 k 划分为高 16 位(k % 2^16)和低 16 位(k mod 2^16)，取高 16 位找到对应的桶，然后在低 16 位存放在相应的 Container 中； 容器的话， RBM 使用两种容器结构： Array Container 和 Bitmap Container。Array Container 存放稀疏的数据，Bitmap Container 存放稠密的数据。即，若一个 Container 里面的 Integer 数量小于 4096，就用 Short 类型的有序数组来存储值。若大于 4096，就用 Bitmap 来存储值。 举个例子：" />
+  <meta name="description" content="0.概述 大数据去重是一个经典的业务场景，包括统计网站登录用户的UV、网页爬虫对URL去重等，下面对其解决方案进行调研学习。
+可以将去重情景分成几个维度：
+实时还是离线 是否要求绝对精准 单进程还是分布式 下面分别介绍几种常见的去重方式
+1.方案 1.1 HashMap&amp;mdash;&amp;gt;BitMap&amp;mdash;&amp;gt;Roaring BitMap 最原始的方案就是使用HashMap，在业务代码中经常使用HashMap来保存key-value的映射关系，当要判断一个key是否已经存在时，使用map.get()获取对应的value来进行判断。
+随着数据量的增大，这种数据结构就会暴露出弊端。加入我们创建的hashMap为Intege类型，那么存储一个元素需要使用4个Btye的空间，如果我们存在2亿个元素，那么机器的内存肯定是扛不住的。及时是使用Byte类型的hashMap，2亿个元素也需要(2亿 * 1 / 1024 / 1024)M的内存空间。
+使用HashMap每次存储的value就是一个boolean类型的value，使用Byte这样的空间显的有些浪费，使用0 1就可以解决，在计算机世界里面，最小的表示0 1的存储单元是bit，1 byte = 8 bit，这样我们就可以把存储空间进行压缩。
+BitMap的最大占用空间由元素中最大的数值决定，如果待判断元素分布的极为不均匀，例如[1,1000000]，那么BitMap也需要开辟出1000000这样大的存储空间，有点浪费。虽然bit已经是可以使用的最小单位了，但还是可以采用压缩算法，及Roaring BitMap(压缩位图)，相比于BitMap，这种结构在性能和空间利用率上有了显著的提升。
+压缩位图的主要流程：
+我们将 32-bit 的范围 ([0, n)) 划分为 2^16 个桶，每一个桶有一个 Container 来存放一个数值的低16位； 在存储和查询数值的时候，我们将一个数值 k 划分为高 16 位(k % 2^16)和低 16 位(k mod 2^16)，取高 16 位找到对应的桶，然后在低 16 位存放在相应的 Container 中； 容器的话， RBM 使用两种容器结构： Array Container 和 Bitmap Container。Array Container 存放稀疏的数据，Bitmap Container 存放稠密的数据。即，若一个 Container 里面的 Integer 数量小于 4096，就用 Short 类型的有序数组来存储值。若大于 4096，就用 Bitmap 来存储值。 举个例子：" />
+  <meta property="og:locale" content="en-us" /><meta property="og:image" content="/logo.png" />
+  
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px;background-color:#f6f8fa}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Hadoo&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-53624533-8"></script><script src="https://cdn.jsdelivr.net/gh/joway/homepage/analytics.js"></script>
+</head>
+
+
+<body>
+  <article class="post " id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Hadoo&#39;s Blog</a
+    >
+  </div>
+  <div class="header-subtitle">大道至简，知行合一</div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://github.com/yeshadoo" target="_blank">About Me</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/yeshadoo" target="_blank">Github</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+   
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/cn/">Chinese</a>
+  </div>
+   
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">大数据量系统去重方案</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2023-09-12 17:55:14 CST">
+                12 Sep 2023
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <h4 id="0概述">0.概述</h4>
+<p>大数据去重是一个经典的业务场景，包括统计网站登录用户的UV、网页爬虫对URL去重等，下面对其解决方案进行调研学习。</p>
+<p>可以将去重情景分成几个维度：</p>
+<ol>
+<li>实时还是离线</li>
+<li>是否要求绝对精准</li>
+<li>单进程还是分布式</li>
+</ol>
+<p>下面分别介绍几种常见的去重方式</p>
+<h4 id="1方案">1.方案</h4>
+<h5 id="11-hashmap---bitmap---roaring-bitmap">1.1 HashMap&mdash;&gt;BitMap&mdash;&gt;Roaring BitMap</h5>
+<p>最原始的方案就是使用HashMap，在业务代码中经常使用HashMap来保存key-value的映射关系，当要判断一个key是否已经存在时，使用map.get()获取对应的value来进行判断。</p>
+<p>随着数据量的增大，这种数据结构就会暴露出弊端。加入我们创建的hashMap为Intege类型，那么存储一个元素需要使用4个Btye的空间，如果我们存在2亿个元素，那么机器的内存肯定是扛不住的。及时是使用Byte类型的hashMap，2亿个元素也需要(2亿 * 1 / 1024 / 1024)M的内存空间。</p>
+<p>使用HashMap每次存储的value就是一个boolean类型的value，使用Byte这样的空间显的有些浪费，使用0 1就可以解决，在计算机世界里面，最小的表示0 1的存储单元是bit，1 byte = 8 bit，这样我们就可以把存储空间进行压缩。</p>
+<p>BitMap的最大占用空间由元素中最大的数值决定，如果待判断元素分布的极为不均匀，例如[1,1000000]，那么BitMap也需要开辟出1000000这样大的存储空间，有点浪费。虽然bit已经是可以使用的最小单位了，但还是可以采用压缩算法，及Roaring BitMap(压缩位图)，相比于BitMap，这种结构在性能和空间利用率上有了显著的提升。</p>
+<p>压缩位图的主要流程：</p>
+<ol>
+<li>我们将 32-bit 的范围 ([0, n)) 划分为 2^16 个桶，每一个桶有一个 Container 来存放一个数值的低16位；</li>
+<li>在存储和查询数值的时候，我们将一个数值 k 划分为高 16 位<code>(k % 2^16)</code>和低 16 位<code>(k mod 2^16)</code>，取高 16 位找到对应的桶，然后在低 16 位存放在相应的 Container 中；</li>
+<li>容器的话， RBM 使用两种容器结构： Array Container 和 Bitmap Container。Array Container 存放稀疏的数据，Bitmap Container 存放稠密的数据。即，若一个 Container 里面的 Integer 数量小于 4096，就用 Short 类型的有序数组来存储值。若大于 4096，就用 Bitmap 来存储值。</li>
+</ol>
+<p>举个例子：</p>
+<ol>
+<li>821697800 对应的 16 进制数为 30FA1D08， 其中高 16 位为 30FA， 低16位为 1D08。</li>
+<li>我们先用二分查找从一级索引（即 Container Array）中找到数值为 30FA 的容器（如果该容器不存在，则新建一个），从图中我们可以看到，该容器是一个 Bitmap 容器。</li>
+<li>找到了相应的容器后，看一下低 16 位的数值 1D08，它相当于是 7432，因此在 Bitmap 中找到相应的位置，将其置为 1 即可。</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230912175732970.png" alt="image-20230912175732970"></p>
+<h5 id="12-布隆过滤器">1.2 布隆过滤器</h5>
+<p>布隆过滤器仍然是使用位示图的方式来存储，不同的是，BitMap是直接对元素进行hash定位，而布隆过滤器会在给定的空间内，使用一系列的哈希函数，来进行元素的判断，和BitMap相比节省了一定的存储空间，但是也牺牲了一定的准确率。</p>
+<p>下面使用一个具体的流程来解释布隆过滤器的工作原理：</p>
+<ol>
+<li>初始化：将位数组全部初始化为0</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230912175625901.png" alt="image-20230912175625901"></p>
+<ol start="2">
+<li>
+<p>添加元素</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230912175751201.png" alt="image-20230912175751201"></p>
+</li>
+</ol>
+<p>假如说我们要添加的元素是 <code>wmyskxz</code>，使用3个hash函数来分别获取对应的索引值，分别为1、3、5，并将其对应索引位置设置为1。</p>
+<ol start="3">
+<li>判断元素是否存在</li>
+</ol>
+<p>当我们要判断一个元素是否存在时，需要使用同样的3个hash函数算出索引值，只要这三个索引值有一个为0，那就说明这个元素是一定不存在的；如果三个索引值全部为0，那么说明这个元素是极有可能存在的。为什么不是一定存在，而是极有可能呢？这就是上面说的，布隆过滤器使用多次哈希的方式降低了空间占用率，但是这个过程也牺牲了一定的准确率，极有可能存在，这就是布隆过滤器假阳性的特点。如下图所示，当我们判断一个inexisteng-key是是否存在时，如果其哈希索引值1、3、5全部存在，那么就会出现误判的情况。</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230912175807703.png" alt="image-20230912175807703"></p>
+<p>布隆过滤器具体在代码中如何使用呢？</p>
+<p>可以使用位运算来进行位数组的操作，实现起来不是很方便，可以使用目前的开源实现，redis和Google Guava都已经做了封装，对于这种成熟并被广泛使用的开源项目，我们就不需要重复造轮子啦。二者相比redis可以是分布式实现，而guava只能是单机版本，为了避免黑盒调用，下面以guava为例，进行一下具体使用。</p>
+<ul>
+<li>导入依赖</li>
+</ul>
+<pre tabindex="0"><code>&lt;dependency&gt;
+    &lt;groupId&gt;com.google.guava&lt;/groupId&gt;
+    &lt;artifactId&gt;guava&lt;/artifactId&gt;
+    &lt;version&gt;28.0-jre&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre><ul>
+<li>代码</li>
+</ul>
+<pre tabindex="0"><code>// 创建布隆过滤器对象
+BloomFilter&lt;Integer&gt; filter = BloomFilter.create(
+        Funnels.integerFunnel(),
+        1500,
+        0.01);
+// 判断指定元素是否存在
+System.out.println(filter.mightContain(1));
+System.out.println(filter.mightContain(2));
+// 将元素添加进布隆过滤器
+filter.put(1);
+filter.put(2);
+System.out.println(filter.mightContain(1));
+System.out.println(filter.mightContain(2));
+</code></pre><p>在BloomFilter.create中，1500表示预计要插入的元素数量，0.01表示容错率。预计元素数量就是初始化一个位数字，当要插入的实际数量大于这个值时，误判率就会增加，另外，随着插入元素的增多，误判率也会随之增加。要求的容错率越精确，那么需要占用的空间也会越大。</p>
+<p>如果同一个布隆过滤器一直被使用，当位数组的所有元素几乎全部为1时，可能会出现误判率极高的情况。这时我们就需要进行扩容操作，迁移不太可能，因为插入元素的过程是不可逆的，我们无法根据位数组来反推出初始元素，所以一个可行的办法就是水平扩容，增加一个同等配置的位数组，当插入的时候，在最新的位数组中插入，当查找时，可以抽出一个查询接口，在多个布隆过滤器中进行遍历查询。这种情况看起来更适合写多读少的情况，如果业务场景是写少读多，那么也可以在多个布隆过滤器中同时插入相同元素，查询的时候只需要遍历一个位数组即可，根据场景进行一个trade-off嘛~</p>
+<h5 id="13-hllhyper-log-logredis--es实现">1.3 HLL(Hyper Log Log)【redis | es实现】</h5>
+<p>在数据量较大且支持一定容错率的情景下，使用HLL也会一个极佳的选择。HLL能够以极少的内存来统计巨量的数据，在 <code>Redis</code> 中实现的 <code>HyperLogLog</code>，只需要 <code>12K</code>内存就能统计 <code>2^64</code>个数据标准误差仅为 0.81% 。下面来看一下HLL算法是如何做到的。</p>
+<p>理解这个算法需要一些数学知识：伯努利试验：硬币拥有正反两面，一次上抛至落下，最终出现正反面的概率都是50%。假设一直抛硬币，直到它出现正面为止，我们记录为一次完整的试验，间中可能抛了一次就出现了正面，也可能抛了4次才出现正面。无论抛了多少次，只要出现了正面，就记录为一次试验。这个试验就是 <code>伯努利试验</code>。</p>
+<p>那么对于多次的 <code>伯努利试验</code>，假设这个多次为 <code>n</code>次。就意味着出现了 <code>n</code>次的正面。假设每次 <code>伯努利试验</code>所经历了的抛掷次数为 <code>k</code>。第一次 <code>伯努利试验</code>，次数设为 <code>k1</code>，以此类推，第 <code>n</code>次对应的是 <code>kn</code>。</p>
+<p>其中，对于这 <code>n</code>次 <code>伯努利试验</code>中，必然会有一个最大的抛掷次数 <code>k</code>，例如抛了12次才出现正面，那么称这个为 <code>k_max</code>，代表抛了最多的次数。</p>
+<p><code>伯努利试验</code>容易得出有以下结论：</p>
+<ol>
+<li>n 次伯努利过程的投掷次数都不大于 k_max。</li>
+<li>n 次伯努利过程，至少有一次投掷次数等于 k_max</li>
+</ol>
+<p>最终结合极大似然估算的方法，发现在 <code>n</code>和 <code>k_max</code>中存在估算关联：<code>n = 2^(k_max)</code> 。</p>
+<p>当数据量越大时，这个公式就越真实，为了提高准确性，HLL使用了计算调和平均值的方式(分桶平均)来得出最终的结果。</p>
+<p>下面来看伯努利试验是如何在去重场景中进行使用的。</p>
+<ul>
+<li>通过<code>hash</code>函数，将数据转为<code>比特串</code>，例如输入5，便转为：101。为什么要这样转化呢？</li>
+</ul>
+<p>是因为要和抛硬币对应上，<code>比特串</code>中，0 代表了反面，1 代表了正面，如果一个数据最终被转化了 <code>10010000</code>，那么从右往左，从低位往高位看，我们可以认为，首次出现 1 的时候，就是正面。</p>
+<p>那么基于上面的估算结论，我们可以通过多次抛硬币实验的最大抛到正面的次数来预估总共进行了多少次实验，同样也就可以根据存入数据中，转化后的出现了 1 的最大的位置 k_max 来估算存入了多少数据。</p>
+<ul>
+<li>分桶就是分多少轮。抽象到计算机存储中去，就是存储的是一个以单位是比特(bit)，长度为 L 的大数组 S ，将 S 平均分为 m 组，注意这个 m 组，就是对应多少轮，然后每组所占有的比特个数是平均的，设为 P。容易得出下面的关系：</li>
+</ul>
+<pre tabindex="0"><code>L = S.length
+</code></pre><pre tabindex="0"><code>L = m * p
+</code></pre><pre tabindex="0"><code>以 K 为单位，S 占用的内存 = L / 8 / 1024
+</code></pre><p>在 <code>Redis</code> 中，<code>HyperLogLog</code>设置为：m=16834，p=6，L=16834 * 6。占用内存为=16834 * 6 / 8 / 1024 = 12K</p>
+<p>形象化为：</p>
+<pre tabindex="0"><code class="language-log" data-lang="log">  第0组     第1组                       .... 第16833组
+[000 000] [000 000] [000 000] [000 000] .... [000 000]
+</code></pre><ul>
+<li>现在回到我们的原始APP页面统计用户的问题中去。</li>
+</ul>
+<p>设 APP 主页的 key 为： main</p>
+<p>用户 id 为：idn , n-&gt;0,1,2,3&hellip;.</p>
+<p>在这个统计问题中，不同的用户 id 标识了一个用户，那么我们可以把用户的 id 作为被 <code>hash</code>的输入。即：</p>
+<blockquote>
+<p>hash(id) = 比特串</p>
+</blockquote>
+<p>不同的用户 id，必然拥有不同的 <code>比特串</code>。每一个 <code>比特串</code>，也必然会至少出现一次 1 的位置。我们类比每一个 <code>比特串</code>为一次 <code>伯努利试验</code>。</p>
+<p>现在要 <code>分轮</code>，也就是 <code>分桶</code>。所以我们可以设定，每个 <code>比特串</code>的前多少位转为10进制后，其值就对应于所在桶的标号。假设 <code>比特串</code>的低两位用来计算桶下标志，此时有一个用户的id的 <code>比特串</code>是：1001011000011。它的所在桶下标为：<code>11(2) = 1*2^1 + 1*2^0 = 3</code>，处于第3个桶，即第3轮中。</p>
+<p>上面例子中，计算出桶号后，剩下的 <code>比特串</code>是：10010110000，从低位到高位看，第一次出现 1 的位置是 5 。也就是说，此时第3个桶，第3轮的试验中，<code>k_max = 5</code>。5 对应的二进制是：101，又因为每个桶有 p 个比特位。当 p&gt;=3 时，便可以将 101 存进去。</p>
+<p>模仿上面的流程，多个不同的用户 id，就被分散到不同的桶中去了，且每个桶有其 k_max。然后当要统计出 数据的去重值时，就是一次估算。最终结合所有桶中的 k_max，代入估算公式，便能得出估算值。</p>
+<p>在redis中，pfadd、pfcount方法已经对其实现。ES中的cardinary聚合函数也是HLL算法的实现。</p>
+<h5 id="14-mapreduce">1.4 MapReduce</h5>
+<p>除了单机解决方式以外，采用分治思想也是解决大数据问题的一大利器。可以在分布式集群中运行Map Reduce任务，来分块的进行数据统计，或者最终的去重解决也是一个选择。但是其中shuffle过程需要对中间结果进行二次处理，可能会产生大量的IO，另外分布式集群对于硬件资源的占用也比较高，所以看起来是一个下策。</p>
+<h4 id="2总结">2.总结</h4>
+<p>上面介绍了大数据去重的几种思路。除了直接对数据进行去重处理以外，如果业务允许，在数据源头做一个唯一性判断，或者如果检测到重复数据，在之前的基础上进行覆盖追加处理，来保证存储的数据全部是非重复的，也是一个选择。</p>
+<blockquote>
+<p>参考文章：</p>
+<p><a href="https://www.wmyskxz.com/2020/03/02/reids-4-shen-qi-de-hyperloglog-jie-jue-tong-ji-wen-ti/">https://www.wmyskxz.com/2020/03/02/reids-4-shen-qi-de-hyperloglog-jie-jue-tong-ji-wen-ti/</a></p>
+<p><a href="https://www.cnblogs.com/linguanh/p/10460421.html">https://www.cnblogs.com/linguanh/p/10460421.html</a></p>
+</blockquote>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              <br/><br/><p>Subscribe：<a target="_blank" href="https://mailchi.mp/a1a0d59e7a19/joway"><b>Mailchimp</b></a></p><br/><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://blog.joway.io/images/cc.png" /></a>
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+<script src="/js/lazyload.min.js"></script>
+<script>
+  var lazyImage = new LazyLoad({
+    container: document.getElementById('article')
+  });
+</script>
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

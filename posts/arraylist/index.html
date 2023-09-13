@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.118.2">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="" />
+  <meta property="og:url" content="https://hanchao666.top/posts/arraylist/" />
+  <link rel="canonical" href="https://hanchao666.top/posts/arraylist/" /><link rel="apple-touch-icon" href="/logo.png" />
+  <link rel="icon" href="/logo.png" />
+  <link rel="shortcut" href="/logo.png" /><link rel="alternate" type="application/atom+xml" href="https://hanchao666.top/index.xml" title="Hadoo&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/hanchao666.top\/"
+      },
+      "articleSection" : "posts",
+      "name" : "Java ArrayList源码解析",
+      "headline" : "Java ArrayList源码解析",
+      "description" : "1. ArrayList为什么线程不安全 public class ArrayList\u0026lt;E\u0026gt; extends AbstractList\u0026lt;E\u0026gt; implements List\u0026lt;E\u0026gt;, RandomAccess, Cloneable, java.io.Serializable { \/** * 列表元素集合数组 * 如果新建ArrayList对象时没有指定大小，那么会将DEFAULTCAPACITY_EMPTY_ELEMENTDATA赋值给elementData， * 并在第一次添加元素时，将列表容量设置为DEFAULT_CAPACITY *\/ transient Object[] elementData; \/** * 列表大小，elementData中存储的元素个数 *\/ private int size; } 通过这两个字段我们可以看出，ArrayList的实现主要就是用了一个Object的数组，用来保存所有的元素，以及一个size变量用来保存当前数组中已经添加了多少元素。\n接下来查看add方法源码：\n\/** * Appends the specified element to the end of this list. * * @param e element to be appended to this list * @return \u0026lt;tt\u0026gt;true\u0026lt;\/tt\u0026gt; (as specified by {@link Collection#add}) *\/ public boolean add(E e) { ensureCapacityInternal(size \u002b 1); \/\/ Increments modCount!",
+      "inLanguage" : "en-US",
+      "author" : "",
+      "creator" : "",
+      "publisher": "",
+      "accountablePerson" : "",
+      "copyrightHolder" : "",
+      "copyrightYear" : "2021",
+      "datePublished": "2021-07-12 17:31:14 \u002b0800 CST",
+      "dateModified" : "2021-07-12 17:31:14 \u002b0800 CST",
+      "url" : "https:\/\/hanchao666.top\/posts\/arraylist\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>Java ArrayList源码解析</title>
+  <meta property="og:title" content="Java ArrayList源码解析" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="1. ArrayList为什么线程不安全 public class ArrayList&amp;lt;E&amp;gt; extends AbstractList&amp;lt;E&amp;gt; implements List&amp;lt;E&amp;gt;, RandomAccess, Cloneable, java.io.Serializable { /** * 列表元素集合数组 * 如果新建ArrayList对象时没有指定大小，那么会将DEFAULTCAPACITY_EMPTY_ELEMENTDATA赋值给elementData， * 并在第一次添加元素时，将列表容量设置为DEFAULT_CAPACITY */ transient Object[] elementData; /** * 列表大小，elementData中存储的元素个数 */ private int size; } 通过这两个字段我们可以看出，ArrayList的实现主要就是用了一个Object的数组，用来保存所有的元素，以及一个size变量用来保存当前数组中已经添加了多少元素。
+接下来查看add方法源码：
+/** * Appends the specified element to the end of this list. * * @param e element to be appended to this list * @return &amp;lt;tt&amp;gt;true&amp;lt;/tt&amp;gt; (as specified by {@link Collection#add}) */ public boolean add(E e) { ensureCapacityInternal(size &#43; 1); // Increments modCount!" />
+  <meta name="description" content="1. ArrayList为什么线程不安全 public class ArrayList&amp;lt;E&amp;gt; extends AbstractList&amp;lt;E&amp;gt; implements List&amp;lt;E&amp;gt;, RandomAccess, Cloneable, java.io.Serializable { /** * 列表元素集合数组 * 如果新建ArrayList对象时没有指定大小，那么会将DEFAULTCAPACITY_EMPTY_ELEMENTDATA赋值给elementData， * 并在第一次添加元素时，将列表容量设置为DEFAULT_CAPACITY */ transient Object[] elementData; /** * 列表大小，elementData中存储的元素个数 */ private int size; } 通过这两个字段我们可以看出，ArrayList的实现主要就是用了一个Object的数组，用来保存所有的元素，以及一个size变量用来保存当前数组中已经添加了多少元素。
+接下来查看add方法源码：
+/** * Appends the specified element to the end of this list. * * @param e element to be appended to this list * @return &amp;lt;tt&amp;gt;true&amp;lt;/tt&amp;gt; (as specified by {@link Collection#add}) */ public boolean add(E e) { ensureCapacityInternal(size &#43; 1); // Increments modCount!" />
+  <meta property="og:locale" content="en-us" /><meta property="og:image" content="/logo.png" />
+  
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body blockquote{margin:0;padding:0 1em;color:#57606a;border-left:.25em solid #d0d7de}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px;background-color:#f6f8fa}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Hadoo&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-53624533-8"></script><script src="https://cdn.jsdelivr.net/gh/joway/homepage/analytics.js"></script>
+</head>
+
+
+<body>
+  <article class="post " id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Hadoo&#39;s Blog</a
+    >
+  </div>
+  <div class="header-subtitle">大道至简，知行合一</div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="https://github.com/yeshadoo" target="_blank">About Me</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/yeshadoo" target="_blank">Github</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+   
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/cn/">Chinese</a>
+  </div>
+   
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">Java ArrayList源码解析</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2021-07-12 17:31:14 CST">
+                12 Jul 2021
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <h2 id="1-arraylist为什么线程不安全"><strong>1. ArrayList为什么线程不安全</strong></h2>
+<pre tabindex="0"><code>public class ArrayList&lt;E&gt; extends AbstractList&lt;E&gt;
+        implements List&lt;E&gt;, RandomAccess, Cloneable, java.io.Serializable
+{
+    /**
+     * 列表元素集合数组
+     * 如果新建ArrayList对象时没有指定大小，那么会将DEFAULTCAPACITY_EMPTY_ELEMENTDATA赋值给elementData，
+     * 并在第一次添加元素时，将列表容量设置为DEFAULT_CAPACITY 
+     */
+    transient Object[] elementData; 
+
+    /**
+     * 列表大小，elementData中存储的元素个数
+     */
+    private int size;
+}
+</code></pre><p>通过这两个字段我们可以看出，ArrayList的实现主要就是用了一个Object的数组，用来保存所有的元素，以及一个size变量用来保存当前数组中已经添加了多少元素。</p>
+<p>接下来查看add方法源码：</p>
+<pre tabindex="0"><code> /**
+     * Appends the specified element to the end of this list.
+     *
+     * @param e element to be appended to this list
+     * @return &lt;tt&gt;true&lt;/tt&gt; (as specified by {@link Collection#add})
+     */
+    public boolean add(E e) {
+        ensureCapacityInternal(size + 1);  // Increments modCount!!
+        elementData[size++] = e;
+        return true;
+    }
+</code></pre><p>进行add操作时，首先要使用 <code>ensureCapacityInternal(size + 1);</code>方法来检查elementData数组的容量是否足够，如果进行size+1操作没有越界，那么将当前元素加入到数组中，否则将数组进行扩容。</p>
+<p>因为进行add操作需要进行两步：</p>
+<ol>
+<li>判断elementData数组容量是否满足需求</li>
+<li>在elementData对应位置上设置值</li>
+</ol>
+<p>所以在多线程情况下，如果不能保证原子性，那么就会出现线程安全问题，举个栗子:</p>
+<p>例子一：</p>
+<p>假设当前数组容量为5，实际已经存在4个元素，</p>
+<ul>
+<li>当前线程进行add操作时，先检查数组的容量，<code>ensureCapacityInternal(size + 1)</code>，这时size+1刚好等于数组容量，没有问题，</li>
+<li>但是这时当前线程的时间片到了，</li>
+<li>另外一个进行进来的时候，数组中实际的元素还是4个，因为上一个线程还没有进行实际的插入操作，这时这个后进来的线程执行完两步操作，数组的实际元素个数整好等于数组容量，</li>
+<li>这时时间片交还给第一个线程，再进行<code>elementData[size++] = e;</code>操作，此时size已经为5，<code>elementData[size++]</code>报出数组越界ArrayIndexOutOfBoundsException异常。</li>
+</ul>
+<hr>
+<p>例子二：</p>
+<p>除此以外，<code>elementData[size++] = e</code>操作也不具备原子性，主要由以下步骤组成：</p>
+<p>1.elementData[size] = e;</p>
+<p>2.size++</p>
+<p>前面已经提到，在进行赋值操作时，只有赋值给一个变量的是常数时才是一个原子操作，类似于上面的变量给变量赋值，和size++操作，都不具备原子性</p>
+<p>在单线程情况不会出现问题，但是在多线程情况下，由于不能保证原子性可能出现各种各样的问题，例如：</p>
+<pre tabindex="0"><code>package java1;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Solution {
+    public static void main(String[] args) throws InterruptedException {
+        final List&lt;Integer&gt; list = new ArrayList&lt;Integer&gt;();
+
+        // 线程A将0-1000添加到list
+        new Thread(new Runnable() {
+            public void run() {
+                for (int i = 0; i &lt; 1000 ; i++) {
+                    list.add(i);
+
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+
+        // 线程B将1000-2000添加到列表
+        new Thread(new Runnable() {
+            public void run() {
+                for (int i = 1000; i &lt; 2000 ; i++) {
+                    list.add(i);
+
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+
+        Thread.sleep(1000);
+
+        // 打印所有结果
+        for (int i = 0; i &lt; list.size(); i++) {
+            System.out.println(&#34;第&#34; + (i + 1) + &#34;个元素为：&#34; + list.get(i));
+        }
+    }
+}
+</code></pre><p>在最终的执行结果中，存在这样的null值：</p>
+<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230912173438478.png" alt="image-20230912173438478"></p>
+<p>结果为什么会出现null值呢？</p>
+<p>可能存在这样的执行顺序：</p>
+<p>线程1对数组的第一个元素进行赋值elementData[size] = a;这时时间片已到，切换到线程2</p>
+<p>由于两个线程的工作空间中，arrayList对象的elementData字段都是从主内存读取的，两个线程分别在工作内存中进行赋值，此时线程2也进行赋值操作，elementData[size] = b;当线程2的时间片执行结束，线程1进行size++操作，这时下标加1，然后线程2也进行size++操作这时下标加到2。线程1执行完size++操作之后，需要进行 <code>Thread.sleep(1);</code>，工作内存中的内存会写到主内存中，这时线程2读取主内存中已经被线程1修改过的size，最后的结果就是线程2中第一个元素的值把线程1的覆盖了，但是size++进行了两次，第二个元素的位置，即elementData[1] 为null。</p>
+<h2 id="2构造函数"><strong>2.构造函数</strong></h2>
+<p>在看源码之前我们先来明确几个概念，不然容易懵逼：</p>
+<ul>
+<li>initialCapacity：数组初始容量</li>
+<li>minCapacity：想要插入当前元素所必须保证的最小容量</li>
+<li>modCount：记录列表被修改的次数，每一次add，remove操作都会进行modCount++，这个成员变量主要在多线程中使用，我们知道ArrayList是线程不安全的，如果一个线程正在对列表使用迭代器进行迭代，另一个线程要是进行修改列表，就会引发安全性问题，这就用到了modCount</li>
+</ul>
+<h3 id="1-arraylistint-initialcapacity">1. ArrayList(int initialCapacity)</h3>
+<p>这个构造方法用来创建一个指定容量大小的数组</p>
+<pre tabindex="0"><code> /**
+     * Constructs an empty list with the specified initial capacity.
+     *
+     * @param  initialCapacity  the initial capacity of the list
+     * @throws IllegalArgumentException if the specified initial capacity
+     *         is negative
+     */
+    public ArrayList(int initialCapacity) {
+        if (initialCapacity &gt; 0) {
+            this.elementData = new Object[initialCapacity];
+        } else if (initialCapacity == 0) {
+            this.elementData = EMPTY_ELEMENTDATA;
+        } else {
+            throw new IllegalArgumentException(&#34;Illegal Capacity: &#34;+
+                                               initialCapacity);
+        }
+    }
+</code></pre><p>这里需要区分一下EMPTY_ELEMENTDATA和DEFAULTCAPACITY_EMPTY_ELEMENTDATA，通过上面的源码我们可以知道，当initialCapacity为0时，直接将EMPTY_ELEMENTDATA赋值给elementData，而EMPTY_ELEMENTDATA的定义是：</p>
+<pre tabindex="0"><code>  /**
+     * Shared empty array instance used for empty instances.
+     */
+    private static final Object[] EMPTY_ELEMENTDATA = {};
+</code></pre><p>这种做法我个人看来非常不好，因为没有后面calculateCapacity()方法照顾，在创建好列表之后，后面执行add()操作时候扩容次数太多了，数组复制过程开销是很大的</p>
+<p>但是DEFAULTCAPACITY_EMPTY_ELEMENTDATA可就不一样了，在下一个构造方法中讲</p>
+<h3 id="2arraylist">2.ArrayList()</h3>
+<p>用于构造一个默认初始容量为10的列表</p>
+<pre tabindex="0"><code> /**
+     * Constructs an empty list with an initial capacity of ten.
+     */
+    public ArrayList() {
+        this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
+    }
+</code></pre><p>DEFAULTCAPACITY_EMPTY_ELEMENTDATA的不同之处在于，在进行确保数组容量的 <code>ensureCapacityInternal(size + 1);</code>中，如果见到这个变量会受到“额外”的照顾：</p>
+<pre tabindex="0"><code>private static int calculateCapacity(Object[] elementData, int minCapacity) {
+        if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
+            return Math.max(DEFAULT_CAPACITY, minCapacity);
+        }
+        return minCapacity;
+    }
+</code></pre><p>在这个 calculateCapacity方法中，如果发现elementData这个引用变量和DEFAULTCAPACITY_EMPTY_ELEMENTDATA指向的是同一数组，也就是同一块内存区域，那么在下面进行特殊照顾，直接返回 <code>Math.max(DEFAULT_CAPACITY, minCapacity);</code></p>
+<p>那么我们再进行深一步的思考，什么情况下，DEFAULT_CAPACITY比较大，什么情况下minCapacity比较大呢？</p>
+<ul>
+<li>DEFAULT_CAPACITY较大：首先创建好列表之后，如果使用add()方法进行第一次增加元素，那么这时候minCapicity = size + 1；size为0,那么minCapacity为1，此时一定DEFAULT_CAPACITY比较大</li>
+<li>minCapicity比较大：但是当使用了addAll()方法时，</li>
+</ul>
+<pre tabindex="0"><code>public boolean addAll(Collection&lt;? extends E&gt; c) {
+        Object[] a = c.toArray();
+        int numNew = a.length;
+        ensureCapacityInternal(size + numNew);  // Increments modCount
+        System.arraycopy(a, 0, elementData, size, numNew);
+        size += numNew;
+        return numNew != 0;
+    }
+</code></pre><p>minCapicity = size + numNew，此时如果nunmNew比较大，就会出现minCapicity更大的情况</p>
+<ul>
+<li>注意上面的比较情况肯定只会出现一次：当默认初始容量为10的列表创建好之后，进行第一次插入的情况，如果再出现插入的情况，那么calculateCapacity会直接返回minCapacity，因为此时这个列表经过<code>grow(int minCapacity)</code>方法之后，就已经不再是“应届生”，不会再进行上面那个所谓的Math.MAX比较了，所以这样来看，calculateCapacity方法只是起到了一个筛选“应届生”的作用</li>
+</ul>
+<h3 id="3arraylistcollection-extends-e-c"><strong>3.ArrayList(Collection&lt;? extends E&gt; c)</strong></h3>
+<pre tabindex="0"><code> /**
+     * Constructs a list containing the elements of the specified
+     * collection, in the order they are returned by the collection&#39;s
+     * iterator.
+     *
+     * @param c the collection whose elements are to be placed into this list
+     * @throws NullPointerException if the specified collection is null
+     */
+    public ArrayList(Collection&lt;? extends E&gt; c) {
+        elementData = c.toArray();
+        if ((size = elementData.length) != 0) {
+            // c.toArray might (incorrectly) not return Object[] (see 6260652)
+            if (elementData.getClass() != Object[].class)
+                elementData = Arrays.copyOf(elementData, size, Object[].class);
+        } else {
+            // replace with empty array.
+            this.elementData = EMPTY_ELEMENTDATA;
+        }
+    }
+</code></pre><h2 id="3细节与总结"><strong>3.细节与总结</strong></h2>
+<h3 id="1elementdata的去序列化">1.elementData的去序列化</h3>
+<p>首先我们来看elementData数组的定义：</p>
+<pre tabindex="0"><code>/**
+     * The array buffer into which the elements of the ArrayList are stored.
+     * The capacity of the ArrayList is the length of this array buffer. Any
+     * empty ArrayList with elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA
+     * will be expanded to DEFAULT_CAPACITY when the first element is added.
+     */
+    transient Object[] elementData; // non-private to simplify nested class access
+</code></pre><p>为什么要加transient关键字呢？</p>
+<p>我们知道transient这个关键字是去序列化的，那么这个对象数组中存储的不正是有意义的数据，为啥要去序列化呢？很好理解，因为数组中容量通常是不小于数组实际元素的，如果要是对整个数组进行序列化，那么后面空闲容量中没有意义的数据也就被序列化了，这些是不应该被存储的，所以ArrayList类实现了Serializable接口，实现了writeObject方法进行序列化，这样就可以只序列化有用的数据</p>
+<pre tabindex="0"><code>private void writeObject(java.io.ObjectOutputStream s)
+        throws java.io.IOException{
+        // Write out element count, and any hidden stuff
+        int expectedModCount = modCount;
+        s.defaultWriteObject();
+
+        // Write out size as capacity for behavioural compatibility with clone()
+        s.writeInt(size);
+
+        // Write out all elements in the proper order.
+        for (int i=0; i&lt;size; i++) {
+            s.writeObject(elementData[i]);
+        }
+
+        if (modCount != expectedModCount) {
+            throw new ConcurrentModificationException();
+        }
+    }
+</code></pre><hr>
+<h3 id="2列表进行扩容的过程">2.列表进行扩容的过程</h3>
+<p>我们以创建一个默认容量大小为10的列表并进行add()操作为例，来看一下列表扩容的过程</p>
+<ul>
+<li>调用ArrayList()构造方法，将elementData赋值为DEFAULTCAPACITY_EMPTY_ELEMENTDATA</li>
+<li>创建列表实例，调用add()方法</li>
+<li>调用ensureCapacityInternal(size + 1);方法对容量进行确认</li>
+<li>
+<pre tabindex="0"><code>ensureExplicitCapacity(calculateCapacity(elementData, minCapacity));
+</code></pre></li>
+</ul>
+<p>其中calculateCapacity用于特殊处理</p>
+<ul>
+<li>
+<pre tabindex="0"><code>private void ensureExplicitCapacity(int minCapacity) {
+    modCount++;
+
+    // overflow-conscious code
+    if (minCapacity - elementData.length &gt; 0)
+        grow(minCapacity);
+}
+private void grow(int minCapacity) {
+    // overflow-conscious code
+    int oldCapacity = elementData.length;
+    int newCapacity = oldCapacity + (oldCapacity &gt;&gt; 1);
+    if (newCapacity - minCapacity &lt; 0)
+        newCapacity = minCapacity;
+    if (newCapacity - MAX_ARRAY_SIZE &gt; 0)
+        newCapacity = hugeCapacity(minCapacity);
+    // minCapacity is usually close to size, so this is a win:
+    elementData = Arrays.copyOf(elementData, newCapacity);
+}
+</code></pre></li>
+</ul>
+<p>由此可知，每次扩容大小为原来的1.5倍</p>
+<p>其中hugeCapacity()方法：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">hugeCapacity</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> minCapacity<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>minCapacity <span style="color:#f92672">&lt;</span> 0<span style="color:#f92672">)</span> <span style="color:#75715e">// overflow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> OutOfMemoryError<span style="color:#f92672">();</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#f92672">(</span>minCapacity <span style="color:#f92672">&gt;</span> MAX_ARRAY_SIZE<span style="color:#f92672">)</span> <span style="color:#f92672">?</span>
+</span></span><span style="display:flex;"><span>            Integer<span style="color:#f92672">.</span><span style="color:#a6e22e">MAX_VALUE</span> <span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>            MAX_ARRAY_SIZE<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span></code></pre></div><p>检查新容量是否超出了ArrayList所定义的最大容量，若超出了，则调用hugeCapacity()来比较minCapacity和MAX_ARRAY_SIZE，如果minCapacity大于最大容量，则新容量则为ArrayList定义的最大容量，否则，新容量大小则为minCapacity。</p>
+<p>还有一点需要注意的是，容量拓展，是创建一个新的数组，然后将旧数组上的数组copy到新数组，这是一个很大的消耗，所以在我们使用ArrayList时，最好能预计数据的大小，在第一次创建时就申请够内存。</p>
+<h3 id="3jdk版本比较">3.JDK版本比较</h3>
+<p>以上源代码全部出自我的JDK1.8，1.7版本都是这样的，但是和之前的JDK1.6版本是有一些不同的，</p>
+<p>我们来看，1.6中进行扩容是这样婶的：</p>
+<pre tabindex="0"><code>/** 
+       * Increases the capacity of this &lt;tt&gt;ArrayList&lt;/tt&gt; instance, if 
+       * necessary, to ensure that it can hold at least the number of elements 
+       * specified by the minimum capacity argument. 
+       * 
+       * @param   minCapacity   the desired minimum capacity 
+       */  
+      public void ensureCapacity(int minCapacity) {  
+      modCount++;  
+      int oldCapacity = elementData.length;  
+      if (minCapacity &gt; oldCapacity) {  
+         Object oldData[] = elementData;  
+         int newCapacity = (oldCapacity * 3)/2 + 1;  
+             if (newCapacity &lt; minCapacity)  
+         newCapacity = minCapacity;  
+             // minCapacity is usually close to size, so this is a win:  
+             elementData = Arrays.copyOf(elementData, newCapacity);  
+     }  
+     }  
+</code></pre><p>从代码上，我们可以看出区别：</p>
+<p>第一：在容量进行扩展的时候，1.6采用将容量乘1.5倍并加1，而jdk1.7是利用位运算，从效率上，jdk1.7之后的版本就要快于jdk1.6。</p>
+<p>第二：在算出newCapacity时，其没有和ArrayList所定义的MAX_ARRAY_SIZE作比较，为什么没有进行比较呢，原因是jdk1.6没有定义这个MAX_ARRAY_SIZE最大容量，也就是说，其没有最大容量限制的，但是jdk1.7之后做了一个改进，进行了容量限制。</p>
+<h3 id="4长度和容量"><strong>4.长度和容量</strong></h3>
+<p>这里需要注意区分二者之间的概念，我们所说的size()方法，是elementData数组实际存在元素的个数，从上面的add方法源码我们也可以看到，每增加一个元素，都要进行size++的操作，而size()方法是这样的：</p>
+<pre tabindex="0"><code> /**
+     * Returns the number of elements in this list.
+     *
+     * @return the number of elements in this list
+     */
+    public int size() {
+        return size;
+    }
+</code></pre><p>而容量一定是不小于size的，是我们创建数组时指定的空间大小</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              <br/><br/><p>Subscribe：<a target="_blank" href="https://mailchi.mp/a1a0d59e7a19/joway"><b>Mailchimp</b></a></p><br/><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://blog.joway.io/images/cc.png" /></a>
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+<script src="/js/lazyload.min.js"></script>
+<script>
+  var lazyImage = new LazyLoad({
+    container: document.getElementById('article')
+  });
+</script>
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>
