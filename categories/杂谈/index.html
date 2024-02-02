@@ -1,32 +1,3 @@
-<div style="position: fixed; left:5px;max-width:600px; overflow:auto; top: 100px; width: 20vw; bottom:50px">
-  <nav id="TableOfContents">
-  <ul>
-    <li>
-      <ul>
-        <li><a href="#区分">区分</a></li>
-        <li><a href="#预读机制">预读机制</a></li>
-        <li><a href="#优势">优势</a></li>
-        <li><a href="#劣势"><strong>劣势</strong></a></li>
-        <li><a href="#一致性"><strong>一致性</strong></a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-  </div>
-  <head><style type="text/css">::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  ::-webkit-scrollbar-thumb {
-    height: 40px;
-    background-color: #eee;
-    border-radius: 16px;
-    &:hover {
-      background-color: #ddd;
-    }
-  }
-  </style></head>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,8 +7,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="" />
-  <meta property="og:url" content="https://hanchao666.top/posts/page-cache-and-buffer-cache/" />
-  <link rel="canonical" href="https://hanchao666.top/posts/page-cache-and-buffer-cache/" /><link rel="apple-touch-icon" href="/logo.png" />
+  <meta property="og:url" content="https://hanchao666.top/categories/%E6%9D%82%E8%B0%88/" />
+  <link rel="canonical" href="https://hanchao666.top/categories/%E6%9D%82%E8%B0%88/" /><link rel="apple-touch-icon" href="/logo.png" />
   <link rel="icon" href="/logo.png" />
   <link rel="shortcut" href="/logo.png" /><link rel="alternate" type="application/atom+xml" href="https://hanchao666.top/index.xml" title="Hadoo&#39;s Blog">
 
@@ -49,10 +20,10 @@
            "@type": "WebPage",
            "@id": "https:\/\/hanchao666.top\/"
       },
-      "articleSection" : "posts",
-      "name" : "Page Cache and Buffer Cache",
-      "headline" : "Page Cache and Buffer Cache",
-      "description" : "区分 先上一个Linux的文件I\/O系统图， 上图红色部分就是page cache，由此可见其存在于os kernel的内存区域。内存管理分配的基本单位是page，page cache由多个页组成，对应于磁盘上的若干数据块。\nLinux上的页供用户访问的页有两种：\nFile-backed pages：文件备份页ME1693830146631.png也就是page cache中的page Anonymous pages：匿名页是进程运行的内存空间，包括方法栈、局部变量表等 在终端执行free命令，\n其中cached列表示的就是page cache的占用量，而buffers列表示当前的buffer cache占用量。\n二者的区别用一句话解释就是：page cache用于缓存文件的页数据，buffer cache用于缓存块设备(如磁盘)的块数据。\n页是逻辑上的概念，因此page cache是与文件系统同级的； 块是物理上的概念，因此buffer cache是与块设备驱动程序同级的。 在Linux 2.4版本的内核之前，二者是完全分离的。但块设备大多是磁盘，磁盘上的数据大多又通过文件系统来组织，这样导致数据被缓存的两次，\n在Linux 2.4版本内核之后，两块缓存近似融合到了一起：如果一个文件的页加载到了page cache，那么buffer cache只需要维护块指向页的指针就可以了。只有那些没有文件表示的块，或者绕过了文件系统直接操作（如dd命令）的块，才会真正放到buffer cache里。\n因此，现在提起page cache，基本就是同时指的是两者。\n预读机制 操作系统为基于page cache的读缓存机制提供了预读机制，例如，\n用户线程仅仅请求读取磁盘上文件 A 的 offset 为 0-3KB 范围内的数据，由于磁盘的基本读写单位为 block（4KB），于是操作系统至少会读 0-4KB 的内容，这恰好可以在一个 page 中装下。 但是操作系统出于局部性原理会选择将磁盘块 offset [4KB,8KB)、[8KB,12KB) 以及 [12KB,16KB) 都加载到内存，于是额外在内存中申请了 3 个 page； ME1693830198441.png\n上图中，应用程序利用 read 系统调动读取 4KB 数据，实际上内核使用 readahead 机制完成了 16KB 数据的读取。\n优势 page cache能够加速数据访问，如果能够命中缓存，就可以缩短直接访问磁盘的gap，\n同时基于操作系统为page cache提供的预读机制，基于程序的局部性原理，可以减少磁盘加载缓存次数，进而提高吞吐量。",
+      "articleSection" : "categories",
+      "name" : "杂谈",
+      "headline" : "杂谈",
+      "description" : "",
       "inLanguage" : "en-US",
       "author" : "",
       "creator" : "",
@@ -60,41 +31,17 @@
       "accountablePerson" : "",
       "copyrightHolder" : "",
       "copyrightYear" : "2023",
-      "datePublished": "2023-07-28 14:23:32 \u002b0800 CST",
-      "dateModified" : "2023-07-28 14:23:32 \u002b0800 CST",
-      "url" : "https:\/\/hanchao666.top\/posts\/page-cache-and-buffer-cache\/",
+      "datePublished": "2023-10-24 16:05:54 \u002b0800 CST",
+      "dateModified" : "2023-10-24 16:05:54 \u002b0800 CST",
+      "url" : "https:\/\/hanchao666.top\/categories\/%E6%9D%82%E8%B0%88\/",
       "keywords" : [  ]
   }
 </script>
-<title>Page Cache and Buffer Cache</title>
-  <meta property="og:title" content="Page Cache and Buffer Cache" />
+<title>杂谈</title>
+  <meta property="og:title" content="杂谈" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="区分 先上一个Linux的文件I/O系统图， 上图红色部分就是page cache，由此可见其存在于os kernel的内存区域。内存管理分配的基本单位是page，page cache由多个页组成，对应于磁盘上的若干数据块。
-Linux上的页供用户访问的页有两种：
-File-backed pages：文件备份页ME1693830146631.png也就是page cache中的page Anonymous pages：匿名页是进程运行的内存空间，包括方法栈、局部变量表等 在终端执行free命令，
-其中cached列表示的就是page cache的占用量，而buffers列表示当前的buffer cache占用量。
-二者的区别用一句话解释就是：page cache用于缓存文件的页数据，buffer cache用于缓存块设备(如磁盘)的块数据。
-页是逻辑上的概念，因此page cache是与文件系统同级的； 块是物理上的概念，因此buffer cache是与块设备驱动程序同级的。 在Linux 2.4版本的内核之前，二者是完全分离的。但块设备大多是磁盘，磁盘上的数据大多又通过文件系统来组织，这样导致数据被缓存的两次，
-在Linux 2.4版本内核之后，两块缓存近似融合到了一起：如果一个文件的页加载到了page cache，那么buffer cache只需要维护块指向页的指针就可以了。只有那些没有文件表示的块，或者绕过了文件系统直接操作（如dd命令）的块，才会真正放到buffer cache里。
-因此，现在提起page cache，基本就是同时指的是两者。
-预读机制 操作系统为基于page cache的读缓存机制提供了预读机制，例如，
-用户线程仅仅请求读取磁盘上文件 A 的 offset 为 0-3KB 范围内的数据，由于磁盘的基本读写单位为 block（4KB），于是操作系统至少会读 0-4KB 的内容，这恰好可以在一个 page 中装下。 但是操作系统出于局部性原理会选择将磁盘块 offset [4KB,8KB)、[8KB,12KB) 以及 [12KB,16KB) 都加载到内存，于是额外在内存中申请了 3 个 page； ME1693830198441.png
-上图中，应用程序利用 read 系统调动读取 4KB 数据，实际上内核使用 readahead 机制完成了 16KB 数据的读取。
-优势 page cache能够加速数据访问，如果能够命中缓存，就可以缩短直接访问磁盘的gap，
-同时基于操作系统为page cache提供的预读机制，基于程序的局部性原理，可以减少磁盘加载缓存次数，进而提高吞吐量。" />
-  <meta name="description" content="区分 先上一个Linux的文件I/O系统图， 上图红色部分就是page cache，由此可见其存在于os kernel的内存区域。内存管理分配的基本单位是page，page cache由多个页组成，对应于磁盘上的若干数据块。
-Linux上的页供用户访问的页有两种：
-File-backed pages：文件备份页ME1693830146631.png也就是page cache中的page Anonymous pages：匿名页是进程运行的内存空间，包括方法栈、局部变量表等 在终端执行free命令，
-其中cached列表示的就是page cache的占用量，而buffers列表示当前的buffer cache占用量。
-二者的区别用一句话解释就是：page cache用于缓存文件的页数据，buffer cache用于缓存块设备(如磁盘)的块数据。
-页是逻辑上的概念，因此page cache是与文件系统同级的； 块是物理上的概念，因此buffer cache是与块设备驱动程序同级的。 在Linux 2.4版本的内核之前，二者是完全分离的。但块设备大多是磁盘，磁盘上的数据大多又通过文件系统来组织，这样导致数据被缓存的两次，
-在Linux 2.4版本内核之后，两块缓存近似融合到了一起：如果一个文件的页加载到了page cache，那么buffer cache只需要维护块指向页的指针就可以了。只有那些没有文件表示的块，或者绕过了文件系统直接操作（如dd命令）的块，才会真正放到buffer cache里。
-因此，现在提起page cache，基本就是同时指的是两者。
-预读机制 操作系统为基于page cache的读缓存机制提供了预读机制，例如，
-用户线程仅仅请求读取磁盘上文件 A 的 offset 为 0-3KB 范围内的数据，由于磁盘的基本读写单位为 block（4KB），于是操作系统至少会读 0-4KB 的内容，这恰好可以在一个 page 中装下。 但是操作系统出于局部性原理会选择将磁盘块 offset [4KB,8KB)、[8KB,12KB) 以及 [12KB,16KB) 都加载到内存，于是额外在内存中申请了 3 个 page； ME1693830198441.png
-上图中，应用程序利用 read 系统调动读取 4KB 数据，实际上内核使用 readahead 机制完成了 16KB 数据的读取。
-优势 page cache能够加速数据访问，如果能够命中缓存，就可以缩短直接访问磁盘的gap，
-同时基于操作系统为page cache提供的预读机制，基于程序的局部性原理，可以减少磁盘加载缓存次数，进而提高吞吐量。" />
+  <meta property="og:description" content="" />
+  <meta name="description" content="" />
   <meta property="og:locale" content="en-us" /><meta property="og:image" content="/logo.png" />
   
 
@@ -121,11 +68,10 @@ File-backed pages：文件备份页ME1693830146631.png也就是page cache中的p
 
 
 <body>
-  <article class="post " id="article">
+  <article class="posts">
     <div class="row">
       <div class="col-xs-12">
-        <div class="site-header">
-          
+        
 <header>
   <div class="header-title">
     <a href="/"
@@ -154,92 +100,29 @@ File-backed pages：文件备份页ME1693830146631.png也就是page cache中的p
 </div>
 <div class="header-line"></div>
 
-        </div>
-        <header class="post-header">
-          <h1 class="post-title">Page Cache and Buffer Cache</h1>
-          
-          <div class="row post-desc">
-            <div class="col-xs-6">
-              
-              <time class="post-date" datetime="2023-07-28 14:23:32 CST">
-                28 Jul 2023
-              </time>
-              
-            </div>
-            <div class="col-xs-6">
-              
-            </div>
-          </div>
-          
-        </header>
 
-        <div class="post-content markdown-body">
-          
-          <h3 id="区分">区分</h3>
-<p>先上一个Linux的文件I/O系统图，
-<img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230913142423309.png" alt="image-20230913142423309"></p>
-<p>上图红色部分就是page cache，由此可见其存在于os kernel的内存区域。内存管理分配的基本单位是page，page cache由多个页组成，对应于磁盘上的若干数据块。</p>
-<p>Linux上的页供用户访问的页有两种：</p>
-<ul>
-<li>File-backed pages：文件备份页ME1693830146631.png也就是page cache中的page</li>
-<li>Anonymous pages：匿名页是进程运行的内存空间，包括方法栈、局部变量表等</li>
-</ul>
-<p>在终端执行<code>free</code>命令，</p>
-<p><img src="https://raw.githubusercontent.com/yeshadoo/blog-images/master/img/image-20230913142439377.png" alt="image-20230913142439377">
-其中cached列表示的就是page cache的占用量，而buffers列表示当前的buffer cache占用量。</p>
-<p>二者的区别用一句话解释就是：<strong>page cache用于缓存文件的页数据，buffer cache用于缓存块设备(如磁盘)的块数据。</strong></p>
-<ul>
-<li>页是逻辑上的概念，因此page cache是与文件系统同级的；</li>
-<li>块是物理上的概念，因此buffer cache是与块设备驱动程序同级的。</li>
-</ul>
-<p>在Linux 2.4版本的内核之前，二者是完全分离的。但块设备大多是磁盘，磁盘上的数据大多又通过文件系统来组织，这样导致数据被缓存的两次，</p>
-<p>在Linux 2.4版本内核之后，两块缓存近似融合到了一起：如果一个文件的页加载到了page cache，那么buffer cache只需要维护块指向页的指针就可以了。只有那些没有文件表示的块，或者绕过了文件系统直接操作（如dd命令）的块，才会真正放到buffer cache里。</p>
-<p>因此，现在提起page cache，基本就是同时指的是两者。</p>
-<h3 id="预读机制">预读机制</h3>
-<p>操作系统为基于page cache的读缓存机制提供了预读机制，例如，</p>
-<ul>
-<li>用户线程仅仅请求读取磁盘上文件 A 的 offset 为 0-3KB 范围内的数据，由于磁盘的基本读写单位为 block（4KB），于是操作系统至少会读 0-4KB 的内容，这恰好可以在一个 page 中装下。</li>
-<li>但是操作系统出于局部性原理会选择将磁盘块 offset [4KB,8KB)、[8KB,12KB) 以及 [12KB,16KB) 都加载到内存，于是额外在内存中申请了 3 个 page；</li>
-</ul>
-<p>ME1693830198441.png</p>
-<p>上图中，应用程序利用 read 系统调动读取 4KB 数据，实际上内核使用 readahead 机制完成了 16KB 数据的读取。</p>
-<h3 id="优势">优势</h3>
-<p>page cache能够加速数据访问，如果能够命中缓存，就可以缩短直接访问磁盘的gap，</p>
-<p>同时基于操作系统为page cache提供的预读机制，基于程序的局部性原理，可以减少磁盘加载缓存次数，进而提高吞吐量。</p>
-<h3 id="劣势"><strong>劣势</strong></h3>
-<p>page cache最直接的劣势就是需要占用额外物理空间，但这是预料之内也是可接受的，你不能又要马儿跑又不给马儿吃草，随之而来的问题是物理内存比较紧张的时候可能会有频繁的swap操作，swap操作的根本原因是操作系统提供了虚拟内存机制，对每个进程吹嘘可独享整个内存空间，吹过的牛逼就要兜着，所以内存不够用时，会涉及到内存回收以及缺页中断等操作。</p>
-<p>另外一点是由于page cache身处kernel层，对应用层没有很好的管理API，应用层很难进行优化，所以MySQL InnoDB选择了自己实现page管理，不使用page cache，人家的page单页大小16KB。</p>
-<h3 id="一致性"><strong>一致性</strong></h3>
-<p>提到缓存，就不得不解决一致性问题，不管是后端常见的redis和mysql的数据一致性，还是mysql buffer pool和磁盘的一致性，都是这个问题。</p>
-<p>当前 Linux 下以两种方式实现文件一致性：</p>
-<ol>
-<li><strong>Write Through（写穿）</strong>：向用户层提供特定接口，应用程序可主动调用接口来保证文件一致性；</li>
-<li><strong>Write back（写回）</strong>：系统中存在定期任务（表现形式为内核线程），周期性地同步文件系统中文件脏数据块，这是默认的 Linux 一致性方案；</li>
-</ol>
+        <h1 class="taxonomy-term">杂谈</h1>
+        <div id="posts-list">
+          <section>
+            <h1 class="site-date-catalog">2023</h1>
 
-        </div>
-
-        <div class="row middle-xs">
-          <div class="col-xs-12">
             
-          </div>
-        </div>
-        
-          <div class="row">
-            <div class="col-xs-12">
-              <br/><br/><p>Subscribe：<a target="_blank" href="https://mailchi.mp/a1a0d59e7a19/hadoo"><b>Mailchimp</b></a></p><br/><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://blog.joway.io/images/cc.png" /></a>
+            <div class="row posts-line">
+              <div class="posts-date col-xs-2">
+                <time datetime="2023-10-24 16:05:54 CST">Oct 24</time>
+              </div>
+              <div class="posts-title col-xs-10">
+                <div class="row">
+                  <div class="col-xs-12">
+                    <a href="/posts/do-not-worry/">少年，别再迷茫</a>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-
+            
+          </section>
           
-
-
-
-          
-          
-          <div style="height: 50px;"></div>
-          
-        
+        </div>
 
         <div class="site-footer">
   
@@ -265,8 +148,6 @@ File-backed pages：文件备份页ME1693830146631.png也就是page cache中的p
     
   
 </script>
-
-  
 
 </body>
 
