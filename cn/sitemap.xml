@@ -14,18 +14,6 @@
                 href="https://hanchao666.top/cn/categories/"
                 />
   </url><url>
-    <loc>https://hanchao666.top/cn/</loc>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en-us"
-                href="https://hanchao666.top/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="cn"
-                href="https://hanchao666.top/cn/"
-                />
-  </url><url>
     <loc>https://hanchao666.top/cn/tags/</loc>
     <xhtml:link
                 rel="alternate"
@@ -36,6 +24,18 @@
                 rel="alternate"
                 hreflang="cn"
                 href="https://hanchao666.top/cn/tags/"
+                />
+  </url><url>
+    <loc>https://hanchao666.top/cn/</loc>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en-us"
+                href="https://hanchao666.top/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="cn"
+                href="https://hanchao666.top/cn/"
                 />
   </url>
 </urlset>

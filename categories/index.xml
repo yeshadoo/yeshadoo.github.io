@@ -1,24 +1,20 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Categories on Hadoo&#39;s Blog</title>
+    <title>Categories on 知行XYZ</title>
     <link>https://hanchao666.top/categories/</link>
-    <description>Recent content in Categories on Hadoo&#39;s Blog</description>
+    <description>Recent content in Categories on 知行XYZ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 24 Oct 2023 16:05:54 +0800</lastBuildDate><atom:link href="https://hanchao666.top/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title></title>
-      <link>https://hanchao666.top/categories/thought/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <title>杂谈</title>
+      <link>https://hanchao666.top/categories/%E6%9D%82%E8%B0%88/</link>
+      <pubDate>Tue, 24 Oct 2023 16:05:54 +0800</pubDate>
       
-      <guid>https://hanchao666.top/categories/thought/</guid>
+      <guid>https://hanchao666.top/categories/%E6%9D%82%E8%B0%88/</guid>
       <description></description>
     </item>
-    
-  </channel>
-</rss>
-m>
     
     <item>
       <title>Design</title>
