@@ -18,3 +18,4 @@ draft: false
 
 ![一张有趣的图片](https://octodex.github.com/images/hugo-octocat.png)
 
+hahahaha
