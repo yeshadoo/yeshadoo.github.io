@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Blogs on 知行XYZ</title>
+    <link>http://localhost:1313/blog/</link>
+    <description>Recent content in Blogs on 知行XYZ</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 22 May 2024 15:30:00 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>My First Post</title>
+      <link>http://localhost:1313/blog/hello/</link>
+      <pubDate>Wed, 22 May 2024 15:30:00 +0800</pubDate>
+      <guid>http://localhost:1313/blog/hello/</guid>
+      <description>&lt;h2 id=&#34;欢迎来到我的新博客&#34;&gt;欢迎来到我的新博客&lt;/h2&gt;&#xA;&lt;p&gt;经过一番折腾，我终于搭建好了自己的博客！这里记录了整个过程的关键步骤。&lt;/p&gt;&#xA;&lt;h3 id=&#34;为什么选择-hugo&#34;&gt;为什么选择 Hugo？&lt;/h3&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;速度快&lt;/strong&gt;：生成静态网站的速度无与伦比。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;安全&lt;/strong&gt;：纯静态文件，没有数据库，几乎没有攻击面。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;免费托管&lt;/strong&gt;：可以完美部署在 GitHub Pages 上。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;接下来，我会在这里分享更多的技术学习笔记和生活感悟。&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://octodex.github.com/images/hugo-octocat.png&#34; alt=&#34;一张有趣的图片&#34;&gt;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

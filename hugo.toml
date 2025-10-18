@@ -1,0 +1,49 @@
+# 网站的基础配置
+baseURL = "https://yeshadoo.github.io/"
+languageCode = "zh-cn"
+title = "知行XYZ"
+theme = "yinyang"
+
+
+[author]
+  name = "知行XYZ"
+  homepage = "https://github.com/yeshadoo"
+
+# Hugo 的 Markdown 渲染器配置，让 HTML 内容可以被渲染
+[markup]
+  [markup.goldmark.renderer]
+    unsafe = true # 允许在 Markdown 中使用原始 HTML
+
+# 主题的核心参数
+[params]
+  # 用于浏览器标签页的标题，如果不设置，会使用 author.name
+  headTitle = "Yeshadoo"
+
+  # 告诉主题你的文章主要放在哪个文件夹，这里我们保持 "posts" 不变
+  mainSections = ["posts"]
+
+  # 在每篇文章底部显示的内容，你可以留空或添加你的信息
+  # 例如，你可以放一个版权声明或者一个 "关注我" 的链接
+  postFooterContent = "---<br/>做正确的事情，把事情做对！"
+  
+  # 页脚的社交链接
+  # 注意：这个主题把导航菜单放在了页脚
+  [[params.socials]]
+    name = "主页"
+    link = "/"
+  
+  [[params.socials]]
+    name = "归档"
+    link = "/archives" # yinyang 主题可能没有内置归档页，需要自己创建或查找方案
+
+  [[params.socials]]
+    name = "标签"
+    link = "/tags"
+
+  [[params.socials]]
+    name = "关于"
+    link = "/about" # 你需要创建一个 content/about.md 文件
+
+  [[params.socials]]
+    name = "GitHub" # 这里配置你的GitHub链接
+    link = "https://github.com/yeshadoo"
