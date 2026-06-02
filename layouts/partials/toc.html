@@ -1,0 +1,180 @@
+{{ $tocEnabled := default true (.Param "toc") }}
+{{ if and $tocEnabled (gt (len (string .TableOfContents)) 100) }}
+<aside id="post-toc" aria-label="目录">
+  <div class="toc-title">目录</div>
+  <div class="toc-body">{{ .TableOfContents }}</div>
+</aside>
+
+<button id="toc-toggle" aria-label="切换目录" title="目录">≡</button>
+
+<style>
+  #post-toc {
+    position: fixed;
+    top: 80px;
+    right: 24px;
+    width: 240px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    padding: 12px 14px;
+    font-size: 0.82em;
+    line-height: 1.55;
+    border-left: 2px solid #eee;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(4px);
+    z-index: 50;
+  }
+
+  #post-toc .toc-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.95em;
+    letter-spacing: 0.5px;
+    color: #333;
+  }
+
+  #post-toc nav#TableOfContents > ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+
+  #post-toc ul ul {
+    list-style: none;
+    padding-left: 12px;
+    margin: 2px 0;
+  }
+
+  #post-toc li {
+    margin: 2px 0;
+  }
+
+  #post-toc a {
+    color: #666;
+    text-decoration: none;
+    display: block;
+    padding: 2px 4px;
+    border-left: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #post-toc a:hover {
+    color: #000;
+  }
+
+  #post-toc a.toc-active {
+    color: #000;
+    font-weight: 600;
+    border-left-color: #000;
+  }
+
+  #toc-toggle {
+    display: none;
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    z-index: 51;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* 中等屏幕：TOC 改为窄一点 */
+  @media (max-width: 1400px) {
+    #post-toc { width: 200px; right: 12px; }
+  }
+
+  /* 窄屏：TOC 默认隐藏，改为通过按钮唤出 */
+  @media (max-width: 1100px) {
+    #post-toc {
+      display: none;
+      top: auto;
+      bottom: 80px;
+      right: 24px;
+      width: 280px;
+      max-height: 60vh;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+    #post-toc.toc-open { display: block; }
+    #toc-toggle { display: flex; align-items: center; justify-content: center; }
+  }
+
+  html { scroll-behavior: smooth; }
+  /* 给目标 heading 一些顶部间距，避免被遮 */
+  .post-content :is(h2, h3, h4) { scroll-margin-top: 24px; }
+</style>
+
+<script>
+(function () {
+  const toc = document.getElementById('post-toc');
+  if (!toc) return;
+  const links = toc.querySelectorAll('a[href^="#"]');
+  if (!links.length) return;
+
+  const idToLink = new Map();
+  links.forEach(a => {
+    const id = decodeURIComponent(a.getAttribute('href').slice(1));
+    if (id) idToLink.set(id, a);
+  });
+
+  const headings = Array.from(idToLink.keys())
+    .map(id => document.getElementById(id))
+    .filter(Boolean);
+
+  if (!headings.length) return;
+
+  let activeLink = null;
+  const setActive = (id) => {
+    const link = idToLink.get(id);
+    if (!link || link === activeLink) return;
+    if (activeLink) activeLink.classList.remove('toc-active');
+    link.classList.add('toc-active');
+    activeLink = link;
+    // 让 active 项保持在 TOC 可视区
+    const tocBody = toc.querySelector('.toc-body');
+    if (tocBody) {
+      const r = link.getBoundingClientRect();
+      const br = tocBody.getBoundingClientRect();
+      if (r.top < br.top || r.bottom > br.bottom) {
+        link.scrollIntoView({ block: 'nearest' });
+      }
+    }
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    // 选最靠近顶部、可见的 heading
+    const visible = entries
+      .filter(e => e.isIntersecting)
+      .sort((a, b) => a.target.getBoundingClientRect().top - b.target.getBoundingClientRect().top);
+    if (visible.length) {
+      setActive(visible[0].target.id);
+    }
+  }, {
+    rootMargin: '-10% 0px -70% 0px',
+    threshold: 0,
+  });
+
+  headings.forEach(h => observer.observe(h));
+
+  // 初始激活第一个
+  setActive(headings[0].id);
+
+  // 移动端切换按钮
+  const toggle = document.getElementById('toc-toggle');
+  if (toggle) {
+    toggle.addEventListener('click', () => toc.classList.toggle('toc-open'));
+    // 点击 TOC 链接后自动收起
+    links.forEach(a => a.addEventListener('click', () => toc.classList.remove('toc-open')));
+  }
+})();
+</script>
+{{ end }}

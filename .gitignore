@@ -1,0 +1,14 @@
+# Hugo build output (handled by GitHub Actions)
+public/
+
+# Hugo cache & build artifacts
+resources/
+.hugo_build.lock
+
+# macOS
+.DS_Store
+
+# Editor
+.idea/
+.vscode/
+*.swp
