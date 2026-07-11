@@ -23,6 +23,9 @@ theme = "yinyang"
   # 用于浏览器标签页的标题，如果不设置，会使用 author.name
   headTitle = "Yeshadoo"
 
+  # 浏览器标签页图标
+  favicon = "/img/taiji-favicon.svg"
+
   # 告诉主题你的文章主要放在哪个文件夹，这里我们保持 "posts" 不变
   mainSections = ["posts"]
 
